@@ -1,0 +1,26 @@
+# Publica la carpeta public/ en aeshilfrix.neocities.org cada vez que cambia en la rama main
+# (cuando publicas desde el panel, o cuando un cambio de diseño ya está aprobado).
+name: Publicar en Neocities
+
+on:
+  push:
+    branches: [main]
+    paths: ['public/**']
+  workflow_dispatch:
+
+concurrency:
+  group: neocities
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Subir public/ a Neocities
+        uses: bcomnes/deploy-to-neocities@v3
+        with:
+          api_key: ${{ secrets.NEOCITIES_API_TOKEN }}
+          dist_dir: public
+          # No borra en Neocities lo que no esté en el repositorio (por ejemplo imágenes subidas a mano)
+          cleanup: false

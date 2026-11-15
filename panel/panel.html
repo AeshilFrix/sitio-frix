@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel - Frix</title>
+<base href="../public/">
+<link rel="stylesheet" href="estilos.css">
+<style>
+  .panel-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; background: var(--azul); color: #fff; padding: 10px 14px; margin-top: 12px; }
+  .panel-cab b { font: bold 20px/1 var(--sistema); }
+  .panel-cab span { font-size: 11px; color: #d8e1f7; }
+  .panel-cab .estado { margin-left: auto; font-size: 11px; }
+  .pestanas { display: flex; flex-wrap: wrap; gap: 2px; margin: 10px 0 0; border-bottom: 1px solid var(--borde); }
+  .pestanas button { font: 12px var(--sistema); color: var(--enlace); background: var(--caja); border: 1px solid var(--borde); border-bottom: 0; padding: 6px 10px; cursor: pointer; }
+  .pestanas button[aria-selected="true"] { background: var(--azul-claro); color: var(--texto); font-weight: bold; }
+  .hoja { background: var(--caja); border: 1px solid var(--borde); border-top: 0; padding: 14px; display: grid; gap: 14px; }
+  .aviso { background: var(--post); border: 1px solid var(--borde-post); padding: 8px 10px; font-size: 12px; }
+  .aviso.error { border-color: var(--rojo); color: var(--rojo); }
+  .ayuda { color: var(--tenue); font-size: 11px; margin: 0; }
+  form.formulario { display: grid; gap: 10px; max-width: 720px; }
+  .campo { display: grid; gap: 3px; }
+  .campo label { font-weight: bold; font-size: 11px; }
+  .campo input, .campo select, .campo textarea { font: 13px/1.4 var(--sistema); color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); padding: 5px 7px; width: 100%; }
+  .campo textarea { min-height: 110px; resize: vertical; }
+  .campo textarea.grande { min-height: 260px; }
+  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn { font: 12px var(--sistema); color: #fff; background: var(--azul); border: 1px solid #1f3a7a; padding: 6px 12px; cursor: pointer; }
+  .btn.sec { color: var(--enlace); background: var(--caja); border-color: var(--borde); }
+  .btn.peligro { background: var(--rojo); border-color: var(--rojo); }
+  .items { list-style: none; margin: 0; padding: 0; border: 1px solid var(--borde); }
+  .items li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--borde); }
+  .items li:last-child { border-bottom: 0; }
+  .items .que { flex: 1; min-width: 180px; }
+  .items .que small { display: block; color: var(--tenue); }
+  .items img { width: 34px; height: 46px; object-fit: cover; border: 1px solid var(--borde); }
+  .resultados { display: grid; gap: 6px; }
+  .resultado { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--borde-post); background: var(--post); padding: 6px; }
+  .resultado .tapa { width: 46px; height: 64px; background: var(--azul-claro); overflow: hidden; }
+  .resultado .tapa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .resultado small { display: block; color: var(--tenue); }
+  textarea.salida { width: 100%; min-height: 220px; font: 11px/1.4 Consolas, "Courier New", monospace; background: var(--fondo); color: var(--texto); border: 1px solid var(--borde); padding: 8px; }
+  ol.pasos { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+  .items li.abierto { background: var(--azul-claro); }
+  details.extra { border: 1px solid var(--borde); padding: 6px 8px; }
+  details.extra .campo + .campo { margin-top: 10px; }
+  details.extra summary { cursor: pointer; font-weight: bold; font-size: 11px; color: var(--enlace); }
+  details.extra[open] summary { margin-bottom: 8px; }
+  .capitulos { display: grid; gap: 10px; }
+  #cap-estado:empty, #trad-estado:empty { display: none; }
+  .traduccion, .pub, .dentro-extra { display: grid; gap: 8px; max-width: 760px; }
+  .pub p { margin: 0; }
+  details.extra .dentro-extra { margin-top: 4px; }
+  .caps-lista .num { width: 22px; text-align: right; color: var(--tenue); font-weight: bold; }
+  .caps-lista li > input, .previa input[type="text"] { font: 13px var(--sistema); color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); padding: 4px 6px; }
+  .caps-lista li > input[type="text"] { flex: 1; min-width: 160px; }
+  .caps-lista li > small { color: var(--tenue); white-space: nowrap; }
+  .botones-cap { display: flex; flex-wrap: wrap; gap: 4px; }
+  .botones-cap .btn { padding: 4px 8px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .vista-cap { flex-basis: 100%; max-height: 320px; overflow: auto; background: var(--fondo); border: 1px solid var(--borde); padding: 10px 14px; font: 15px/1.7 Georgia, "Times New Roman", serif; }
+  .vista-cap p { margin: 0 0 .8em; }
+  .previa { display: grid; gap: 8px; border: 1px solid var(--borde-post); background: var(--post); padding: 10px; }
+  .previa .items { background: var(--caja); }
+  .previa .que input { width: 100%; margin-bottom: 3px; }
+  .previa small.inicio { font-style: italic; }
+</style>
+</head>
+<body data-pagina="panel" data-cubo="no">
+<div class="marco">
+  <div class="panel-cab"><b>Panel</b><span>Escribe y agrega cosas aquí; cuando termines, ve a Publicar.</span><span class="estado" id="estado">Sin cambios</span></div>
+  <div id="borrador" class="aviso" hidden></div>
+  <div class="pestanas" role="tablist" id="pestanas"></div>
+  <div class="hoja" id="hoja"></div>
+</div>
+<script src="datos.js"></script>
+<script src="../panel/tintero.js"></script>
+<script src="../panel/panel.js"></script>
+</body>
+</html>
