@@ -1,0 +1,26 @@
+# Publica también lo que está en main (la carpeta public/) en aeshilfrix.neocities.org.
+# Usa el secreto NEOCITIES_API_TOKEN (la clave API de Neocities, en Settings → Secrets → Actions).
+name: Publicar en Neocities
+
+on:
+  push:
+    branches: [main]
+    paths: ['public/**', '.github/workflows/neocities.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: neocities
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Subir public/ a Neocities
+        uses: bcomnes/deploy-to-neocities@v3
+        with:
+          api_key: ${{ secrets.NEOCITIES_API_TOKEN }}
+          dist_dir: public
+          # No borra en Neocities lo que no esté en el repositorio
+          cleanup: false
