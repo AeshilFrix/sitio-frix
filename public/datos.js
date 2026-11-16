@@ -48,8 +48,8 @@ window.DATOS = {
     {
       "fecha": "2026-11-15T20:04",
       "titulo": {
-        "es": "Hola hola",
-        "en": "Hi, hi."
+        "es": "ola ola",
+        "en": "Wave Wave"
       },
       "imagen": "https://images.gamebanana.com/img/ss/mods/6a8ca307c6fa9.jpg",
       "texto": {
