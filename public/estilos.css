@@ -120,8 +120,11 @@ hr { border: 0; border-top: 1px solid var(--borde-post); margin: 8px 0; }
 .post .texto p:last-child { margin-bottom: 0; }
 .verde { color: var(--verde); }
 .archivo { font-size: 11px; color: var(--tenue); }
-.post .img { float: left; width: 125px; height: 125px; margin: 4px 14px 6px 0; border: 1px solid var(--borde-post); overflow: hidden; background: repeating-linear-gradient(45deg, #0e1a1f 0 8px, #142a2f 8px 16px); }
-.post .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Miniatura como en 4chan: la imagen entera, reducida; con un clic se agranda ahi mismo */
+.post .img { float: left; margin: 4px 14px 6px 0; border: 1px solid var(--borde-post); background: repeating-linear-gradient(45deg, #0e1a1f 0 8px, #142a2f 8px 16px); cursor: zoom-in; line-height: 0; max-width: calc(100% - 14px); }
+.post .img img { display: block; max-width: 125px; max-height: 125px; width: auto; height: auto; }
+.post .img.grande { cursor: zoom-out; float: none; display: table; margin-right: 0; }
+.post .img.grande img { max-width: 100%; max-height: none; }
 .ejemplo { font-size: 10px; color: var(--rojo); border: 1px solid currentColor; padding: 0 4px; margin-left: 4px; white-space: nowrap; }
 
 /* ---------- Listas estilo MAL ---------- */
@@ -204,7 +207,8 @@ hr { border: 0; border-top: 1px solid var(--borde-post); margin: 8px 0; }
 @media (max-width: 760px) {
   .cuerpo { grid-template-columns: minmax(0, 1fr); }
   .lado { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .post .img { width: 90px; height: 90px; }
+  .post .img img { max-width: 90px; max-height: 90px; }
+  .post .img.grande img { max-width: 100%; max-height: none; }
   #cubo { width: 96px; height: 96px; }
   .musica .titulo { display: none; }
 }

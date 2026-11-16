@@ -11,11 +11,22 @@
   const t = (es, en) => es === en ? es : `<span lang="es">${es}</span><span lang="en">${en}</span>`;
   const par = o => (o && typeof o === 'object') ? [o.es || o.en || '', o.en || o.es || ''] : [String(o || ''), String(o || '')];
   const tx = o => { const [es, en] = par(o); return t(esc(es), esc(en)); };
+  // Color: "# texto #FF0000" pinta ese texto (cualquier color en hexadecimal, dentro de una linea)
+  const COLOR = /(^|\s)#\s+(.+?)\s*#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-zA-Z])/g;
   function textoHTML(s) {
     return esc(s).split(/\n\s*\n/).filter(b => b.trim()).map(b => '<p>' + b.split('\n').map(l =>
-      (l.startsWith('&gt;') ? `<span class="verde">${l}</span>` : l).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>')
+      (l.startsWith('&gt;') ? `<span class="verde">${l}</span>` : l)
+        .replace(COLOR, (m, a, txt, hex) => `${a}<span class="color" style="color:#${hex}">${txt}</span>`)
+        .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>')
     ).join('<br>') + '</p>').join('');
   }
+  // Nombre corto para "Archivo:" (los enlaces de Google y similares no tienen un nombre legible)
+  const nombreArchivo = u => {
+    let ult = String(u).split(/[?#]/)[0].split('/').pop() || '';
+    try { ult = decodeURIComponent(ult); } catch (e) {}
+    const n = /\.[a-z0-9]{2,5}$/i.test(ult) ? ult : ((/^https?:\/\/([^/]+)/i.exec(u) || [])[1] || ult || 'imagen');
+    return n.length > 40 ? n.slice(0, 37) + '…' : n;
+  };
   const textoBi = o => { const [es, en] = par(o); return es === en ? textoHTML(es) : `<div lang="es">${textoHTML(es)}</div><div lang="en">${textoHTML(en)}</div>`; };
   const DIAS = { es: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
   const dos = n => String(n).padStart(2, '0');
@@ -110,6 +121,15 @@
     guardar('idioma', l);
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (b) idioma(b.dataset.l); });
+  // Imagenes de las entradas: un clic las agranda ahi mismo (como en 4chan) y otro las achica.
+  // Con Ctrl o clic del medio se sigue abriendo en otra pestana.
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a.img'); if (!a || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const grande = a.classList.toggle('grande');
+    a.setAttribute('aria-expanded', grande);
+    if (!grande && a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: 'nearest' });
+  });
   idioma(leer('idioma', 'es') === 'en' ? 'en' : 'es');
 
   // ---------- Musica aleatoria ----------
@@ -159,7 +179,7 @@
 
   // ---------- Bloques reutilizables ----------
   function postHTML(p, tablero, op) {
-    const img = p.imagen ? `<div class="archivo">${t('Archivo:', 'File:')} ${esc(p.imagen.split('/').pop())}</div><a class="img" href="${esc(p.imagen)}"><img src="${esc(p.imagen)}" alt="" loading="lazy"></a>` : '';
+    const img = p.imagen ? `<div class="archivo">${t('Archivo:', 'File:')} <a href="${esc(p.imagen)}" target="_blank" rel="noopener">${esc(nombreArchivo(p.imagen))}</a></div><a class="img" href="${esc(p.imagen)}" aria-expanded="false" title="Clic para agrandar / Click to expand"><img src="${esc(p.imagen)}" alt="" loading="lazy"></a>` : '';
     return `<article class="post${op ? ' op' : ''}" id="${tablero}-${p.id}">${img}
       <div class="cab"><span class="asunto">${tx(p.titulo)}</span><span class="autor">${esc(P.nombre)}</span><span>${fechaTablon(p.fecha)}</span><span>No.${String(p.id).padStart(6, '0')}</span><a href="leer.html#${tablero}-${p.id}">[${t('Leer', 'Read')}]</a>${ejemplo(p)}</div>
       <div class="texto">${textoBi(p.texto)}</div></article>`;
