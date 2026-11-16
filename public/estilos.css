@@ -120,6 +120,7 @@ hr { border: 0; border-top: 1px solid var(--borde-post); margin: 8px 0; }
 .post .texto p:last-child { margin-bottom: 0; }
 .verde { color: var(--verde); }
 .archivo { font-size: 11px; color: var(--tenue); }
+.mas { margin: 10px 0 0; font-size: 12px; text-align: right; }
 /* Miniatura como en 4chan: la imagen entera, reducida; con un clic se agranda ahi mismo */
 .post .img { float: left; margin: 4px 14px 6px 0; border: 1px solid var(--borde-post); background: repeating-linear-gradient(45deg, #0e1a1f 0 8px, #142a2f 8px 16px); cursor: zoom-in; line-height: 0; max-width: calc(100% - 14px); }
 .post .img img { display: block; max-width: 125px; max-height: 125px; width: auto; height: auto; }

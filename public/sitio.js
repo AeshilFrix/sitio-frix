@@ -247,7 +247,8 @@
           </aside>
           <main class="principal">
             <section class="seccion"><h2><span class="rojo" aria-hidden="true">&#9829;</span>Blog<a href="blog.html">${t('Ver todo', 'View all')}</a></h2>
-              ${[...D.blog].sort(porFecha).slice(0, 5).map(p => postHTML(p, 'b', true)).join('') || vacio('Todavía no hay entradas.', 'No posts yet.')}</section>
+              ${[...D.blog].sort(porFecha).slice(0, 5).map(p => postHTML(p, 'b', true)).join('') || vacio('Todavía no hay entradas.', 'No posts yet.')}
+              ${D.blog.length > 5 ? `<p class="mas"><a href="blog.html">${t(`Ver las ${D.blog.length - 5} entradas anteriores en el Blog`, `See the ${D.blog.length - 5} older posts in the Blog`)} &raquo;</a></p>` : ''}</section>
           </main>
         </div>`;
       activarBanner();
