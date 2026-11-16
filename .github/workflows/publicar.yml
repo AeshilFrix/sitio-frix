@@ -1,0 +1,48 @@
+# Publica el sitio en GitHub Pages (rama gh-pages) cada vez que cambia main o diseno:
+#   /         lo que está en main   -> el sitio publicado
+#   /previa/  lo que está en diseno -> la vista previa de cambios de diseño
+name: Publicar sitio
+
+on:
+  push:
+    branches: [main, diseno]
+    paths: ['public/**', '.github/workflows/publicar.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+      - uses: actions/checkout@v4
+        with:
+          ref: diseno
+          path: diseno
+      - name: Armar el sitio y la vista previa
+        run: |
+          mkdir -p salida/previa
+          cp -r main/public/. salida/
+          cp -r diseno/public/. salida/previa/
+          cd salida/previa
+          for f in *.html; do
+            sed -i 's#<head>#<head><meta name="robots" content="noindex">#' "$f"
+            sed -i 's#</body>#<div style="position:fixed;left:8px;bottom:8px;z-index:50;font:11px Verdana,sans-serif;background:\#af0a0f;color:\#fff;padding:3px 8px">Vista previa: todavía no está publicado</div></body>#' "$f"
+          done
+          touch ../.nojekyll
+      - name: Subir a la rama gh-pages
+        run: |
+          cd salida
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "Sitio: main ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages

@@ -90,7 +90,7 @@
   if (pie) pie.innerHTML = `<footer class="pie">
       <div>[${PAGINAS.map(([href, , , es, en]) => `<a href="${href}">${t(es, en)}</a>`).join(' / ')}]</div>
       <div class="botones"><span class="b88 f">${esc((P.nombre || 'FRIX').toUpperCase())}</span><span class="b88 m">MyAnimeList</span><span class="b88 c"><b>&#9824;&#9829;&#9830;&#9827;</b></span></div>
-      <div>${t('Hecho a mano en Neocities. Se ve bien en cualquier navegador.', 'Handmade on Neocities. Looks fine in any browser.')}</div>
+      <div>${t('Hecho a mano. Se ve bien en cualquier navegador.', 'Handmade. Looks fine in any browser.')}</div>
     </footer>`;
 
   const menuBtn = $('#avatar-btn'), menu = $('#menu-perfil');

@@ -1,26 +1,26 @@
 # Sitio de Frix
 
-Mi sitio personal en Neocities: [aeshilfrix.neocities.org](https://aeshilfrix.neocities.org/).
+Mi sitio personal: [aeshilfrix.github.io/sitio-frix](https://aeshilfrix.github.io/sitio-frix/).
 Blog, diario, escritos (con capítulos desde Tintero), obras que veo y leo, y galería.
 
 ## Cómo se publica
 
-Nada se sube a mano. Todo pasa por este repositorio:
+Nada se sube a mano. Todo pasa por este repositorio y se publica solo con GitHub Pages:
 
 | Rama | Qué hay | Dónde se ve |
 |------|---------|-------------|
-| `main` | Lo publicado | [aeshilfrix.neocities.org](https://aeshilfrix.neocities.org/), se actualiza solo en ~1 minuto |
-| `diseno` | Cambios de diseño en prueba | [Vista previa](https://aeshilfrix.github.io/sitio-frix/), con una etiqueta roja abajo |
+| `main` | Lo publicado | [aeshilfrix.github.io/sitio-frix](https://aeshilfrix.github.io/sitio-frix/), se actualiza solo en ~1 minuto |
+| `diseno` | Cambios de diseño en prueba | [Vista previa](https://aeshilfrix.github.io/sitio-frix/previa/), con una etiqueta roja abajo |
 
-- **Escribir** (blog, diario, capítulos, obras…): con el panel. Al pulsar *Publicar ahora*, el panel guarda `public/datos.js` en `main` y GitHub lo sube a Neocities.
-- **Diseño**: los cambios se prueban en `diseno`. Cuando la vista previa está bien, se pasan a `main` y se publican.
+- **Escribir** (blog, diario, capítulos, obras…): con el panel. Al pulsar *Publicar ahora*, el panel guarda `public/datos.js` en `main` y el sitio se actualiza.
+- **Diseño**: los cambios se prueban en `diseno`. Cuando la vista previa está bien, se pasan a `main`.
 
 ## Carpetas
 
 ```
-public/     Lo que se publica: páginas, estilos, sitio.js, cubo.js, datos.js y galeria/
+public/     Lo que se publica: páginas, estilos, sitio.js, cubo.js, datos.js, galeria/ y musica/
 panel/      El panel para escribir. Se usa desde tu PC; no se publica
-.github/    Las tareas que publican solas (Neocities y la vista previa)
+.github/    La tarea que publica sola el sitio y la vista previa
 ```
 
 ## El panel
@@ -53,16 +53,18 @@ Traductor: el de Chrome si el navegador lo tiene; si no, [MyMemory](https://myme
 ### Obras (buscador)
 
 Anime y manga (AniList), series (TVMaze), libros y cómics (Open Library), películas, juegos y otros
-(Wikidata). Solo funciona en el panel desde tu PC: Neocities gratis bloquea esas búsquedas en el sitio.
+(Wikidata).
 
 ### Imágenes y música
 
-- **Galería:** pon la imagen en `public/galeria/` (en GitHub: *Add file → Upload files*) y en el panel
-  escribe su ruta, por ejemplo `galeria/mi-foto.png`.
-- **Música:** Neocities gratis no acepta mp3. Usa enlaces directos a audio alojado en otro sitio.
+Donde el panel pide una imagen o una canción, pulsa **Subir desde tu PC**: se sube a `public/galeria/`
+o `public/musica/` y la ruta se llena sola. También puedes pegar un enlace directo
+(`https://i.imgur.com/….png`, `https://….mp3`). Hasta 25 MB por archivo.
 
 ## Formato del texto
 
 - Una línea que empieza con `>` sale en verde.
 - Una línea en blanco empieza un párrafo nuevo.
 - Los enlaces `https://…` se vuelven clicables.
+- Color: `# aviso importante #FF0000` pinta ese texto de rojo (cualquier color en hexadecimal).
+  En el panel puedes seleccionar el texto y pulsar *Pintar lo seleccionado*.

@@ -1,4 +1,4 @@
-/* Panel del sitio: edita los datos con formularios y publica datos.js (directo en GitHub, que lo sube a Neocities). */
+/* Panel del sitio: edita los datos con formularios y publica datos.js directo en GitHub, que actualiza el sitio solo. */
 (function () {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -38,7 +38,7 @@
   const OPC_ESTADO_ESC = [['1', 'Escribiendo'], ['2', 'Terminado'], ['3', 'En pausa'], ['4', 'Abandonado'], ['5', 'Planeado']];
   const OPC_TIPO_ESC = [['novela', 'Novela'], ['relato', 'Relato'], ['mundo', 'Mundo'], ['poema', 'Poema'], ['otro', 'Otro']];
   const OPC_NOTA = [['0', 'Sin nota'], ...[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map(n => [String(n), String(n)])];
-  const AYUDA_TEXTO = 'Empieza una línea con > para que salga en verde. Deja una línea en blanco para empezar otro párrafo. Los enlaces (https://...) se vuelven clicables.';
+  const AYUDA_TEXTO = 'Empieza una línea con > para que salga en verde. Deja una línea en blanco para empezar otro párrafo. Los enlaces (https://...) se vuelven clicables. Para dar color, selecciona el texto y pulsa Pintar, o escríbelo así: # aviso importante #FF0000';
   const AYUDA_EN = 'Se traduce solo al guardar: si lo dejas vacío, o si cambias el español sin tocar esto. Si lo corriges a mano, se respeta tu versión y ya no se reemplaza.';
   const OPC_IDIOMA = [['es', 'Español'], ['en', 'English (sale con la etiqueta #English)']];
   // Otras versiones posibles de un escrito: todos los demas escritos
@@ -68,7 +68,7 @@
       campos: [['archivo', 'Imagen', 'imagen', 1, 'Pulsa «Subir desde tu PC», o pega un enlace directo a la imagen (el que termina en .png, .jpg o .gif, como los de imgur).'], ['texto.es', 'Descripción', 'text'], ['texto.en', 'Descripción en inglés (se traduce sola)', 'text']],
       resumen: i => [i.archivo, i.texto && i.texto.es], imagen: i => i.archivo },
     musica: { nombre: 'Música', lista: 'musica', nuevo: () => ({}),
-      campos: [['titulo', 'Nombre de la canción', 'text', 1], ['url', 'Enlace directo al audio (.mp3 u .ogg)', 'url', 1, 'Las cuentas gratis de Neocities no permiten subir mp3: usa un enlace directo de otro sitio, o súbelo a Neocities si tienes Supporter (entonces escribe por ejemplo musica/cancion.mp3).']],
+      campos: [['titulo', 'Nombre de la canción', 'text', 1], ['url', 'Audio: enlace directo o súbelo desde tu PC', 'audio', 1, 'Acepta .mp3, .ogg o .m4a de hasta 25 MB.']],
       resumen: i => [i.titulo, i.url] },
     enlaces: { nombre: 'Enlaces', lista: 'enlaces', nuevo: () => ({}),
       campos: [['nombre', 'Nombre', 'text', 1], ['url', 'Enlace', 'url', 1], ['detalle', 'Detalle (opcional), por ejemplo tu usuario', 'text']],
@@ -84,9 +84,10 @@
     const id = 'f-' + ruta.replace('.', '-'), v = valor == null ? '' : valor;
     let control;
     if (Array.isArray(tipo)) control = `<select id="${id}" name="${ruta}">${tipo.map(([k, n]) => `<option value="${k}"${String(v) === k ? ' selected' : ''}>${n}</option>`).join('')}</select>`;
-    else if (tipo.startsWith('textarea')) control = `<textarea id="${id}" name="${ruta}" class="${tipo.includes('grande') ? 'grande' : ''}"${req ? ' required' : ''}>${esc(v)}</textarea>`;
-    else if (tipo === 'imagen') control = `<div class="con-imagen"><input id="${id}" name="${ruta}" type="text" value="${esc(v)}"${req ? ' required' : ''} placeholder="https://i.imgur.com/… o galeria/foto.png">
-      <button class="btn sec" type="button" data-subir-img="${id}">Subir desde tu PC</button></div><p class="ayuda estado-img" id="${id}-estado" role="status"></p>`;
+    else if (tipo.startsWith('textarea')) control = `<textarea id="${id}" name="${ruta}" class="${tipo.includes('grande') ? 'grande' : ''}"${req ? ' required' : ''}>${esc(v)}</textarea>`
+      + (/\.(es|en)$/.test(ruta) ? `<div class="pintar"><input type="color" value="#ff0000" id="${id}-color" aria-label="Color"><button class="btn sec" type="button" data-pintar="${id}">Pintar lo seleccionado</button><span class="ayuda" id="${id}-pintar" role="status"></span></div>` : '');
+    else if (tipo === 'imagen' || tipo === 'audio') control = `<div class="con-imagen"><input id="${id}" name="${ruta}" type="text" value="${esc(v)}"${req ? ' required' : ''} placeholder="${tipo === 'audio' ? 'https://… .mp3 o musica/cancion.mp3' : 'https://i.imgur.com/… o galeria/foto.png'}">
+      <button class="btn sec" type="button" data-subir-img="${id}" data-tipo="${tipo}">Subir desde tu PC</button></div><p class="ayuda estado-img" id="${id}-estado" role="status"></p>`;
     else control = `<input id="${id}" name="${ruta}" type="${tipo}" value="${esc(v)}"${req ? ' required' : ''}${tipo === 'number' ? ' min="0" max="2100"' : ''}>`;
     return `<div class="campo"><label for="${id}">${etiqueta}</label>${control}${ayuda ? `<p class="ayuda">${ayuda}</p>` : ''}</div>`;
   }
@@ -358,7 +359,7 @@
           <button class="btn" type="button" data-agregar="${n}">Agregar</button></div></div>`).join('');
       } catch (err) {
         est.className = 'aviso error';
-        est.textContent = 'No se pudo buscar. Revisa tu conexión. Si abriste el panel desde tu sitio en Neocities, ábrelo desde tu PC (el archivo panel.html): las cuentas gratis de Neocities bloquean las búsquedas en otros sitios.';
+        est.textContent = 'No se pudo buscar. Revisa tu conexión e inténtalo otra vez; si sigue fallando, agrégalo a mano.';
       }
     });
     $('#b-resultados').addEventListener('click', e => {
@@ -441,8 +442,11 @@
     for (const l of String(s).split('\n')) {
       if (!l.trim()) { out.push(l); continue; }
       const m = /^(\s*>+\s*)?([\s\S]*)$/.exec(l); let r = m[1] || '';
-      for (const p of m[2].split(/(https?:\/\/\S+)/)) {
-        if (!p.trim() || /^https?:\/\//.test(p)) { r += p; continue; }
+      // Las partes impares son enlaces o marcas de color (# ... #FF0000): se copian tal cual
+      const partes = m[2].split(/(https?:\/\/\S+|(?:^|\s)#(?=\s)|#[0-9a-fA-F]{6}(?![0-9a-zA-Z])|#[0-9a-fA-F]{3}(?![0-9a-zA-Z]))/);
+      for (let k = 0; k < partes.length; k++) {
+        const p = partes[k];
+        if (k % 2 || !p.trim()) { r += p; continue; }
         const [, a, medio, b] = /^(\s*)([\s\S]*?)(\s*)$/.exec(p);
         r += a + (await traducir(medio)).trim() + b;
       }
@@ -495,11 +499,12 @@
   }
 
   // ---------- Publicar directo en el sitio (GitHub) ----------
-  // datos.js vive en el repositorio. Al cambiarlo ahi, GitHub lo sube solo a Neocities.
+  // datos.js vive en el repositorio. Al cambiarlo ahi, GitHub actualiza el sitio solo (GitHub Pages).
   const CLAVE_GH = 'panel-github', RUTA_DATOS = 'public/datos.js';
   const GH_DEF = { repo: 'AeshilFrix/sitio-frix', rama: 'main', token: '' };
   const configGH = () => { try { return Object.assign({}, GH_DEF, JSON.parse(localStorage.getItem(CLAVE_GH) || '{}')); } catch (e) { return Object.assign({}, GH_DEF); } };
   const guardarConfigGH = c => { try { localStorage.setItem(CLAVE_GH, JSON.stringify(c)); } catch (e) {} };
+  const urlSitio = c => { const [d, r] = c.repo.split('/'); const u = (d || '').toLowerCase(); return r && r.toLowerCase() === u + '.github.io' ? `https://${u}.github.io/` : `https://${u}.github.io/${r}/`; };
   const URL_CLAVE = 'https://github.com/settings/personal-access-tokens/new' + String.fromCharCode(63) +
     'name=Panel+sitio-frix&description=Publica+datos.js+desde+el+panel+del+sitio&target_name=AeshilFrix&expires_in=366&contents=write';
   const cabecerasGH = (c, crudo) => ({ Authorization: 'Bearer ' + c.token, Accept: crudo ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' });
@@ -529,49 +534,71 @@
     if (!r.ok) { const e = await r.json().catch(() => ({})); throw errorGH(r.status, e.message); }
   }
   // ---------- Subir imagenes a public/galeria/ (van directo al sitio) ----------
-  const TIPOS_IMG = /\.(png|jpe?g|gif|webp)$/i, MAX_IMG = 25 * 1024 * 1024;
+  const SUBIDAS = {
+    imagen: { carpeta: 'galeria', re: /\.(png|jpe?g|gif|webp)$/i, accept: 'image/png,image/jpeg,image/gif,image/webp', error: 'solo se pueden subir imágenes .png, .jpg, .gif o .webp', que: 'imagen' },
+    audio: { carpeta: 'musica', re: /\.(mp3|ogg|m4a)$/i, accept: 'audio/mpeg,audio/ogg,audio/mp4,.mp3,.ogg,.m4a', error: 'solo se puede subir audio .mp3, .ogg o .m4a', que: 'canción' }
+  };
+  const MAX_SUBIDA = 25 * 1024 * 1024;
   const nombreLimpio = n => {
     const m = /^(.*?)(\.[a-z0-9]+)?$/i.exec(n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase());
     return ((m[1].replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'imagen').slice(0, 60)) + ((m[2] || '.png').replace('.jpeg', '.jpg'));
   };
   const bytesABase64 = buf => { const b = new Uint8Array(buf); let t = ''; for (let i = 0; i < b.length; i += 0x8000) t += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(t); };
   const urlCrudaGH = ruta => { const c = configGH(); return `https://raw.githubusercontent.com/${c.repo}/${c.rama}/public/${ruta}`; };
-  async function subirImagen(archivo, aviso) {
-    const c = configGH();
+  async function subirArchivo(archivo, tipo, aviso) {
+    const c = configGH(), S = SUBIDAS[tipo];
     if (!c.token) throw new Error('primero conecta el panel con GitHub en la pestaña Publicar');
-    if (!TIPOS_IMG.test(archivo.name)) throw new Error('solo se pueden subir imágenes .png, .jpg, .gif o .webp');
-    if (archivo.size > MAX_IMG) throw new Error('la imagen pesa más de 25 MB');
+    if (!S.re.test(archivo.name)) throw new Error(S.error);
+    if (archivo.size > MAX_SUBIDA) throw new Error('el archivo pesa más de 25 MB');
     const h = cabecerasGH(c), base = nombreLimpio(archivo.name), punto = base.lastIndexOf('.');
     let nombre = base;
     // Si ya existe una imagen con ese nombre, se agrega -2, -3...
     for (let n = 2; ; n++) {
-      const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/galeria/${nombre}` + q + 'ref=' + encodeURIComponent(c.rama), { headers: h });
+      const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/${S.carpeta}/${nombre}` + q + 'ref=' + encodeURIComponent(c.rama), { headers: h });
       if (r.status === 404) break;
       if (!r.ok) throw errorGH(r.status);
       nombre = base.slice(0, punto) + '-' + n + base.slice(punto);
     }
     aviso(`Subiendo ${nombre}…`);
-    const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/galeria/${nombre}`, { method: 'PUT', headers: h,
-      body: JSON.stringify({ message: 'Panel: subir imagen ' + nombre, content: bytesABase64(await archivo.arrayBuffer()), branch: c.rama }) });
+    const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/${S.carpeta}/${nombre}`, { method: 'PUT', headers: h,
+      body: JSON.stringify({ message: `Panel: subir ${S.que} ${nombre}`, content: bytesABase64(await archivo.arrayBuffer()), branch: c.rama }) });
     if (!r.ok) { const e = await r.json().catch(() => ({})); throw errorGH(r.status, e.message); }
-    return 'galeria/' + nombre;
+    return S.carpeta + '/' + nombre;
   }
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-subir-img]'); if (!b) return;
     const campo = document.getElementById(b.dataset.subirImg), est = document.getElementById(b.dataset.subirImg + '-estado');
-    const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/png,image/jpeg,image/gif,image/webp'; input.hidden = true;
+    const tipo = SUBIDAS[b.dataset.tipo] ? b.dataset.tipo : 'imagen';
+    const input = document.createElement('input'); input.type = 'file'; input.accept = SUBIDAS[tipo].accept; input.hidden = true;
     document.body.appendChild(input);
     input.onchange = async () => {
       const f = input.files[0]; input.remove(); if (!f) return;
       b.disabled = true;
       try {
-        const ruta = await subirImagen(f, m => { est.textContent = m; });
+        const ruta = await subirArchivo(f, tipo, m => { est.textContent = m; });
         campo.value = ruta;
         est.innerHTML = `Subida: <b>${esc(ruta)}</b>. En tu sitio aparece en un minuto. Ahora pulsa ${campo.form && campo.form.id === 'form-perfil' ? 'Guardar perfil' : 'Agregar o Guardar'}.`;
       } catch (err) { est.textContent = 'No se pudo subir: ' + err.message + '.'; }
       b.disabled = false;
     };
     input.click();
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-pintar]'); if (!b) return;
+    const ta = document.getElementById(b.dataset.pintar), color = document.getElementById(b.dataset.pintar + '-color').value.toUpperCase();
+    const est = document.getElementById(b.dataset.pintar + '-pintar');
+    let i = ta.selectionStart, f = ta.selectionEnd, v = ta.value;
+    while (i < f && /\s/.test(v[i])) i++;
+    while (f > i && /\s/.test(v[f - 1])) f--;
+    if (i === f) { est.textContent = 'Primero selecciona el texto que quieres pintar.'; ta.focus(); return; }
+    if (v.slice(i, f).includes('\n')) { est.textContent = 'El color va dentro de una sola línea: selecciona menos texto.'; ta.focus(); return; }
+    // Si lo seleccionado ya tiene color, solo se cambia el color (no se anida)
+    const yaPintado = /^#\s+([\s\S]*?)\s*#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.exec(v.slice(i, f));
+    const antes = i > 0 && !/\s/.test(v[i - 1]) ? ' ' : '', despues = f < v.length && /[0-9a-zA-Z]/.test(v[f]) ? ' ' : '';
+    const nuevo = `${antes}# ${yaPintado ? yaPintado[1] : v.slice(i, f)} ${color}${despues}`;
+    ta.value = v.slice(0, i) + nuevo + v.slice(f);
+    ta.focus(); ta.setSelectionRange(i + nuevo.length, i + nuevo.length);
+    est.innerHTML = `Listo: ese texto sale en <span style="color:${color}">este color</span> en tu sitio.`;
   });
   // En el panel, una imagen recien subida todavia no esta en tu carpeta: se muestra desde GitHub
   document.addEventListener('error', e => {
@@ -610,7 +637,7 @@
     const ejemplos = ['blog', 'diario', 'escritos', 'obras', 'galeria'].reduce((s, k) => s + datos[k].filter(x => x.ejemplo).length, 0);
     const faltan = sinTraducir().length, c = configGH(), cambios = JSON.stringify(datos) !== original;
     h.innerHTML = `<section class="caja"><h3>Publicar en tu sitio</h3><div class="dentro pub">
-      ${c.token ? `<p>${cambios ? 'Tienes cambios sin publicar.' : 'Todo está publicado.'} Al publicar, el contenido se guarda en GitHub (<a href="https://github.com/${esc(c.repo)}" target="_blank" rel="noopener">${esc(c.repo)}</a>) y tu sitio de Neocities se actualiza solo en un minuto.${faltan ? ` Antes se traducen al inglés los ${faltan} textos que faltan.` : ''}</p>
+      ${c.token ? `<p>${cambios ? 'Tienes cambios sin publicar.' : 'Todo está publicado.'} Al publicar, el contenido se guarda en GitHub (<a href="https://github.com/${esc(c.repo)}" target="_blank" rel="noopener">${esc(c.repo)}</a>) y <a href="${urlSitio(c)}" target="_blank" rel="noopener">tu sitio</a> se actualiza solo en un minuto.${faltan ? ` Antes se traducen al inglés los ${faltan} textos que faltan.` : ''}</p>
         <div class="acciones"><button class="btn" type="button" id="publicar-gh">Publicar ahora</button>
           ${ejemplos ? `<button class="btn ${borrarPendiente === 'ej' ? 'peligro' : 'sec'}" type="button" id="sin-ejemplos">${borrarPendiente === 'ej' ? '¿Seguro? Quitar ' + ejemplos + ' ejemplos' : 'Quitar los ' + ejemplos + ' ejemplos'}</button>` : ''}
           <button class="btn sec" type="button" id="gh-olvidar">${borrarPendiente === 'gh' ? '¿Seguro? Quitar la clave de esta PC' : 'Cambiar la clave'}</button></div>`
@@ -630,7 +657,7 @@
         <div class="campo"><label for="correo-trad">Correo para el traductor (opcional; solo se guarda en este navegador, no va a tu sitio)</label><input id="correo-trad" type="email" value="${esc(correoTraductor())}" placeholder="tu@correo.com"></div>
       </div></section>
       <details class="extra"><summary>Otras formas de publicar: descargar o copiar datos.js</summary>
-        <div class="dentro-extra"><p class="ayuda">Sirve si no tienes la clave a mano: descarga datos.js y súbelo a la carpeta public/ del repositorio en GitHub (Add file → Upload files) o directo a Neocities.</p>
+        <div class="dentro-extra"><p class="ayuda">Sirve si no tienes la clave a mano: descarga datos.js y súbelo a la carpeta public/ del repositorio en GitHub (Add file → Upload files).</p>
         <div class="acciones"><button class="btn sec" type="button" id="descargar">Descargar datos.js</button><button class="btn sec" type="button" id="copiar">Copiar texto</button>
         <button class="btn sec" type="button" id="abrir">Abrir otro datos.js</button><input type="file" id="archivo" accept=".js,.json,text/javascript" hidden></div>
         <p class="ayuda" id="pub-estado">Tus cambios se guardan solos en este navegador hasta que publiques.</p>
@@ -663,7 +690,7 @@
         original = JSON.stringify(datos);
         try { localStorage.removeItem(CLAVE); } catch (e) {}
         revisarBorrador(); pintar(); marcarEstado();
-        $('#gh-estado').innerHTML = `Publicado. Tu sitio se actualiza solo en un minuto.${esc(aviso)} <a href="https://github.com/${esc(configGH().repo)}/actions" target="_blank" rel="noopener">Ver el avance</a>`;
+        $('#gh-estado').innerHTML = `Publicado. <a href="${urlSitio(configGH())}" target="_blank" rel="noopener">Tu sitio</a> se actualiza solo en un minuto.${esc(aviso)} <a href="https://github.com/${esc(configGH().repo)}/actions" target="_blank" rel="noopener">Ver el avance</a>`;
       } catch (e) { est.textContent = 'No se pudo publicar: ' + e.message + '.' + aviso; pub.disabled = false; }
     };
     const btnTrad = $('#traducir-faltan');
@@ -677,7 +704,7 @@
     if (correo) correo.onchange = () => { try { localStorage.setItem(CLAVE_CORREO, correo.value.trim()); } catch (e) {} };
     $('#descargar').onclick = () => {
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([salida()], { type: 'text/javascript' })); a.download = 'datos.js';
-      document.body.appendChild(a); a.click(); a.remove(); $('#pub-estado').textContent = 'Descargado. Ahora súbelo a la carpeta public/ de tu repositorio, o a Neocities.';
+      document.body.appendChild(a); a.click(); a.remove(); $('#pub-estado').textContent = 'Descargado. Ahora súbelo a la carpeta public/ de tu repositorio.';
     };
     $('#copiar').onclick = () => {
       const ta = $('#salida');
