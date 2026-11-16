@@ -13,6 +13,10 @@
   const D = Object.assign({ perfil: {}, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [] }, window.DATOS || {});
   const P = Object.assign({ nombre: 'Frix', avatar: '', desde: '', lema: '', presentacion: '', gustos: [] }, D.perfil);
   const PAGINA = document.body.dataset.pagina || 'inicio';
+  // Diario escondido: no sale en el menu ni en el inicio. Se abre con 5 clics seguidos al cubo
+  // (dura hasta cerrar el navegador) y entonces aparece su boton en la Galeria.
+  const diarioAbierto = () => { try { return sessionStorage.getItem('diario') === '1'; } catch (e) { return false; } };
+  if (PAGINA === 'diario' && !diarioAbierto()) { location.replace('inicio.html'); return; }
   const $ = (s, r = document) => r.querySelector(s);
 
   // ---------- Utilidades ----------
@@ -77,7 +81,6 @@
   const PAGINAS = [
     ['inicio.html', 'inicio', '&#9818;', 'Inicio', 'Home', ''],
     ['blog.html', 'blog', '&#9829;', 'Blog', 'Blog', 'rojo'],
-    ['diario.html', 'diario', '&#9824;', 'Diario', 'Journal', ''],
     ['escritos.html', 'escritos', '&#9830;', 'Escritos', 'Writing', 'rojo'],
     ['obras.html', 'obras', '&#9827;', 'Obras', 'Watched & read', ''],
     ['galeria.html', 'galeria', '&#9635;', 'Galería', 'Gallery', '']
@@ -130,6 +133,17 @@
     guardar('idioma', l);
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (b) idioma(b.dataset.l); });
+  // 5 clics seguidos al cubo (menos de 1,5 s entre uno y otro) abren el diario
+  let clicsCubo = 0, ultimoClic = 0;
+  document.addEventListener('click', e => {
+    const cubo = e.target.closest('#cubo'); if (!cubo) return;
+    const ahora = Date.now(); clicsCubo = ahora - ultimoClic < 1500 ? clicsCubo + 1 : 1; ultimoClic = ahora;
+    if (clicsCubo < 5 || diarioAbierto()) return;
+    clicsCubo = 0;
+    try { sessionStorage.setItem('diario', '1'); } catch (err) { return; }
+    cubo.classList.remove('abierto'); void cubo.offsetWidth; cubo.classList.add('abierto');
+    const extra = document.querySelector('.extra-diario'); if (extra) extra.hidden = false;
+  });
   // Imagenes de las entradas: un clic las agranda ahi mismo (como en 4chan) y otro las achica.
   // Con Ctrl o clic del medio se sigue abriendo en otra pestana.
   document.addEventListener('click', e => {
@@ -227,7 +241,7 @@
   const C = $('#contenido');
   const R = {
     inicio() {
-      const novedades = [...D.blog.map(p => ['Blog', 'Blog', p, 'b-' + p.id]), ...D.diario.map(p => ['Diario', 'Journal', p, 'd-' + p.id]),
+      const novedades = [...D.blog.map(p => ['Blog', 'Blog', p, 'b-' + p.id]),
         ...D.escritos.flatMap(e => {
           const caps = capsDe(e);
           const es = par(e.titulo)[0] + (e.idioma === 'en' ? ' #English' : '');
@@ -242,7 +256,7 @@
         <div class="cuerpo">
           <aside class="lado">
             ${caja('Sobre mí', 'About me', `<div class="avatar-grande">${avatarHTML}</div>${textoBi(P.presentacion) || vacio('Escribe tu presentación en el panel.', 'Write your introduction in the panel.')}
-              <table class="datos"><tr><td>${t('Desde', 'Since')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Entradas', 'Posts')}</td><td>${D.blog.length + D.diario.length}</td></tr><tr><td>${t('Escritos', 'Writing')}</td><td>${D.escritos.length}</td></tr><tr><td>${t('Obras', 'Titles')}</td><td>${D.obras.length}</td></tr></table>`)}
+              <table class="datos"><tr><td>${t('Desde', 'Since')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Entradas', 'Posts')}</td><td>${D.blog.length}</td></tr><tr><td>${t('Escritos', 'Writing')}</td><td>${D.escritos.length}</td></tr><tr><td>${t('Obras', 'Titles')}</td><td>${D.obras.length}</td></tr></table>`)}
             ${caja('Me gusta', 'I like', P.gustos.length ? `<ul class="gustos">${P.gustos.map(g => `<li>${tx(g)}</li>`).join('')}</ul>` : vacio('Agrega tus gustos en el panel.', 'Add what you like in the panel.'))}
             ${caja('Estadísticas', 'Stats', estadisticas(), `<a href="obras.html">${t('Ver todo', 'View all')}</a>`)}
             ${caja('Galería', 'Gallery', galeria.length ? `<div class="mini-galeria">${galeria.map(([g, n]) => `<a href="galeria.html#g-${n}" title="${esc(par(g.texto)[0])}"><img src="${esc(g.archivo)}" alt="${esc(par(g.texto)[0])}" loading="lazy"></a>`).join('')}</div>` : vacio('Sube imágenes y agrégalas en el panel.', 'Upload images and add them in the panel.'), `<a href="galeria.html">${t('Ver todo', 'View all')}</a>`)}
@@ -297,6 +311,7 @@
     galeria() {
       const G = D.galeria;
       C.innerHTML = tituloTablon('gal', 'Galería', 'Gallery') + `<section class="seccion"><p class="nota">${t('Fotos y GIF. Haz clic en una para verla en grande.', 'Photos and GIFs. Click one to see it full size.')}</p>
+        <p class="extra-diario"${diarioAbierto() ? '' : ' hidden'}><a class="boton-leer" href="diario.html"><span aria-hidden="true">&#9824;</span> ${t('Diario', 'Journal')}</a></p>
         ${G.length ? `<div class="galeria">${G.map((g, n) => `<button type="button" data-g="${n}"><img src="${esc(g.archivo)}" alt="${esc(par(g.texto)[0])}" loading="lazy"><span>${tx(g.texto)}</span></button>`).join('')}</div>` : vacio('Todavía no hay imágenes.', 'No images yet.')}</section>
         <div class="visor" id="visor" hidden role="dialog" aria-modal="true" aria-label="Imagen">
           <div class="arriba"><button type="button" data-v="cerrar">${t('Cerrar', 'Close')} (Esc)</button></div>
@@ -316,7 +331,7 @@
         navegar = null;
         const m = /^#([bde])-(\d+)(?:-c(\d+))?$/.exec(location.hash);
         const fuente = m && { b: ['blog', 'Blog', 'Blog', 'blog.html'], d: ['diario', 'Diario', 'Journal', 'diario.html'], e: ['escritos', 'Escritos', 'Writing', 'escritos.html'] }[m[1]];
-        const item = fuente && D[fuente[0]].find(x => String(x.id) === m[2]);
+        const item = fuente && !(m[1] === 'd' && !diarioAbierto()) && D[fuente[0]].find(x => String(x.id) === m[2]);
         const caps = m && m[1] === 'e' ? capsDe(item) : [];
         const nCap = m && m[3] ? +m[3] : 0;
         if (!item || (nCap && !caps[nCap - 1])) { C.innerHTML = `<div class="lector">${vacio('No encontré esa entrada.', 'That entry was not found.')}<p><a href="inicio.html">&laquo; ${t('Volver al inicio', 'Back to home')}</a></p></div>`; return; }

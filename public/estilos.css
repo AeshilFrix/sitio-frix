@@ -204,6 +204,11 @@ hr { border: 0; border-top: 1px solid var(--borde-post); margin: 8px 0; }
 #cubo { position: fixed; z-index: 5; width: 160px; height: 160px; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: 50%;
   right: calc(10px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
 #cubo canvas { display: block; width: 100%; height: 100%; }
+/* Senal discreta de que el diario se abrio */
+#cubo.abierto { animation: abierto 1.2s ease-out; }
+@keyframes abierto { 0% { filter: drop-shadow(0 0 0 rgba(175,10,15,0)); } 30% { filter: drop-shadow(0 0 14px rgba(175,10,15,.9)); } 100% { filter: drop-shadow(0 0 0 rgba(175,10,15,0)); } }
+@media (prefers-reduced-motion: reduce) { #cubo.abierto { animation: none; outline: 2px solid var(--rojo); outline-offset: -6px; } }
+.extra-diario { margin: 0 0 12px; }
 
 @media (max-width: 760px) {
   .cuerpo { grid-template-columns: minmax(0, 1fr); }
