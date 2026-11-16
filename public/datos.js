@@ -68,6 +68,18 @@ window.DATOS = {
         "en": "It's almost the end of the day, and I still haven't wished my friend [Maricielo] a happy birthday. \nThe truth is, I knew she wouldn't tell me anything, and I hadn't prepared anything either. Last year, I broke my word, and I didn't want to lie to her like that again, even though ignoring her all day knowing it's her birthday is still horrible. \nI wouldn't know what to say or what I would make up to \"justify it.\"\nWell, at least I remembered when it was."
       },
       "id": 1
+    },
+    {
+      "fecha": "2026-11-16T14:19",
+      "titulo": {
+        "es": "Cero practica",
+        "en": "No practical experience"
+      },
+      "texto": {
+        "es": "Mañana tengo uno de mi exámenes finales y tuve todo el fin de semana para prepararme, cosa que hice a medias. No me tengo fe para mañana, la única forma que veo ahora para aprobar es no dormir, claro que si, otra vez, crj voy a dañar mi horario de sueño si sigo durmiendo así de mal. \n",
+        "en": "Tomorrow I have one of my final exams, and I had the whole weekend to prepare, which I did half-heartedly. I don't have confidence for tomorrow. The only way I see now to pass is to not sleep. Of course, yes, again. Damn it, I'm going to mess up my sleep schedule if I keep sleeping this badly. \n"
+      },
+      "id": 2
     }
   ],
   "escritos": [
