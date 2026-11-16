@@ -6,30 +6,13 @@ window.DATOS = {
     "desde": "2026-11",
     "lema": {
       "es": "Todo lo que escribo, sin mentiras.",
-      "en": "Everything I write, no lies."
+      "en": "Everything I write, without lies."
     },
     "presentacion": {
-      "es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\nEste texto es de ejemplo: cámbialo desde el panel.",
-      "en": "Hi, I'm Frix. This is where I keep my journal, my thoughts on what I watch and read, and everything I write.\n\nThis text is an example: change it from the panel."
+      "es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\n",
+      "en": "Hi, I'm Frix. This is where I keep my diary, what I think about what I see and read, and everything I write.\n\n"
     },
-    "gustos": [
-      {
-        "es": "Manga de apuestas",
-        "en": "Gambling manga"
-      },
-      {
-        "es": "Cubos Rubik",
-        "en": "Rubik's cubes"
-      },
-      {
-        "es": "Ajedrez",
-        "en": "Chess"
-      },
-      {
-        "es": "Escribir mundos",
-        "en": "Writing worlds"
-      }
-    ]
+    "gustos": []
   },
   "blog": [
     {
