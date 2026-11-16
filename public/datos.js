@@ -49,8 +49,8 @@ window.DATOS = {
       },
       "imagen": "https://media.tenor.com/0EgQgZWi8WoAAAAM/sigh-yamadakun-and-the-seven-witches.gif",
       "texto": {
-        "es": "# sepa a quien le importaría, pero logre recuperar todo, tampoco es que fuera tan difícil, pero me re complique todo. #FF0000",
-        "en": "# Who knows who would care, but I managed to get everything back. It wasn't that difficult, but I made everything really complicated for myself. #FF0000"
+        "es": "#sepa a quien le importaría, pero logre recuperar todo, tampoco es que fuera tan difícil, pero me re complique todo.#FF0000",
+        "en": "#I don't know who would care, but I managed to get everything back. It wasn't that difficult, but I made everything complicated for myself.#FF0000"
       },
       "id": 3
     }
