@@ -15,6 +15,11 @@ Nada se sube a mano. Todo pasa por este repositorio y se publica solo con GitHub
 - **Escribir** (blog, diario, capítulos, obras…): con el panel. Al pulsar *Publicar ahora*, el panel guarda `public/datos.js` en `main` y el sitio se actualiza.
 - **Diseño**: los cambios se prueban en `diseno`. Cuando la vista previa está bien, se pasan a `main`.
 
+## Entrada
+
+`index.html` es una pantalla de acceso; la portada del sitio es `inicio.html`. Si alguien abre
+cualquier otra página sin pasar por la entrada, vuelve a ella. Las páginas no aparecen en buscadores.
+
 ## Carpetas
 
 ```

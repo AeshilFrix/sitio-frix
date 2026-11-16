@@ -1,6 +1,15 @@
 /* Sitio de Frix: arma la cabecera, el menu, la musica y el contenido de cada pagina a partir de datos.js */
 (function () {
   'use strict';
+  // Puerta: quien no entro por la pantalla de acceso (index.html) vuelve a ella, recordando a donde iba.
+  // Es para que nadie llegue por casualidad: no es una contrasena de verdad.
+  try {
+    if (!sessionStorage.getItem('puerta')) {
+      sessionStorage.setItem('destino', (location.pathname.split('/').pop() || 'inicio.html') + location.search + location.hash);
+      location.replace('index.html');
+      return;
+    }
+  } catch (e) { /* si el navegador no deja guardar nada, se deja pasar */ }
   const D = Object.assign({ perfil: {}, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [] }, window.DATOS || {});
   const P = Object.assign({ nombre: 'Frix', avatar: '', desde: '', lema: '', presentacion: '', gustos: [] }, D.perfil);
   const PAGINA = document.body.dataset.pagina || 'inicio';
@@ -66,7 +75,7 @@
   const nombreDe = (tabla, k) => { const v = tabla[k] || tabla.otro || ['-', '-']; return t(v[0], v[1]); };
 
   const PAGINAS = [
-    ['index.html', 'inicio', '&#9818;', 'Inicio', 'Home', ''],
+    ['inicio.html', 'inicio', '&#9818;', 'Inicio', 'Home', ''],
     ['blog.html', 'blog', '&#9829;', 'Blog', 'Blog', 'rojo'],
     ['diario.html', 'diario', '&#9824;', 'Diario', 'Journal', ''],
     ['escritos.html', 'escritos', '&#9830;', 'Escritos', 'Writing', 'rojo'],
@@ -80,7 +89,7 @@
   if (cab) cab.innerHTML = `
     <div class="mini"><div class="idioma" role="group" aria-label="Idioma / Language">[<button type="button" data-l="es" aria-pressed="true">Español</button>/<button type="button" data-l="en" aria-pressed="false">English</button>]</div></div>
     <header class="cabecera">
-      <a class="logo" href="index.html">${esc(P.nombre)}</a>
+      <a class="logo" href="inicio.html">${esc(P.nombre)}</a>
       <span class="lema">${tx(P.lema)}</span>
       <div class="derecha">
         <div class="musica" id="musica">
@@ -306,7 +315,7 @@
         const item = fuente && D[fuente[0]].find(x => String(x.id) === m[2]);
         const caps = m && m[1] === 'e' ? capsDe(item) : [];
         const nCap = m && m[3] ? +m[3] : 0;
-        if (!item || (nCap && !caps[nCap - 1])) { C.innerHTML = `<div class="lector">${vacio('No encontré esa entrada.', 'That entry was not found.')}<p><a href="index.html">&laquo; ${t('Volver al inicio', 'Back to home')}</a></p></div>`; return; }
+        if (!item || (nCap && !caps[nCap - 1])) { C.innerHTML = `<div class="lector">${vacio('No encontré esa entrada.', 'That entry was not found.')}<p><a href="inicio.html">&laquo; ${t('Volver al inicio', 'Back to home')}</a></p></div>`; return; }
         if (nCap) return pintarCapitulo(item, caps, nCap);
         if (m[1] === 'e') return pintarEscrito(item, caps);
         C.innerHTML = `<p><a href="${fuente[3]}">&laquo; ${t(fuente[1], fuente[2])}</a></p><article class="lector"><h1>${tx(item.titulo)}${ejemplo(item)}</h1><div class="meta">${esc(P.nombre)} · ${fechaTablon(item.fecha)} · No.${String(item.id).padStart(6, '0')}</div>
