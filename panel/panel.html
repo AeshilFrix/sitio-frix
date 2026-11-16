@@ -48,7 +48,10 @@
   details.extra summary { cursor: pointer; font-weight: bold; font-size: 11px; color: var(--enlace); }
   details.extra[open] summary { margin-bottom: 8px; }
   .capitulos { display: grid; gap: 10px; }
-  #cap-estado:empty, #trad-estado:empty { display: none; }
+  #cap-estado:empty, #trad-estado:empty, .estado-img:empty { display: none; }
+  .con-imagen { display: flex; gap: 6px; }
+  .con-imagen input { flex: 1; min-width: 0; }
+  .con-imagen .btn { white-space: nowrap; }
   .traduccion, .pub, .dentro-extra { display: grid; gap: 8px; max-width: 760px; }
   .pub p { margin: 0; }
   details.extra .dentro-extra { margin-top: 4px; }

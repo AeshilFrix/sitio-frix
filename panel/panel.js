@@ -47,7 +47,7 @@
 
   const SECCIONES = {
     blog: { nombre: 'Blog', lista: 'blog', conId: true, bilingue: ['titulo', 'texto'], nuevo: () => ({ fecha: ahora() }),
-      campos: [['titulo.es', 'Título', 'text', 1], ['titulo.en', 'Título en inglés (se traduce solo)', 'text'], ['fecha', 'Fecha y hora', 'datetime-local', 1], ['imagen', 'Imagen (opcional), por ejemplo galeria/foto.png', 'text'], ['texto.es', 'Texto', 'textarea', 1, AYUDA_TEXTO], ['texto.en', 'Texto en inglés (se traduce solo)', 'textarea', 0, AYUDA_EN]],
+      campos: [['titulo.es', 'Título', 'text', 1], ['titulo.en', 'Título en inglés (se traduce solo)', 'text'], ['fecha', 'Fecha y hora', 'datetime-local', 1], ['imagen', 'Imagen (opcional): enlace directo o súbela desde tu PC', 'imagen'], ['texto.es', 'Texto', 'textarea', 1, AYUDA_TEXTO], ['texto.en', 'Texto en inglés (se traduce solo)', 'textarea', 0, AYUDA_EN]],
       resumen: i => [i.titulo && i.titulo.es, (i.fecha || '').replace('T', ' ')] },
     diario: { nombre: 'Diario', lista: 'diario', conId: true, bilingue: ['titulo', 'texto'], nuevo: () => ({ fecha: ahora() }),
       campos: [['titulo.es', 'Título', 'text', 1], ['titulo.en', 'Título en inglés (se traduce solo)', 'text'], ['fecha', 'Fecha y hora', 'datetime-local', 1], ['texto.es', 'Texto', 'textarea', 1, AYUDA_TEXTO], ['texto.en', 'Texto en inglés (se traduce solo)', 'textarea', 0, AYUDA_EN]],
@@ -62,10 +62,10 @@
         ['texto.es', 'Texto', 'textarea grande', 0, 'Si el escrito tiene capítulos, deja esto vacío y sube los capítulos más abajo. ' + AYUDA_TEXTO]],
       resumen: i => { const n = (i.capitulos || []).length; return [((i.titulo && i.titulo.es) || '') + (i.idioma === 'en' ? ' #English' : ''), (OPC_ESTADO_ESC.find(o => o[0] === String(i.estado)) || [, ''])[1] + (n ? ` · ${n} ${n === 1 ? 'capítulo' : 'capítulos'}` : '')]; } },
     obras: { nombre: 'Obras', lista: 'obras', conId: true, nuevo: () => ({ fecha: hoy(), estado: 2, nota: 0, tipo: 'anime' }),
-      campos: [['titulo', 'Título', 'text', 1], ['tipo', 'Tipo', OPC_TIPO_OBRA], ['anio', 'Año', 'number'], ['portada', 'Portada (enlace a una imagen, opcional)', 'url'], ['estado', 'Estado', OPC_ESTADO_OBRA], ['nota', 'Nota', OPC_NOTA], ['fecha', 'Fecha en que lo registras', 'date', 1]],
+      campos: [['titulo', 'Título', 'text', 1], ['tipo', 'Tipo', OPC_TIPO_OBRA], ['anio', 'Año', 'number'], ['portada', 'Portada (opcional): enlace directo o súbela desde tu PC', 'imagen'], ['estado', 'Estado', OPC_ESTADO_OBRA], ['nota', 'Nota', OPC_NOTA], ['fecha', 'Fecha en que lo registras', 'date', 1]],
       resumen: i => [i.titulo, `${(OPC_TIPO_OBRA.find(o => o[0] === i.tipo) || [, ''])[1]} · ${(OPC_ESTADO_OBRA.find(o => o[0] === String(i.estado)) || [, ''])[1]}${i.nota > 0 ? ' · ' + i.nota : ''}`], imagen: i => i.portada },
     galeria: { nombre: 'Galería', lista: 'galeria', bilingue: ['texto'], nuevo: () => ({}),
-      campos: [['archivo', 'Archivo o enlace de la imagen', 'text', 1, 'Sube la imagen a la carpeta galeria/ de tu sitio en Neocities y escribe aquí, por ejemplo: galeria/mi-foto.png'], ['texto.es', 'Descripción', 'text'], ['texto.en', 'Descripción en inglés (se traduce sola)', 'text']],
+      campos: [['archivo', 'Imagen', 'imagen', 1, 'Pulsa «Subir desde tu PC», o pega un enlace directo a la imagen (el que termina en .png, .jpg o .gif, como los de imgur).'], ['texto.es', 'Descripción', 'text'], ['texto.en', 'Descripción en inglés (se traduce sola)', 'text']],
       resumen: i => [i.archivo, i.texto && i.texto.es], imagen: i => i.archivo },
     musica: { nombre: 'Música', lista: 'musica', nuevo: () => ({}),
       campos: [['titulo', 'Nombre de la canción', 'text', 1], ['url', 'Enlace directo al audio (.mp3 u .ogg)', 'url', 1, 'Las cuentas gratis de Neocities no permiten subir mp3: usa un enlace directo de otro sitio, o súbelo a Neocities si tienes Supporter (entonces escribe por ejemplo musica/cancion.mp3).']],
@@ -85,6 +85,8 @@
     let control;
     if (Array.isArray(tipo)) control = `<select id="${id}" name="${ruta}">${tipo.map(([k, n]) => `<option value="${k}"${String(v) === k ? ' selected' : ''}>${n}</option>`).join('')}</select>`;
     else if (tipo.startsWith('textarea')) control = `<textarea id="${id}" name="${ruta}" class="${tipo.includes('grande') ? 'grande' : ''}"${req ? ' required' : ''}>${esc(v)}</textarea>`;
+    else if (tipo === 'imagen') control = `<div class="con-imagen"><input id="${id}" name="${ruta}" type="text" value="${esc(v)}"${req ? ' required' : ''} placeholder="https://i.imgur.com/… o galeria/foto.png">
+      <button class="btn sec" type="button" data-subir-img="${id}">Subir desde tu PC</button></div><p class="ayuda estado-img" id="${id}-estado" role="status"></p>`;
     else control = `<input id="${id}" name="${ruta}" type="${tipo}" value="${esc(v)}"${req ? ' required' : ''}${tipo === 'number' ? ' min="0" max="2100"' : ''}>`;
     return `<div class="campo"><label for="${id}">${etiqueta}</label>${control}${ayuda ? `<p class="ayuda">${ayuda}</p>` : ''}</div>`;
   }
@@ -284,7 +286,7 @@
     const gustos = (p.gustos || []).map(g => g.en && g.en !== g.es && !g.auto ? `${g.es} | ${g.en}` : (g.es || '')).join('\n');
     h.innerHTML = `<form class="formulario" id="form-perfil"><b>Perfil</b>
       <div class="dos">${campoHTML(['nombre', 'Nombre', 'text', 1], p.nombre)}${campoHTML(['desde', 'Desde (mes en que abriste el sitio)', 'month'], p.desde)}</div>
-      ${campoHTML(['avatar', 'Avatar (enlace o archivo, por ejemplo galeria/avatar.png)', 'text'], p.avatar)}
+      ${campoHTML(['avatar', 'Avatar: enlace directo o súbelo desde tu PC', 'imagen'], p.avatar)}
       <div class="dos">${campoHTML(['lema.es', 'Lema', 'text'], p.lema && p.lema.es)}${campoHTML(['lema.en', 'Lema en inglés (se traduce solo)', 'text'], p.lema && p.lema.en)}</div>
       ${campoHTML(['presentacion.es', 'Presentación', 'textarea', 0, AYUDA_TEXTO], p.presentacion && p.presentacion.es)}
       ${campoHTML(['presentacion.en', 'Presentación en inglés (se traduce sola)', 'textarea', 0, AYUDA_EN], p.presentacion && p.presentacion.en)}
@@ -526,6 +528,59 @@
     r = await pedirGH(urlGH(c), { method: 'PUT', headers: h, body: JSON.stringify(cuerpo) });
     if (!r.ok) { const e = await r.json().catch(() => ({})); throw errorGH(r.status, e.message); }
   }
+  // ---------- Subir imagenes a public/galeria/ (van directo al sitio) ----------
+  const TIPOS_IMG = /\.(png|jpe?g|gif|webp)$/i, MAX_IMG = 25 * 1024 * 1024;
+  const nombreLimpio = n => {
+    const m = /^(.*?)(\.[a-z0-9]+)?$/i.exec(n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase());
+    return ((m[1].replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'imagen').slice(0, 60)) + ((m[2] || '.png').replace('.jpeg', '.jpg'));
+  };
+  const bytesABase64 = buf => { const b = new Uint8Array(buf); let t = ''; for (let i = 0; i < b.length; i += 0x8000) t += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(t); };
+  const urlCrudaGH = ruta => { const c = configGH(); return `https://raw.githubusercontent.com/${c.repo}/${c.rama}/public/${ruta}`; };
+  async function subirImagen(archivo, aviso) {
+    const c = configGH();
+    if (!c.token) throw new Error('primero conecta el panel con GitHub en la pestaña Publicar');
+    if (!TIPOS_IMG.test(archivo.name)) throw new Error('solo se pueden subir imágenes .png, .jpg, .gif o .webp');
+    if (archivo.size > MAX_IMG) throw new Error('la imagen pesa más de 25 MB');
+    const h = cabecerasGH(c), base = nombreLimpio(archivo.name), punto = base.lastIndexOf('.');
+    let nombre = base;
+    // Si ya existe una imagen con ese nombre, se agrega -2, -3...
+    for (let n = 2; ; n++) {
+      const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/galeria/${nombre}` + q + 'ref=' + encodeURIComponent(c.rama), { headers: h });
+      if (r.status === 404) break;
+      if (!r.ok) throw errorGH(r.status);
+      nombre = base.slice(0, punto) + '-' + n + base.slice(punto);
+    }
+    aviso(`Subiendo ${nombre}…`);
+    const r = await pedirGH(`https://api.github.com/repos/${c.repo}/contents/public/galeria/${nombre}`, { method: 'PUT', headers: h,
+      body: JSON.stringify({ message: 'Panel: subir imagen ' + nombre, content: bytesABase64(await archivo.arrayBuffer()), branch: c.rama }) });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); throw errorGH(r.status, e.message); }
+    return 'galeria/' + nombre;
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-subir-img]'); if (!b) return;
+    const campo = document.getElementById(b.dataset.subirImg), est = document.getElementById(b.dataset.subirImg + '-estado');
+    const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/png,image/jpeg,image/gif,image/webp'; input.hidden = true;
+    document.body.appendChild(input);
+    input.onchange = async () => {
+      const f = input.files[0]; input.remove(); if (!f) return;
+      b.disabled = true;
+      try {
+        const ruta = await subirImagen(f, m => { est.textContent = m; });
+        campo.value = ruta;
+        est.innerHTML = `Subida: <b>${esc(ruta)}</b>. En tu sitio aparece en un minuto. Ahora pulsa ${campo.form && campo.form.id === 'form-perfil' ? 'Guardar perfil' : 'Agregar o Guardar'}.`;
+      } catch (err) { est.textContent = 'No se pudo subir: ' + err.message + '.'; }
+      b.disabled = false;
+    };
+    input.click();
+  });
+  // En el panel, una imagen recien subida todavia no esta en tu carpeta: se muestra desde GitHub
+  document.addEventListener('error', e => {
+    const i = e.target;
+    if (i.tagName !== 'IMG' || i.dataset.respaldo) return;
+    const src = i.getAttribute('src') || '';
+    if (/^galeria\//.test(src)) { i.dataset.respaldo = '1'; i.src = urlCrudaGH(src); }
+  }, true);
+
   // Al abrir el panel, trae lo ultimo publicado (por si escribiste desde otra PC o el archivo local esta viejo)
   async function sincronizarGH() {
     const c = configGH(); if (!c.token) return;
