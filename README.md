@@ -5,15 +5,14 @@ Blog, diario, escritos (con capítulos desde Tintero), obras que veo y leo, y ga
 
 ## Cómo se publica
 
-Nada se sube a mano. Todo pasa por este repositorio y se publica solo con GitHub Pages:
+Nada se sube a mano. Todo lo que llega a la rama `main` se publica solo, en un minuto, en:
 
-| Rama | Qué hay | Dónde se ve |
-|------|---------|-------------|
-| `main` | Lo publicado | [aeshilfrix.github.io/sitio-frix](https://aeshilfrix.github.io/sitio-frix/), se actualiza solo en ~1 minuto |
-| `diseno` | Cambios de diseño en prueba | [Vista previa](https://aeshilfrix.github.io/sitio-frix/previa/), con una etiqueta roja abajo |
+- [aeshilfrix.neocities.org](https://aeshilfrix.neocities.org/)
+- [aeshilfrix.github.io/sitio-frix](https://aeshilfrix.github.io/sitio-frix/)
 
-- **Escribir** (blog, diario, capítulos, obras…): con el panel. Al pulsar *Publicar ahora*, el panel guarda `public/datos.js` en `main` y el sitio se actualiza.
-- **Diseño**: los cambios se prueban en `diseno`. Cuando la vista previa está bien, se pasan a `main`.
+Para escribir (blog, diario, capítulos, obras…) se usa el panel: *Publicar ahora* guarda
+`public/datos.js` en `main`. Los cambios de diseño también van directo a `main`; la pantalla de
+acceso evita que alguien vea el sitio a medio hacer.
 
 ## Entrada
 
@@ -25,7 +24,7 @@ cualquier otra página sin pasar por la entrada, vuelve a ella. Las páginas no 
 ```
 public/     Lo que se publica: páginas, estilos, sitio.js, cubo.js, datos.js, galeria/ y musica/
 panel/      El panel para escribir. Se usa desde tu PC; no se publica
-.github/    La tarea que publica sola el sitio y la vista previa
+.github/    Las tareas que publican solas el sitio (Neocities y GitHub Pages)
 ```
 
 ## El panel
