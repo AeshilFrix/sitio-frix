@@ -44,19 +44,6 @@ window.DATOS = {
         "es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n",
         "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"
       }
-    },
-    {
-      "fecha": "2026-11-15T20:04",
-      "titulo": {
-        "es": "ola ola",
-        "en": "Wave Wave"
-      },
-      "imagen": "https://images.gamebanana.com/img/ss/mods/6a8ca307c6fa9.jpg",
-      "texto": {
-        "es": "pasa pasa",
-        "en": "pass pass"
-      },
-      "id": 2
     }
   ],
   "diario": [
