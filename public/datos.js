@@ -44,6 +44,19 @@ window.DATOS = {
         "es": ">querer una página propia\n>hacerla a mano (A medias)\n\n",
         "en": ">want a page of my own\n>make it by hand\n\nEverything I write is going here."
       }
+    },
+    {
+      "fecha": "2026-11-15T20:04",
+      "titulo": {
+        "es": "Hola hola",
+        "en": "Hi, hi."
+      },
+      "imagen": "",
+      "texto": {
+        "es": "pasa pasa",
+        "en": "pass pass"
+      },
+      "id": 2
     }
   ],
   "diario": [],
