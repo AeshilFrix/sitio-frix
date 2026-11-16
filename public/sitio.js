@@ -296,17 +296,23 @@
     }
     cuerpo.innerHTML = html; caja.hidden = false;
   }
-  // Fichas: contador de visitas (una por visita, no por pagina) con Abacus
+  // Fichas: contador de visitas (una por visita, no por pagina) con Abacus.
+  // Ese servicio a veces tarda: se muestra al instante el ultimo numero conocido y se actualiza al llegar.
   async function pintarFichas() {
     const caja = $('#fichas'); if (!caja) return;
+    const mostrar = v => {
+      caja.innerHTML = String(v).padStart(4, '0').split('').map((c, i) => `<span class="ficha f${i % 4}">${c}</span>`).join('');
+      caja.setAttribute('aria-label', `${v} visitas / visits`);
+    };
+    const guardado = leer('fichas-ultimo', null);
+    if (typeof guardado === 'number') mostrar(guardado); else caja.innerHTML = '<span class="ficha f0">·</span><span class="ficha f1">·</span><span class="ficha f2">·</span><span class="ficha f3">·</span>';
     let nueva = false; try { nueva = !sessionStorage.getItem('visita'); sessionStorage.setItem('visita', '1'); } catch (e) {}
     try {
       const r = await fetch(`https://abacus.jasoncameron.dev/${nueva ? 'hit' : 'get'}/aeshilfrix-sitio/visitas`, { cache: 'no-store' });
       const v = (await r.json()).value;
       if (typeof v !== 'number') throw new Error();
-      caja.innerHTML = String(v).padStart(4, '0').split('').map((c, i) => `<span class="ficha f${i % 4}">${c}</span>`).join('');
-      caja.setAttribute('aria-label', t(`${v} visitas`, `${v} visits`).replace(/<[^>]+>/g, ' '));
-    } catch (e) { caja.closest('.caja').hidden = true; }
+      mostrar(v); guardar('fichas-ultimo', v);
+    } catch (e) { if (typeof guardado !== 'number') caja.closest('.caja').hidden = true; }
   }
   const caja = (tituloEs, tituloEn, cuerpo, enlace) => `<section class="caja"><h3>${t(tituloEs, tituloEn)}${enlace || ''}</h3><div class="dentro">${cuerpo}</div></section>`;
 
