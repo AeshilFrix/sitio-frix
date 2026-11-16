@@ -27,6 +27,19 @@ window.DATOS = {
         "es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n",
         "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"
       }
+    },
+    {
+      "fecha": "2026-11-16T01:16",
+      "titulo": {
+        "es": "Creo que he roto algo",
+        "en": "I think I broke something."
+      },
+      "imagen": "https://media.tenor.com/RmHRq5dDMDoAAAAM/misaka-railgun.gif",
+      "texto": {
+        "es": "Si esto funciona god, si no, ptmr",
+        "en": "If this works, thank God. If not, damn it."
+      },
+      "id": 2
     }
   ],
   "diario": [
