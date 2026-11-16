@@ -53,7 +53,7 @@
       sessionStorage.setItem('puerta', '1');
       var guardado = sessionStorage.getItem('destino') || '';
       sessionStorage.removeItem('destino');
-      if (/^[a-z]+\.html([?#].*)?$/.test(guardado) && guardado.indexOf('index.html') !== 0) d = guardado;
+      if (/^[a-z]+(\.html)?([?#].*)?$/.test(guardado) && !/^index(\.html)?([?#]|$)/.test(guardado)) d = guardado; // Neocities quita el .html de las direcciones
     } catch (e) {}
     location.replace(d);
   };
