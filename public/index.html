@@ -13,8 +13,8 @@
   main { width: 100%; max-width: 340px; background: var(--caja); border: 1px solid var(--borde); border-radius: 6px; padding: 26px 24px 20px; }
   h1 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
   p { margin: 0 0 16px; color: var(--tenue); }
-  .x { position: relative; }
-  .x::after { content: ''; position: absolute; left: -6px; right: -12px; top: -8px; bottom: -8px; }
+  .x { position: fixed; z-index: 5; width: 160px; height: 160px; right: calc(10px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  @media (max-width: 760px) { .x { width: 96px; height: 96px; } }
   form { display: flex; gap: 8px; }
   input { flex: 1; min-width: 0; font: inherit; color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); border-radius: 4px; padding: 7px 10px; }
   input:focus-visible, button:focus-visible { outline: 2px solid var(--tenue); outline-offset: 1px; }
@@ -29,13 +29,14 @@
 <body>
 <main>
   <h1 data-t="Acceso restringido|Restricted access">Acceso restringido</h1>
-  <p><span data-t="Este sitio es privado. Escribe el código de acceso|This site is private. Enter the access code">Este sitio es privado. Escribe el código de acceso</span><span class="x">.</span></p>
+  <p><span data-t="Este sitio es privado. Escribe el código de acceso|This site is private. Enter the access code">Este sitio es privado. Escribe el código de acceso</span>.</p>
   <form id="f" autocomplete="off">
     <input id="c" type="password" data-p="Código|Code" placeholder="Código" aria-label="Código">
     <button id="b" type="submit" data-t="Entrar|Enter">Entrar</button>
   </form>
   <p id="m" role="status"></p>
 </main>
+<div class="x" aria-hidden="true"></div>
 <script>
 (function () {
   var en = false;
