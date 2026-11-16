@@ -35,14 +35,14 @@ window.DATOS = {
     {
       "id": 1,
       "fecha": "2026-11-15T14:00",
-      "imagen": "galeria/ejemplo-1.png",
+      "imagen": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl48i2nW1soWZLD7sflHB74io-t42ChuLxEkArfVX2kQ&s=10",
       "titulo": {
         "es": "Prueba rápida y ejemplo  ",
         "en": "I opened this site"
       },
       "texto": {
-        "es": ">querer una página propia\n>hacerla a mano (A medias)\n\n",
-        "en": ">want a page of my own\n>make it by hand\n\nEverything I write is going here."
+        "es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n",
+        "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"
       }
     },
     {
