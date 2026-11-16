@@ -679,6 +679,7 @@
     };
     const pub = $('#publicar-gh');
     if (pub) pub.onclick = async () => {
+      if (JSON.stringify(datos) === original && !sinTraducir().length) { est.textContent = 'No hay nada nuevo que publicar: tu sitio ya tiene todo.'; return; }
       pub.disabled = true; borrarPendiente = null;
       let aviso = '';
       if (sinTraducir().length) {

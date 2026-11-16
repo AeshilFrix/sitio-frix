@@ -142,6 +142,9 @@
   idioma(leer('idioma', 'es') === 'en' ? 'en' : 'es');
 
   // ---------- Musica aleatoria ----------
+  // Neocities gratis no acepta mp3: las canciones subidas a musica/ se toman de la copia del sitio en GitHub Pages
+  const ESPEJO = 'https://aeshilfrix.github.io/sitio-frix/';
+  const urlAudio = u => /^musica\//.test(u) && /neocities\.org$/.test(location.hostname) ? ESPEJO + u : u;
   (function musica() {
     const caja = $('#musica'); if (!caja) return;
     const lista = (D.musica || []).filter(c => c && c.url);
@@ -158,7 +161,7 @@
     const audio = new Audio(); audio.preload = 'metadata'; audio.muted = !!e.mute; audio.volume = 0.6;
     function cargar(n, desde) {
       i = (n + orden.length) % orden.length; const c = lista[orden[i]];
-      audio.src = c.url; tit.textContent = '♪ ' + (c.titulo || ''); tit.title = c.titulo || '';
+      audio.src = urlAudio(c.url); tit.textContent = '♪ ' + (c.titulo || ''); tit.title = c.titulo || '';
       if (desde) audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = desde; } catch (err) {} }, { once: true });
     }
     function ui() {
