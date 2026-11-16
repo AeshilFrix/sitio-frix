@@ -51,7 +51,7 @@ window.DATOS = {
         "es": "Hola hola",
         "en": "Hi, hi."
       },
-      "imagen": "",
+      "imagen": "https://images.gamebanana.com/img/ss/mods/6a8ca307c6fa9.jpg",
       "texto": {
         "es": "pasa pasa",
         "en": "pass pass"
