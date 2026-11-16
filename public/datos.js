@@ -60,7 +60,36 @@ window.DATOS = {
     }
   ],
   "diario": [],
-  "escritos": [],
+  "escritos": [
+    {
+      "actualizado": "2026-11-16",
+      "estado": 1,
+      "tipo": "novela",
+      "idioma": "es",
+      "titulo": {
+        "es": "El hombre al que todo olvidan. "
+      },
+      "version": "",
+      "resumen": {
+        "es": ""
+      },
+      "notas": {
+        "es": ""
+      },
+      "texto": {
+        "es": ""
+      },
+      "id": 1,
+      "capitulos": [
+        {
+          "id": 1,
+          "titulo": "La ciudad de cristal",
+          "fecha": "2026-11-16",
+          "html": "<p>Me preguntaba por qué cantaban los pájaros.</p><p>Bajé del tren junto a un viejo carpintero que, entre anécdotas de su oficio, me habló de lo difícil que era alejarse de la familia. Tras la partida de su hijo, escuchó lo que sus oídos habían ignorado por años: el canto de los pájaros. Sus historias fueron lo único que hizo soportable aquel viaje de un día. Él, por fin, iba a ver a su hijo después de tanto tiempo. En el centro de la terminal me despedí de él. Su familia lo esperaba; yo acababa de separarme de la mía.</p><p>Sobre mi cabeza escuché un chirrido rítmico que subía y bajaba de tono, como un engranaje oxidado girando sin control en lo alto de los postes. Al voltear vi lo que parecía una pequeña esfera viviente montada sobre dos alambres rígidos. Estaba cubierta por capas de hojas blancas, superpuestas como escamas, y de su frente brotaba una aguja de hueso amarillento que se abría en dos cada vez que emitía ese chirrido.</p><p>—<i>Qué raros animales tiene la capital.</i></p><p>Me quedé inmóvil un momento; la gente pasaba a mi lado sin mirarme. Busqué algún paradero que me llevara al centro. Aunque entre tantas personas me era imposible avanzar. Sentado en lo que parecía una cafetín espere que todo se calmara, y ya sea por el cansancio o por la música caí dormido.</p>"
+        }
+      ]
+    }
+  ],
   "obras": [],
   "galeria": [],
   "musica": [],
