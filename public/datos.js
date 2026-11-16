@@ -59,7 +59,20 @@ window.DATOS = {
       "id": 2
     }
   ],
-  "diario": [],
+  "diario": [
+    {
+      "fecha": "2026-11-15T23:09",
+      "titulo": {
+        "es": "Casi un descuido, o no.",
+        "en": "Almost an oversight, or not."
+      },
+      "texto": {
+        "es": "Ya casi a final de día sigo sin haberle felicitado a mi amiga [Maricielo] por su cumpleaños. \nLa verdad supe que no me diría nada y tampoco tenía nada preparado, el año pasado falle en mi palabra y no quería volver a mentirle de esas forma, aunque ignorarla todo el día sabiendo que es su cumpleaños sigue siendo horrible. \nNo sabría decir o que me inventaría para \"justificarlo\"\nBueno, al menos me acorde de cuando era.",
+        "en": "It's almost the end of the day, and I still haven't wished my friend [Maricielo] a happy birthday. \nThe truth is, I knew she wouldn't tell me anything, and I hadn't prepared anything either. Last year, I broke my word, and I didn't want to lie to her like that again, even though ignoring her all day knowing it's her birthday is still horrible. \nI wouldn't know what to say or what I would make up to \"justify it.\"\nWell, at least I remembered when it was."
+      },
+      "id": 1
+    }
+  ],
   "escritos": [
     {
       "actualizado": "2026-11-16",
