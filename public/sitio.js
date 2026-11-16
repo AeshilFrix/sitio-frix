@@ -6,7 +6,7 @@
   try {
     if (!sessionStorage.getItem('puerta')) {
       sessionStorage.setItem('destino', (location.pathname.split('/').pop() || 'inicio.html') + location.search + location.hash);
-      location.replace('index.html');
+      location.replace(location.protocol === 'file:' ? 'index.html' : './' + String.fromCharCode(63) + Date.now()); // sin cache: evita una portada vieja guardada
       return;
     }
   } catch (e) { /* si el navegador no deja guardar nada, se deja pasar */ }
