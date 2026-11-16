@@ -10,7 +10,7 @@
       return;
     }
   } catch (e) { /* si el navegador no deja guardar nada, se deja pasar */ }
-  const D = Object.assign({ perfil: {}, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [] }, window.DATOS || {});
+  const D = Object.assign({ perfil: {}, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [], cambios: [] }, window.DATOS || {});
   const P = Object.assign({ nombre: 'Frix', avatar: '', desde: '', lema: '', presentacion: '', gustos: [] }, D.perfil);
   const PAGINA = document.body.dataset.pagina || 'inicio';
   // Diario escondido: no sale en el menu ni en el inicio. Se abre con 5 clics seguidos al cubo
@@ -222,6 +222,92 @@
     banner.addEventListener('click', () => { n = (n + 1) % bs.length; poner(); });
   }
   const vacio = (es, en) => `<p class="vacio">${t(es, en)}</p>`;
+  // ---------- Paneles vivos del inicio ----------
+  const hoyISO = () => new Date().toISOString().slice(0, 10);
+  // Frase del dia: la misma todo el dia, cambia al siguiente
+  function fraseDelDia() {
+    const f = (P.frases || []).filter(x => par(x)[0]); if (!f.length) return '';
+    const d = new Date(), dia = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+    return f[(dia + d.getFullYear()) % f.length];
+  }
+  // Ultima actualizacion: lo mas nuevo que se ve en el sitio (el diario no cuenta: es secreto)
+  function ultimaActualizacion() {
+    const fechas = [...D.blog.map(p => p.fecha), ...D.obras.map(o => o.fecha), ...(D.cambios || []).map(c => c.fecha),
+      ...D.escritos.flatMap(e => [e.actualizado, ...capsDe(e).map(c => c.fecha)])].filter(Boolean).map(f => String(f).slice(0, 10)).sort();
+    return fechas[fechas.length - 1] || '';
+  }
+  function ultimoCapitulo() {
+    let mejor = null;
+    D.escritos.forEach(e => capsDe(e).forEach((c, n) => { if (!mejor || String(c.fecha || '') > String(mejor.c.fecha || '')) mejor = { e, c, n: n + 1 }; }));
+    return mejor;
+  }
+  function ahoraMismoHTML() {
+    const viendo = D.obras.filter(o => String(o.estado) === '1').sort(porFecha).slice(0, 4);
+    const cap = ultimoCapitulo();
+    const tarjetas = [];
+    if (P.discord) tarjetas.push(`<div class="tarjeta" id="ahora-discord" hidden><h3>${t('Escuchando', 'Listening')}</h3><div class="disco" id="discord-cuerpo"></div></div>`);
+    if (viendo.length) tarjetas.push(`<div class="tarjeta"><h3>${t('Viendo y leyendo', 'Watching & reading')}</h3><ul class="viendo">${viendo.map(o => `<li><a href="obras.html" title="${esc(o.titulo)}">${o.portada ? `<img src="${esc(o.portada)}" alt="" loading="lazy">` : `<span class="sin-portada" aria-hidden="true">${esc((o.titulo || '?')[0])}</span>`}<span>${esc(o.titulo)}</span></a></li>`).join('')}</ul></div>`);
+    if (cap) tarjetas.push(`<div class="tarjeta"><h3>${t('Último capítulo', 'Latest chapter')}</h3><p class="ultimo-cap"><a href="leer.html#e-${cap.e.id}-c${cap.n}">${tituloCap(cap.c, cap.n)}</a><span>${sol(cap.e.titulo)}${etiquetaEn(cap.e)}</span><span class="tenue">${fechaCorta(cap.c.fecha)}</span></p></div>`);
+    if (!tarjetas.length) return '';
+    return `<section class="seccion ahora-mismo"><h2><span aria-hidden="true">&#9827;</span>${t('Ahora mismo', 'Right now')}</h2><div class="ahora">${tarjetas.join('')}</div></section>`;
+  }
+  // Discord (Lanyard): lo que suena en Liner u otra actividad, y el estado
+  const ESTADO_DISCORD = { online: ['En línea', 'Online', '#3ba55d'], idle: ['Ausente', 'Away', '#faa81a'], dnd: ['No molestar', 'Do not disturb', '#ed4245'], offline: ['Desconectado', 'Offline', '#80848e'] };
+  function imagenActividad(a) {
+    const li = a.assets && a.assets.large_image; if (!li) return '';
+    if (li.startsWith('mp:')) return 'https://media.discordapp.net/' + li.slice(3);
+    if (li.startsWith('spotify:')) return 'https://i.scdn.co/image/' + li.slice(8);
+    return a.application_id ? `https://cdn.discordapp.com/app-assets/${a.application_id}/${li}.png` : '';
+  }
+  let relojCancion = null;
+  async function pintarDiscord() {
+    const caja = $('#ahora-discord'), cuerpo = $('#discord-cuerpo'); if (!caja || !P.discord) return;
+    let d;
+    try {
+      const j = await (await fetch('https://api.lanyard.rest/v1/users/' + encodeURIComponent(P.discord), { cache: 'no-store' })).json();
+      if (!j.success) { caja.hidden = true; return; }
+      d = j.data;
+    } catch (e) { caja.hidden = true; return; }
+    const acts = d.activities || [];
+    const musica = acts.find(a => /liner/i.test(a.name || '')) || acts.find(a => a.type === 2);
+    const otra = acts.find(a => a !== musica && (a.type === 0 || a.type === 3));
+    const propio = acts.find(a => a.type === 4 && a.state);
+    const [es, en, color] = ESTADO_DISCORD[d.discord_status] || ESTADO_DISCORD.offline;
+    const estado = `<span class="punto-estado" style="background:${color}" aria-hidden="true"></span>${t(es, en)}`;
+    clearInterval(relojCancion);
+    let html;
+    if (musica) {
+      const img = musica === acts.find(a => a.id === 'spotify:1') && d.spotify ? d.spotify.album_art_url : imagenActividad(musica);
+      const titulo = musica.details || (d.spotify && d.spotify.song) || musica.name;
+      const artista = musica.state || (d.spotify && d.spotify.artist) || '';
+      const ts = musica.timestamps || {};
+      html = `${img ? `<img src="${esc(img)}" alt="" referrerpolicy="no-referrer">` : '<span class="sin-portada" aria-hidden="true">&#9835;</span>'}
+        <div class="disco-texto"><b>${esc(titulo)}</b>${artista ? `<span>${esc(artista)}</span>` : ''}<span class="tenue">${t('en', 'on')} ${esc(musica.name || 'Liner')} · ${estado}</span>
+        ${ts.start && ts.end ? '<div class="barra-cancion"><i id="barra-cancion"></i></div>' : ''}</div>`;
+      $('#ahora-discord h3').innerHTML = t('Escuchando', 'Listening');
+      if (ts.start && ts.end) {
+        const mover = () => { const b = $('#barra-cancion'); if (!b) return; b.style.width = Math.max(0, Math.min(100, (Date.now() - ts.start) / (ts.end - ts.start) * 100)) + '%'; };
+        setTimeout(mover); relojCancion = setInterval(mover, 1000);
+      }
+    } else {
+      $('#ahora-discord h3').innerHTML = t('En Discord', 'On Discord');
+      html = `<div class="disco-texto">${otra ? `<b>${t(otra.type === 3 ? 'Viendo' : 'Jugando', otra.type === 3 ? 'Watching' : 'Playing')} ${esc(otra.name)}</b>${otra.details ? `<span>${esc(otra.details)}</span>` : ''}` : ''}
+        ${propio ? `<span>${esc(propio.state)}</span>` : ''}<span class="tenue">${estado}</span></div>`;
+    }
+    cuerpo.innerHTML = html; caja.hidden = false;
+  }
+  // Fichas: contador de visitas (una por visita, no por pagina) con Abacus
+  async function pintarFichas() {
+    const caja = $('#fichas'); if (!caja) return;
+    let nueva = false; try { nueva = !sessionStorage.getItem('visita'); sessionStorage.setItem('visita', '1'); } catch (e) {}
+    try {
+      const r = await fetch(`https://abacus.jasoncameron.dev/${nueva ? 'hit' : 'get'}/aeshilfrix-sitio/visitas`, { cache: 'no-store' });
+      const v = (await r.json()).value;
+      if (typeof v !== 'number') throw new Error();
+      caja.innerHTML = String(v).padStart(4, '0').split('').map((c, i) => `<span class="ficha f${i % 4}">${c}</span>`).join('');
+      caja.setAttribute('aria-label', t(`${v} visitas`, `${v} visits`).replace(/<[^>]+>/g, ' '));
+    } catch (e) { caja.closest('.caja').hidden = true; }
+  }
   const caja = (tituloEs, tituloEn, cuerpo, enlace) => `<section class="caja"><h3>${t(tituloEs, tituloEn)}${enlace || ''}</h3><div class="dentro">${cuerpo}</div></section>`;
 
   function estadisticas() {
@@ -257,18 +343,25 @@
           <aside class="lado">
             ${caja('Sobre mí', 'About me', `<div class="avatar-grande">${avatarHTML}</div>${textoBi(P.presentacion) || vacio('Escribe tu presentación en el panel.', 'Write your introduction in the panel.')}
               <table class="datos"><tr><td>${t('Desde', 'Since')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Entradas', 'Posts')}</td><td>${D.blog.length}</td></tr><tr><td>${t('Escritos', 'Writing')}</td><td>${D.escritos.length}</td></tr><tr><td>${t('Obras', 'Titles')}</td><td>${D.obras.length}</td></tr></table>`)}
+            ${fraseDelDia() ? caja('Frase del día', 'Quote of the day', `<blockquote class="frase">${tx(fraseDelDia())}</blockquote>`) : ''}
             ${caja('Me gusta', 'I like', P.gustos.length ? `<ul class="gustos">${P.gustos.map(g => `<li>${tx(g)}</li>`).join('')}</ul>` : vacio('Agrega tus gustos en el panel.', 'Add what you like in the panel.'))}
             ${caja('Estadísticas', 'Stats', estadisticas(), `<a href="obras.html">${t('Ver todo', 'View all')}</a>`)}
             ${caja('Galería', 'Gallery', galeria.length ? `<div class="mini-galeria">${galeria.map(([g, n]) => `<a href="galeria.html#g-${n}" title="${esc(par(g.texto)[0])}"><img src="${esc(g.archivo)}" alt="${esc(par(g.texto)[0])}" loading="lazy"></a>`).join('')}</div>` : vacio('Sube imágenes y agrégalas en el panel.', 'Upload images and add them in the panel.'), `<a href="galeria.html">${t('Ver todo', 'View all')}</a>`)}
+            ${(D.cambios || []).length ? caja('Bitácora de la mesa', 'Table log', `<ul class="bitacora">${[...D.cambios].sort(porFecha).slice(0, 6).map(c => `<li><span class="tenue">${fechaCorta(c.fecha)}</span> ${tx(c.texto)}</li>`).join('')}</ul>`) : ''}
+            ${caja('Fichas', 'Chips', `<div class="fichas" id="fichas" role="img" aria-label="…"></div><table class="datos"><tr><td>${t('Abierto', 'Opened')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Actualizado', 'Updated')}</td><td>${fechaCorta(ultimaActualizacion())}</td></tr></table>`)}
             ${caja('Enlaces', 'Links', D.enlaces.length ? `<ul class="enlaces-lista">${D.enlaces.map(l => `<li><a href="${esc(l.url)}">${esc(l.nombre)}</a><span>${esc(l.detalle || '')}</span></li>`).join('')}</ul>` : vacio('Sin enlaces.', 'No links.'))}
           </aside>
           <main class="principal">
+            ${ahoraMismoHTML()}
             <section class="seccion"><h2><span class="rojo" aria-hidden="true">&#9829;</span>Blog<a href="blog.html">${t('Ver todo', 'View all')}</a></h2>
               ${[...D.blog].sort(porFecha).slice(0, 5).map(p => postHTML(p, 'b', true)).join('') || vacio('Todavía no hay entradas.', 'No posts yet.')}
               ${D.blog.length > 5 ? `<p class="mas"><a href="blog.html">${t(`Ver las ${D.blog.length - 5} entradas anteriores en el Blog`, `See the ${D.blog.length - 5} older posts in the Blog`)} &raquo;</a></p>` : ''}</section>
           </main>
         </div>`;
       activarBanner();
+      pintarFichas();
+      pintarDiscord();
+      setInterval(() => { if (!document.hidden) pintarDiscord(); }, 30000);
     },
     blog() {
       C.innerHTML = tituloTablon('fx', 'Blog', 'Blog') + `<section class="seccion"><p class="nota">${t('Cosas sobre mí: lo que veo, leo y juego.', 'Things about me: what I watch, read and play.')}</p>

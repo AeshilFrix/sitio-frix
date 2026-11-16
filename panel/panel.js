@@ -4,7 +4,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const copia = o => JSON.parse(JSON.stringify(o));
-  const VACIO = { perfil: { nombre: 'Frix', avatar: '', desde: '', lema: { es: '', en: '' }, presentacion: { es: '', en: '' }, gustos: [] }, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [] };
+  const VACIO = { perfil: { nombre: 'Frix', avatar: '', desde: '', discord: '', lema: { es: '', en: '' }, presentacion: { es: '', en: '' }, gustos: [], frases: [] }, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [], cambios: [] };
   let datos = Object.assign(copia(VACIO), copia(window.DATOS || {}));
   let original = JSON.stringify(datos); // lo publicado: el datos.js de la carpeta o, si hay clave de GitHub, el del repositorio
   let pestana = 'blog', editando = null, borrarPendiente = null;
@@ -70,11 +70,15 @@
     musica: { nombre: 'Música', lista: 'musica', nuevo: () => ({}),
       campos: [['titulo', 'Nombre de la canción', 'text', 1], ['url', 'Audio: enlace directo o súbelo desde tu PC', 'audio', 1, 'Acepta .mp3, .ogg o .m4a de hasta 25 MB.']],
       resumen: i => [i.titulo, i.url] },
+    // Bitacora de la mesa: lo que cambia en el sitio (sale en el inicio)
+    cambios: { nombre: 'Bitácora', lista: 'cambios', conId: true, bilingue: ['texto'], nuevo: () => ({ fecha: hoy() }),
+      campos: [['fecha', 'Fecha', 'date', 1], ['texto.es', 'Qué cambió en el sitio', 'text', 1, 'Una línea. En el inicio salen las 6 más nuevas.'], ['texto.en', 'En inglés (se traduce solo)', 'text']],
+      resumen: i => [i.texto && i.texto.es, i.fecha] },
     enlaces: { nombre: 'Enlaces', lista: 'enlaces', nuevo: () => ({}),
       campos: [['nombre', 'Nombre', 'text', 1], ['url', 'Enlace', 'url', 1], ['detalle', 'Detalle (opcional), por ejemplo tu usuario', 'text']],
       resumen: i => [i.nombre, i.url] }
   };
-  const PESTANAS = [['perfil', 'Perfil'], ['blog', 'Blog'], ['diario', 'Diario'], ['escritos', 'Escritos'], ['obras', 'Obras'], ['galeria', 'Galería'], ['musica', 'Música'], ['enlaces', 'Enlaces'], ['publicar', 'Publicar']];
+  const PESTANAS = [['perfil', 'Perfil'], ['blog', 'Blog'], ['diario', 'Diario'], ['escritos', 'Escritos'], ['obras', 'Obras'], ['galeria', 'Galería'], ['musica', 'Música'], ['enlaces', 'Enlaces'], ['cambios', 'Bitácora'], ['publicar', 'Publicar']];
 
   // ---------- Utilidades de formulario ----------
   const leerRuta = (o, ruta) => ruta.split('.').reduce((a, k) => a == null ? undefined : a[k], o);
@@ -284,7 +288,8 @@
   function pintarPerfil(h) {
     const p = datos.perfil;
     // Los gustos traducidos solos no muestran su ingles: solo los que pusiste a mano con la barra
-    const gustos = (p.gustos || []).map(g => g.en && g.en !== g.es && !g.auto ? `${g.es} | ${g.en}` : (g.es || '')).join('\n');
+    const aTexto = lista => (lista || []).map(g => g.en && g.en !== g.es && !g.auto ? `${g.es} | ${g.en}` : (g.es || '')).join('\n');
+    const gustos = aTexto(p.gustos);
     h.innerHTML = `<form class="formulario" id="form-perfil"><b>Perfil</b>
       <div class="dos">${campoHTML(['nombre', 'Nombre', 'text', 1], p.nombre)}${campoHTML(['desde', 'Desde (mes en que abriste el sitio)', 'month'], p.desde)}</div>
       ${campoHTML(['avatar', 'Avatar: enlace directo o súbelo desde tu PC', 'imagen'], p.avatar)}
@@ -292,21 +297,24 @@
       ${campoHTML(['presentacion.es', 'Presentación', 'textarea', 0, AYUDA_TEXTO], p.presentacion && p.presentacion.es)}
       ${campoHTML(['presentacion.en', 'Presentación en inglés (se traduce sola)', 'textarea', 0, AYUDA_EN], p.presentacion && p.presentacion.en)}
       ${campoHTML(['gustos', 'Cosas que me gustan', 'textarea', 0, 'Una por línea. Se traducen solas al inglés; si quieres poner tu propia traducción, sepárala con una barra: Ajedrez | Chess'], gustos)}
+      ${campoHTML(['frases', 'Frases del día', 'textarea', 0, 'Una por línea; el inicio muestra una distinta cada día. Se traducen solas, o pon la tuya con una barra: Frase | Quote'], aTexto(p.frases))}
+      ${campoHTML(['discord', 'ID de usuario de Discord (para mostrar lo que escuchas)', 'text', 0, 'Para que funcione tienes que estar en el servidor de Discord de Lanyard. Déjalo vacío para no mostrar nada.'], p.discord)}
       <div class="acciones"><button class="btn" type="submit">Guardar perfil</button></div></form>`;
     $('#form-perfil').addEventListener('submit', async e => {
       e.preventDefault(); const f = e.target.elements, boton = e.target.querySelector('[type="submit"]');
       const antes = copia(datos.perfil);
-      const nuevo = Object.assign(copia(datos.perfil), { nombre: f['nombre'].value.trim() || 'Frix', desde: f['desde'].value, avatar: f['avatar'].value.trim(),
+      const nuevo = Object.assign(copia(datos.perfil), { nombre: f['nombre'].value.trim() || 'Frix', desde: f['desde'].value, avatar: f['avatar'].value.trim(), discord: f['discord'].value.replace(/\D/g, ''),
         lema: Object.assign({}, antes.lema, { es: f['lema.es'].value, en: f['lema.en'].value }),
         presentacion: Object.assign({}, antes.presentacion, { es: f['presentacion.es'].value.replace(/\r/g, ''), en: f['presentacion.en'].value.replace(/\r/g, '') }) });
       boton.disabled = true;
       const r = await completarIngles(nuevo, antes, ['lema', 'presentacion'], avisar);
       const g = await gustosDesde(f['gustos'].value, antes.gustos || [], avisar);
+      const fr = await gustosDesde(f['frases'].value, antes.frases || [], avisar);
       boton.disabled = false;
-      nuevo.gustos = g.gustos; datos.perfil = nuevo;
+      nuevo.gustos = g.gustos; nuevo.frases = fr.gustos; datos.perfil = nuevo;
       guardarBorrador();
-      const fallo = r.fallo || g.fallo;
-      avisar(fallo ? `Perfil guardado, pero no se pudo traducir al inglés (${fallo.message}). Puedes intentarlo luego en Publicar.` : (r.hechos + g.hechos ? 'Perfil guardado y traducido al inglés.' : 'Perfil guardado en el borrador.'));
+      const fallo = r.fallo || g.fallo || fr.fallo;
+      avisar(fallo ? `Perfil guardado, pero no se pudo traducir al inglés (${fallo.message}). Puedes intentarlo luego en Publicar.` : (r.hechos + g.hechos + fr.hechos ? 'Perfil guardado y traducido al inglés.' : 'Perfil guardado en el borrador.'));
       if (pestana === 'perfil') pintar();
     });
   }
@@ -492,9 +500,9 @@
   function sinTraducir() {
     const lista = [];
     const mirar = o => { if (o && typeof o === 'object' && (o.es || '').trim() && !(o.en || '').trim()) lista.push([o, false]); };
-    ['blog', 'diario', 'galeria'].forEach(k => datos[k].forEach(it => SECCIONES[k].bilingue.forEach(r => mirar(it[r]))));
+    ['blog', 'diario', 'galeria', 'cambios'].forEach(k => (datos[k] || []).forEach(it => SECCIONES[k].bilingue.forEach(r => mirar(it[r]))));
     mirar(datos.perfil.lema); mirar(datos.perfil.presentacion);
-    (datos.perfil.gustos || []).forEach(g => { if (g.es && (!g.en || (g.en === g.es && !g.auto))) lista.push([g, true]); });
+    [...(datos.perfil.gustos || []), ...(datos.perfil.frases || [])].forEach(g => { if (g.es && (!g.en || (g.en === g.es && !g.auto))) lista.push([g, true]); });
     return lista;
   }
 
@@ -687,6 +695,14 @@
       }
       est.textContent = 'Publicando…';
       try {
+        try {
+          // Lo que el sitio tiene y este panel nunca vio (por ejemplo, campos nuevos) se conserva
+          const remoto = await leerDeGitHub(configGH()), antes = JSON.parse(original);
+          const nada = v => v == null || v === '' || (Array.isArray(v) && !v.length);
+          const adoptar = (local, previo, rem) => Object.keys(rem || {}).forEach(k => { if (nada(local[k]) && nada((previo || {})[k]) && !nada(rem[k])) local[k] = rem[k]; });
+          adoptar(datos, antes, remoto);
+          adoptar(datos.perfil, antes.perfil, remoto.perfil);
+        } catch (e) { /* si no se puede leer, se publica igual */ }
         await publicarEnGitHub(configGH(), salida());
         original = JSON.stringify(datos);
         try { localStorage.removeItem(CLAVE); } catch (e) {}

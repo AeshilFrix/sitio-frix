@@ -12,7 +12,22 @@ window.DATOS = {
       "es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\n",
       "en": "Hi, I'm Frix. This is where I keep my diary, what I think about what I see and read, and everything I write.\n\n"
     },
-    "gustos": []
+    "gustos": [],
+    "discord": "1074051356349976727",
+    "frases": [
+      {
+        "es": "Cuando veas una buena jugada, busca una mejor. (Emanuel Lasker)",
+        "en": "When you see a good move, look for a better one. (Emanuel Lasker)"
+      },
+      {
+        "es": "En esta mesa no se miente.",
+        "en": "No lies at this table."
+      },
+      {
+        "es": "Cada cara del cubo tiene su orden.",
+        "en": "Every face of the cube has its order."
+      }
+    ]
   },
   "blog": [
     {
@@ -141,6 +156,48 @@ window.DATOS = {
       "nombre": "Manga list",
       "url": "https://myanimelist.net/mangalist/AeshilFrix",
       "detalle": "MAL"
+    }
+  ],
+  "cambios": [
+    {
+      "id": 1,
+      "fecha": "2026-11-15",
+      "texto": {
+        "es": "Abrí el sitio: blog, escritos, obras y galería.",
+        "en": "Opened the site: blog, writing, titles and gallery."
+      }
+    },
+    {
+      "id": 2,
+      "fecha": "2026-11-15",
+      "texto": {
+        "es": "Mis escritos ahora tienen capítulos, subidos desde Tintero.",
+        "en": "My writing now has chapters, uploaded from Tintero."
+      }
+    },
+    {
+      "id": 3,
+      "fecha": "2026-11-15",
+      "texto": {
+        "es": "Todo se traduce solo al inglés, menos mis historias.",
+        "en": "Everything is translated into English automatically, except my stories."
+      }
+    },
+    {
+      "id": 4,
+      "fecha": "2026-11-16",
+      "texto": {
+        "es": "Colores en el texto e imágenes que se agrandan con un clic.",
+        "en": "Colored text and images that grow with a click."
+      }
+    },
+    {
+      "id": 5,
+      "fecha": "2026-11-16",
+      "texto": {
+        "es": "Paneles nuevos: ahora mismo, frase del día, bitácora y fichas.",
+        "en": "New panels: right now, quote of the day, table log and chips."
+      }
     }
   ]
 };

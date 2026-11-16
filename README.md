@@ -54,6 +54,15 @@ idioma *English* (sale con la etiqueta **#English**), y se pueden enlazar entre 
 Traductor: el de Chrome si el navegador lo tiene; si no, [MyMemory](https://mymemory.translated.net/)
 (gratis: 5.000 letras al día, o 50.000 con un correo).
 
+### Inicio: paneles vivos
+
+- **Ahora mismo**: lo que suena en Liner (vía Discord y [Lanyard](https://github.com/Phineas/Lanyard)), lo que estás
+  viendo o leyendo (las obras marcadas *En curso*) y el último capítulo. El ID de Discord va en *Perfil*; para que
+  funcione hay que estar en el servidor de Discord de Lanyard.
+- **Frase del día**: una distinta cada día, de las que pongas en *Perfil → Frases del día*.
+- **Bitácora de la mesa**: lo que cambia en el sitio; se escribe en la pestaña *Bitácora*.
+- **Fichas**: contador de visitas (una por visita) con [Abacus](https://abacus.jasoncameron.dev/).
+
 ### Obras (buscador)
 
 Anime y manga (AniList), series (TVMaze), libros y cómics (Open Library), películas, juegos y otros
