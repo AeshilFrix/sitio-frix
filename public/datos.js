@@ -90,7 +90,18 @@ window.DATOS = {
       ]
     }
   ],
-  "obras": [],
+  "obras": [
+    {
+      "id": 1,
+      "tipo": "manga",
+      "titulo": "Usogui",
+      "anio": 2006,
+      "portada": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/small/bx39982-68LS2Z9075Kw.jpg",
+      "estado": 2,
+      "nota": 10,
+      "fecha": "2026-11-16"
+    }
+  ],
   "galeria": [],
   "musica": [],
   "enlaces": [
