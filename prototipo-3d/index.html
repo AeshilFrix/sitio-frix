@@ -61,6 +61,28 @@
   .vineta::-webkit-scrollbar-thumb { background: var(--tinta); }
   .vineta h2 { margin: 0 0 10px; font: 400 24px/1.15 var(--f-rotulo); text-wrap: balance; }
   .amplia h2 { font-size: 32px; }
+  .rotulo { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3px 2px; margin: 2px 0 14px; }
+  .rotulo .l { display: inline-block; padding: 2px 5px 3px; line-height: 1; transform: rotate(var(--r)) translateY(var(--y)); }
+  .rotulo .l.a { background: var(--tinta); color: var(--papel); font: 400 1em var(--f-rotulo); }
+  .rotulo .l.b { background: var(--papel); color: var(--tinta); box-shadow: inset 0 0 0 2px var(--tinta); font: 700 0.86em var(--f-texto); padding: 3px 5px; }
+  .rotulo .l.c { background: var(--sala); color: var(--papel); font: 400 1.22em var(--f-rotulo); }
+  .rotulo .esp { width: 9px; }
+  .solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @keyframes entra { from { clip-path: polygon(0 0, 0 0, -14% 100%, 0 100%); } to { clip-path: polygon(0 0, 114% 0, 100% 100%, 0 100%); } }
+  .contenido.entra { animation: entra 0.26s cubic-bezier(0.22, 1, 0.36, 1); }
+  .hora-grande { margin: 4px 0 6px; font: 400 54px/1 var(--f-rotulo); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+  .mes { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0 8px; }
+  .mes b { font: 400 20px/1.2 var(--f-rotulo); }
+  .mes .boton { padding: 6px 12px; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin-bottom: 12px; }
+  .cal .sem { text-align: center; font-size: 12px; font-weight: 700; color: var(--tenue); padding-bottom: 2px; }
+  .cal button { all: unset; box-sizing: border-box; position: relative; aspect-ratio: 1; display: grid; place-items: start; padding: 4px 5px; cursor: pointer; border: 2px solid var(--linea); font-size: 13px; font-variant-numeric: tabular-nums; max-width: 100%; }
+  .cal button.con { border-color: var(--tinta); font-weight: 700; }
+  .cal button.con::after { content: ""; position: absolute; right: 0; bottom: 0; border: 7px solid transparent; border-right-color: var(--sala); border-bottom-color: var(--sala); }
+  .cal button.hoy { box-shadow: inset 0 0 0 2px var(--sala); }
+  .cal button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+  .cal button:focus-visible { outline: 3px solid var(--sala); outline-offset: 1px; }
+  .cal button:disabled { cursor: default; opacity: 0.45; }
   .vineta h3 { margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 2px solid var(--tinta); font: 700 15px/1.3 var(--f-texto); }
   .vineta p { margin: 0 0 10px; }
   .tenue { color: var(--tenue); font-size: 13px; }
@@ -73,7 +95,9 @@
   .lista .f { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; padding-top: 2px; }
   .lista b { display: block; font-weight: 700; line-height: 1.35; }
   .lista small { font-size: 12px; color: var(--tenue); }
-  .lista button:hover b { text-decoration: underline 2px var(--sala); text-underline-offset: 3px; }
+  .lista button { position: relative; isolation: isolate; }
+  .lista button:hover::before, .lista button:focus-visible::before { content: ""; position: absolute; inset: 2px -6px; z-index: -1; background: var(--tinta); clip-path: polygon(1.5% 0, 100% 0, 98.5% 100%, 0 100%); }
+  .lista button:hover b, .lista button:hover .f, .lista button:hover small, .lista button:focus-visible b, .lista button:focus-visible .f, .lista button:focus-visible small { color: var(--papel); }
   .bitacora { list-style: none; margin: 0; padding: 0; font-size: 13px; }
   .bitacora li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding: 5px 0; }
   .bitacora .f { color: var(--tenue); font-variant-numeric: tabular-nums; }
@@ -168,14 +192,19 @@
   .tira > * { pointer-events: auto; }
   .marca { display: grid; place-items: center; padding: 0 16px; background: var(--tinta); color: var(--papel); font: 400 26px/1 var(--f-rotulo); }
   .salas { display: flex; gap: 8px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
-  .sala-btn { all: unset; box-sizing: border-box; flex: none; cursor: pointer; display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: stretch; width: 158px; height: 66px;
-    background: var(--papel); border: var(--borde) solid var(--tinta); transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1); }
+  .sala-btn { all: unset; box-sizing: border-box; flex: none; cursor: pointer; display: grid; grid-template-columns: 49px minmax(0, 1fr); align-items: stretch; width: 158px; height: 66px;
+    position: relative; isolation: isolate; padding: var(--borde); transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1); }
+  .sala-btn::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--papel); border: var(--borde) solid var(--tinta); }
   .sala-btn .k { display: grid; place-items: center; background: var(--c); color: var(--papel); border-right: var(--borde) solid var(--tinta); font: 400 27px/1 var(--f-rotulo); }
   .sala-btn .t { padding: 9px 12px; line-height: 1.2; min-width: 0; }
   .sala-btn .t b { display: block; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sala-btn .t span { font-size: 12px; color: var(--tenue); white-space: nowrap; }
-  .sala-btn:hover { transform: translateY(-2px); }
-  .sala-btn[aria-current="page"] { background: var(--c); }
+  .sala-btn:hover { transform: translateY(-2px) rotate(-1deg); }
+  .sala-btn[aria-current="page"] { transform: rotate(-2.5deg) scale(1.05); z-index: 1; }
+  .sala-btn[aria-current="page"]::after { background: var(--c); }
+  .sala-btn[aria-current="page"]::before { content: ""; position: absolute; inset: -7px -11px -9px -9px; z-index: -2; background: var(--tinta);
+    clip-path: polygon(2% 14%, 20% 0, 52% 10%, 84% 0, 100% 18%, 96% 58%, 100% 100%, 66% 88%, 34% 100%, 0 90%, 5% 50%); }
+  .salas { padding: 10px 14px 6px 10px; margin: -10px -14px -6px -10px; }
   .sala-btn[aria-current="page"] .t b, .sala-btn[aria-current="page"] .t span { color: var(--papel); }
   .sala-btn:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
   .icono { all: unset; box-sizing: border-box; pointer-events: auto; flex: none; cursor: pointer; display: grid; place-items: center; width: 66px; height: 66px; background: var(--papel); color: var(--tinta); border: var(--borde) solid var(--tinta);
@@ -195,7 +224,9 @@
   .acciones p { margin: 0; padding: 5px 12px; background: var(--papel); border: 2px solid var(--tinta); font-size: 13px; }
   .acciones p:empty { display: none; }
   .acciones div { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .acciones .boton { padding: 12px 22px; font-size: 15px; border: var(--borde) solid var(--tinta); }
+  .acciones .boton { padding: 12px 24px; font-size: 15px; border: var(--borde) solid var(--tinta); transform: skewX(-12deg); transition: box-shadow 0.15s ease-out, transform 0.15s ease-out, background-color 0.15s ease-out; }
+  .acciones .boton > span { display: inline-block; transform: skewX(12deg); }
+  .acciones .boton:hover { box-shadow: 6px 6px 0 var(--sala); transform: skewX(-12deg) translate(-2px, -2px); }
   .acciones .boton.claro { background: var(--papel); color: var(--tinta); }
   .acciones .boton.claro:hover { background: var(--tinta); color: var(--papel); }
   .inventario { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px)); width: min(300px, calc(100vw - 32px)); box-sizing: border-box;
@@ -224,6 +255,7 @@
     .amplia .dos, .gal-dos { grid-template-columns: minmax(0, 1fr); }
     .marcador { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .icono { width: 60px; height: 60px; }
+    .sala-btn { grid-template-columns: 39px minmax(0, 1fr); }
     .acciones { right: 16px; bottom: calc(96px + 42vh + 12px); }
     .marca, .ayuda { display: none; }
     .sala-btn { width: 132px; height: 60px; grid-template-columns: 42px minmax(0, 1fr); }
@@ -231,6 +263,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .vineta, .sala-btn, .boton, .icono, #mundo { transition: none; }
+    .contenido.entra { animation: none; }
   }
 </style>
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
@@ -277,7 +310,8 @@ const SALAS = [
 ];
 // El diario no es una sala: se abre con el cubo de la librería y es la sexta cara del formato cubo
 // El diario y la cara sin señal no son salas: solo se llega a ellos dentro del cubo
-const SECCIONES = [...SALAS, { id: 'diario', nombre: 'Diario', seccion: 'Diario', kanji: '日', color: PAPEL, v: '--tinta', dir: null }, { id: 'oculta', nombre: 'Sin señal', seccion: 'Sin señal', kanji: '', color: PAPEL, v: '--tenue', dir: null }];
+const SECCIONES = [...SALAS, { id: 'diario', nombre: 'Diario', seccion: 'Diario', kanji: '日', color: PAPEL, v: '--tinta', dir: null }, { id: 'oculta', nombre: 'Sin señal', seccion: 'Sin señal', kanji: '', color: PAPEL, v: '--tenue', dir: null },
+  { id: 'reloj', nombre: 'Reloj', seccion: 'Reloj', kanji: '時', color: '#e0362c', v: '--bermellon', dir: null }, { id: 'calendario', nombre: 'Calendario', seccion: 'Calendario', kanji: '暦', color: '#e0362c', v: '--bermellon', dir: null }];
 const sala = id => SALAS.find(s => s.id === id);
 const seccion = id => SECCIONES.find(s => s.id === id);
 const L = 18, ALTO = 4.6, GROSOR = 0.36, PUERTA = 4.6, DINTEL = 3.9, DIST = 26;
@@ -294,6 +328,20 @@ let estado = 'sala', asiento = null, invAbierto = false, diarioVisto = false;
 // dónde está el cubo: estante (librería), mano (inventario) o mesa (sobre la ruleta)
 let estadoCubo = ['estante', 'mano', 'mesa'].includes(leer('cubo')) ? leer('cubo') : 'estante', asientoCubo = Math.min(5, Math.max(0, +leer('asiento') || 1));
 let girando = false, tiradas = [];
+// El reloj y el calendario cuelgan en una esquina de la sala de la Ruleta; objeto = el que estás mirando de cerca
+let objeto = null, calMes = (() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; })(), calDia = null;
+const dosD = n => String(n).padStart(2, '0');
+const isoDia = (y, m, d) => `${y}-${dosD(m + 1)}-${dosD(d)}`;
+const horaLarga = () => { const d = new Date(); return `${dosD(d.getHours())}:${dosD(d.getMinutes())}:${dosD(d.getSeconds())}`; };
+const hoyISO = () => { const d = new Date(); return isoDia(d.getFullYear(), d.getMonth(), d.getDate()); };
+function cambiosPorDia() { const m = new Map(); (D.cambios || []).forEach(c => { const k = String(c.fecha || '').slice(0, 10); if (!m.has(k)) m.set(k, []); m.get(k).push(c); }); m.forEach(v => v.sort((a, b) => (b.id ?? 0) - (a.id ?? 0))); return m; }
+// Día elegido por defecto: hoy si tuvo cambios; si no, el último día con cambios de ese mes
+function diaDelMes() {
+  if (calDia && calDia.startsWith(`${calMes.y}-${dosD(calMes.m + 1)}`)) return calDia;
+  const pd = cambiosPorDia(), pref = `${calMes.y}-${dosD(calMes.m + 1)}`;
+  if (pd.has(hoyISO()) && hoyISO().startsWith(pref)) return hoyISO();
+  return [...pd.keys()].filter(k => k.startsWith(pref)).sort().pop() || null;
+}
 let galDemo = false, ronda = 0, galSel = null, obrasDemo = false, obraMarcada = null, tableroPag = 0;
 let paneles = [], compuesto = null;
 
@@ -416,7 +464,7 @@ const VISTAS = {
   inicio() {
     const p = D.perfil || {}, frases = (p.frases || []).map(tx).filter(Boolean);
     const frase = frases.length ? frases[new Date().getDate() % frases.length] : '';
-    return `<div class="dos"><div><h2>Sobre mí</h2>
+    return `<div class="dos"><div><h2 class="rotulo">Sobre mí</h2>
       <p>${esc(tx(p.presentacion))}</p>
       ${frase ? `<p class="frase">${esc(frase)}</p>` : ''}
       <h3 id="ancla-ruleta">Ruleta</h3>
@@ -426,11 +474,12 @@ const VISTAS = {
       <ol class="lista">${jugadas().slice(0, 6).map((j, i) => `<li><button type="button" data-jugada="${i}"><span class="f">${fechaCorta(j.f)}</span><span><b>${esc(j.titulo)}</b><small>${esc(j.tipo)}</small></span></button></li>`).join('')}</ol></div>
       <div><h3 id="ancla-bitacora">Bitácora</h3>
       <ul class="bitacora">${[...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)) || (b.id - a.id)).slice(0, amplia ? 10 : 4).map(c => `<li><span class="f">${fechaCorta(c.fecha)}</span><span>${esc(tx(c.texto))}</span></li>`).join('')}</ul>
+      <p><button class="enlace" type="button" data-calendario>Ver la bitácora en el calendario</button></p>
       ${(D.enlaces || []).length ? `<h3 id="ancla-enlaces">Enlaces</h3><ul class="bitacora">${D.enlaces.map(e => `<li><span class="f">${esc(e.nombre || '')}</span><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(String(e.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))}</a></li>`).join('')}</ul>` : ''}</div></div>`;
   },
   blog() {
-    if (!blog.length) return `<h2>Blog</h2><p>Todavía no hay entradas. Cada una aparece como una carta sobre la mesa.</p>`;
-    return `<h2>Blog</h2><p class="tenue">Cada entrada es una carta boca arriba sobre la mesa. Haz clic en una imagen para agrandarla.</p>
+    if (!blog.length) return `<h2 class="rotulo">Blog</h2><p>Todavía no hay entradas. Cada una aparece como una carta sobre la mesa.</p>`;
+    return `<h2 class="rotulo">Blog</h2><p class="tenue">Cada entrada es una carta boca arriba sobre la mesa. Haz clic en una imagen para agrandarla.</p>
       ${blog.map(p => `<article class="post" id="post-${p.id}">${p.imagen ? `<p class="archivo">Archivo: <a href="${esc(p.imagen)}" target="_blank" rel="noopener">${esc(nombreArchivo(p.imagen))}</a></p><a class="img" href="${esc(p.imagen)}" aria-expanded="false" title="Clic para agrandar"><img src="${esc(p.imagen)}" alt="Imagen de la entrada" loading="lazy"></a>` : ''}
         <header><span class="asunto">${esc(tx(p.titulo))}</span><span class="meta">${esc((D.perfil || {}).nombre || 'Frix')} · ${fechaCorta(p.fecha)} · ${numPost(p.id)}</span></header>
         <div class="cuerpo">${textoPost(tx(p.texto))}</div></article>`).join('')}`;
@@ -450,10 +499,10 @@ const VISTAS = {
   },
   obras() {
     const lista = obrasLista(), aviso = obrasDemo ? `<p class="ejemplo">Estás viendo ${lista.length} obras de ejemplo para probar cómo se llena el tablero. <button class="enlace" type="button" data-demo-obras>Volver a tus obras</button></p>` : '';
-    if (!lista.length) return `<h2>Obras</h2><p>Todavía no hay obras en el tablero.</p><p><button class="enlace" type="button" data-demo-obras>Ver cómo queda con obras de ejemplo</button></p>`;
+    if (!lista.length) return `<h2 class="rotulo">Obras</h2><p>Todavía no hay obras en el tablero.</p><p><button class="enlace" type="button" data-demo-obras>Ver cómo queda con obras de ejemplo</button></p>`;
     const cuenta = j => lista.filter(x => x.jugada === j).length, tableros = Math.ceil(lista.length / 100);
     const pagina = lista.filter(x => x.tablero === tableroPag);
-    return `<h2>Obras</h2>${aviso}
+    return `<h2 class="rotulo">Obras</h2>${aviso}
       <p class="tenue">Cada obra que agregas es un disparo en el tablero, en el orden en que la agregas. En la sala, la flota del fondo tiene un barco por tipo de obra: cada obra le suma una pieza, hasta cinco.</p>
       <div class="marcador"><div><b>${lista.length - cuenta('apuntada')}</b><span>disparos</span></div><div><b>${cuenta('hundida')}</b><span>hundidas</span></div><div><b>${cuenta('tocada')}</b><span>tocadas</span></div><div><b>${cuenta('agua')}</b><span>al agua</span></div></div>
       <ul class="leyenda"><li><span class="senal hundida" aria-hidden="true">&times;</span>Hundida: completada</li><li><span class="senal tocada" aria-hidden="true"></span>Tocada: en curso o en pausa</li><li><span class="senal agua" aria-hidden="true"></span>Agua: abandonada</li><li><span class="senal apuntada" aria-hidden="true"></span>Apuntada: planeada, todavía sin disparo</li></ul>
@@ -465,29 +514,45 @@ const VISTAS = {
   galeria() {
     const G = galLista(), n = G.length, rondas = rondasGal();
     const aviso = galDemo ? `<p class="ejemplo">Estás viendo 24 imágenes de ejemplo para probar cómo se reparten. <button class="enlace" type="button" data-demo-gal>Quitar el ejemplo</button></p>` : '';
-    if (!n) return `<h2>Galería</h2><p>Todavía no subiste imágenes. Cada una que subas queda escondida detrás de un panel con su letra, como en el programa del Juego maquiavélico, y se da vuelta al hacer clic.</p>
+    if (!n) return `<h2 class="rotulo">Galería</h2><p>Todavía no subiste imágenes. Cada una que subas queda escondida detrás de un panel con su letra, como en el programa del Juego maquiavélico, y se da vuelta al hacer clic.</p>
       <p>Van de 6 en 6. Si subes 24, la pared muestra la ronda 1 y las demás se pasan con los botones de ronda; en la viñeta ampliada se ven todas juntas.</p>
       <p><button class="enlace" type="button" data-demo-gal>Ver cómo queda con 24 imágenes de ejemplo</button></p>`;
     const visor = galSel != null && G[galSel] ? visorHTML(G) : '';
     if (amplia) {
       let grupos = '';
       for (let r = 0; r < rondas; r++) grupos += `<p class="grupo">Ronda ${r + 1}</p><div class="miniaturas todas">${G.slice(r * 6, r * 6 + 6).map((g, k) => miniatura(G, r * 6 + k)).join('')}</div>`;
-      const texto = `<h2>Galería</h2>${aviso}<p class="tenue">${n} ${n === 1 ? 'imagen' : 'imágenes'} en ${rondas} ${rondas === 1 ? 'ronda' : 'rondas'} de 6. Haz clic en una para verla en grande.</p>`;
+      const texto = `<h2 class="rotulo">Galería</h2>${aviso}<p class="tenue">${n} ${n === 1 ? 'imagen' : 'imágenes'} en ${rondas} ${rondas === 1 ? 'ronda' : 'rondas'} de 6. Haz clic en una para verla en grande.</p>`;
       return visor ? `${texto}<div class="gal-dos"><div>${grupos}</div>${visor}</div>` : texto + grupos;
     }
     const celdas = Array.from({ length: 6 }, (_, k) => { const gi = ronda * 6 + k; return G[gi] ? miniatura(G, gi) : `<span class="vacio" aria-hidden="true">${LETRAS[k]}</span>`; }).join('');
-    return `<h2>Galería</h2>${aviso}<p class="tenue">${n} ${n === 1 ? 'imagen' : 'imágenes'}, de 6 en 6. Haz clic en un panel de la pared o aquí abajo para darle la vuelta.</p>
+    return `<h2 class="rotulo">Galería</h2>${aviso}<p class="tenue">${n} ${n === 1 ? 'imagen' : 'imágenes'}, de 6 en 6. Haz clic en un panel de la pared o aquí abajo para darle la vuelta.</p>
       ${rondas > 1 ? `<div class="ronda"><button class="boton" type="button" data-ronda="-1">&lsaquo; Anterior</button><span>Ronda ${ronda + 1} de ${rondas}</span><button class="boton" type="button" data-ronda="1">Siguiente &rsaquo;</button></div>` : ''}
       <div class="miniaturas">${celdas}</div>${visor}
       <p><button class="enlace" type="button" data-ver-todas>Ver todas en la viñeta ampliada</button></p>`;
   },
   diario() {
     const E = diarioOrdenado();
-    return `<h2>Diario</h2>
+    return `<h2 class="rotulo">Diario</h2>
       <div class="diario">${E.map(e => `<article id="dia-${e.id}"><p class="dia">${fechaLarga(e.fecha)}</p><h4>${esc(tx(e.titulo))}</h4><div class="cuerpo">${textoPost(tx(e.texto))}</div></article>`).join('') || '<p>El diario está vacío.</p>'}</div>`;
   },
   oculta() {
-    return `<h2>Sin señal</h2><p>Ninguna de estas pantallas muestra nada.</p>`;
+    return `<h2 class="rotulo">Sin señal</h2><p>Ninguna de estas pantallas muestra nada.</p>`;
+  },
+  reloj() {
+    return `<h2 class="rotulo">Reloj</h2><p class="hora-grande" id="hora-grande">${horaLarga()}</p>
+      <p class="tenue">${fechaLarga(hoyISO())}</p><p>Es la hora de tu computadora. El reloj de la pared marca lo mismo con sus tres agujas.</p>`;
+  },
+  calendario() {
+    const { y, m } = calMes, pd = cambiosPorDia(), dias = new Date(y, m + 1, 0).getDate(), hueco = (new Date(y, m, 1).getDay() + 6) % 7, sel = diaDelMes(), hoy = hoyISO();
+    const celdas = Array.from({ length: hueco }, () => '<span aria-hidden="true"></span>').join('') + Array.from({ length: dias }, (_, i) => {
+      const k = isoDia(y, m, i + 1), n = (pd.get(k) || []).length;
+      return `<button type="button" data-dia="${k}" class="${n ? 'con' : ''}${k === hoy ? ' hoy' : ''}" aria-pressed="${k === sel}" aria-label="${i + 1} de ${MESES[m]}${n ? `, ${n} ${n === 1 ? 'cambio' : 'cambios'}` : ''}">${i + 1}</button>`;
+    }).join('');
+    const lista = sel ? (pd.get(sel) || []) : [];
+    return `<h2 class="rotulo">Calendario</h2><p class="tenue">La bitácora del sitio, día por día. Los días con esquina de color tienen cambios.</p>
+      <div class="mes"><button class="boton" type="button" data-mes="-1" aria-label="Mes anterior">&lsaquo;</button><b>${MESES[m][0].toUpperCase() + MESES[m].slice(1)} ${y}</b><button class="boton" type="button" data-mes="1" aria-label="Mes siguiente">&rsaquo;</button></div>
+      <div class="cal">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => `<span class="sem" aria-hidden="true">${d}</span>`).join('')}${celdas}</div>
+      ${sel ? `<h3>${fechaLarga(sel)}</h3>${lista.length ? `<ul class="bitacora">${lista.map(c => `<li><span class="f">${fechaCorta(c.fecha)}</span><span>${esc(tx(c.texto))}</span></li>`).join('')}</ul>` : '<p>Ese día no hubo cambios.</p>'}` : '<p>Este mes no hubo cambios.</p>'}`;
   }
 };
 
@@ -502,11 +567,19 @@ function mostrar(id, abrir) {
   seccionActual = id; ultima = abrir || {};
   raiz.style.setProperty('--sala', `var(${s.v})`);
   document.title = `${s.seccion} · Casa de juego de Frix`;
-  marcarTira(id); pintarVineta();
+  marcarTira(SALAS.some(x => x.id === id) ? id : (id === 'reloj' || id === 'calendario') ? 'inicio' : id); pintarVineta();
+  if (!menos) { contenido.classList.remove('entra'); void contenido.offsetWidth; contenido.classList.add('entra'); }
+}
+// Recorte: cada letra en su papelito, con tipos y giros distintos (como los títulos de Persona 5)
+function rotular(h) {
+  const texto = h.textContent, r = azarSemilla([...texto].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7));
+  h.innerHTML = `<span class="solo-lectores">${esc(texto)}</span>` + [...texto].map((ch, i) => ch === ' ' ? '<span class="esp" aria-hidden="true"></span>'
+    : `<span class="l ${i === 0 ? 'c' : r() < 0.58 ? 'a' : 'b'}" aria-hidden="true" style="--r:${((r() - 0.5) * 10).toFixed(1)}deg;--y:${((r() - 0.5) * 5).toFixed(1)}px">${esc(ch)}</span>`).join('');
 }
 function pintarVineta(mantener) {
   const a = ultima, top = vineta.scrollTop;
   contenido.innerHTML = VISTAS[seccionActual](a);
+  contenido.querySelectorAll('h2.rotulo').forEach(rotular);
   vineta.scrollTop = mantener ? top : 0;
   if (a.post != null) { const el = document.getElementById('post-' + a.post); if (el) { el.classList.add('marcado'); el.scrollIntoView({ block: 'start' }); } }
   if (a.entrada != null) { const el = document.getElementById('dia-' + a.entrada); if (el) el.scrollIntoView({ block: 'start' }); }
@@ -534,6 +607,9 @@ contenido.addEventListener('click', e => {
   if (q('[data-demo-obras]')) { obrasDemo = !obrasDemo; obraMarcada = null; tableroPag = 0; if (hay3D) { reconstruirNaval(); repintarCara('obras'); } pintarVineta(true); return; }
   if ((b = q('[data-tablero]'))) { const n = Math.ceil(obrasLista().length / 100); tableroPag = (tableroPag + +b.dataset.tablero + n) % n; obraMarcada = null; if (hay3D) reconstruirNaval(); pintarVineta(true); return; }
   if ((b = q('tr[data-obra]'))) { marcarObra(+b.dataset.obra); return; }
+  if ((b = q('[data-mes]'))) { const d = new Date(calMes.y, calMes.m + +b.dataset.mes, 1); calMes = { y: d.getFullYear(), m: d.getMonth() }; calDia = null; pintarVineta(true); if (hay3D) pintarCalendario3D(); return; }
+  if ((b = q('[data-dia]'))) { calDia = b.dataset.dia; pintarVineta(true); if (hay3D) pintarCalendario3D(); return; }
+  if (q('[data-calendario]')) { if (hay3D && (estado === 'sala' || estado === 'sentado' || estado === 'objeto')) acercarObjeto('calendario'); else mostrar('calendario'); return; }
 });
 
 // Galería: elegir una imagen da vuelta su panel; cambiar de ronda cierra los abiertos
@@ -602,13 +678,14 @@ function pintarEstado() {
   const nota = $('#acciones-nota'), bot = $('#acciones-botones'), botones = [];
   let texto = '';
   if (estado === 'cerca') { texto = 'Arrastra para girarlo. Haz clic en una pieza para mover su fila.'; botones.push(['agarrar', 'Agarrar', ''], ['soltar', 'Dejarlo', 'claro']); }
+  else if (estado === 'objeto') { texto = objeto === 'calendario' ? 'Haz clic en un día para ver qué cambió. Las flechas de arriba cambian de mes.' : ''; botones.push(['volver', 'Volver', 'claro']); }
   else if (estado === 'sentado') {
     if (estadoCubo === 'mano') botones.push(['dejar', 'Dejar el cubo', '']);
     if (estadoCubo === 'mesa' && asientoCubo === asiento) { texto = 'Doble clic en el cubo para abrirlo.'; botones.push(['recoger', 'Recoger el cubo', 'claro']); }
     botones.push(['levantarse', 'Levantarse', 'claro']);
   }
   nota.textContent = texto;
-  bot.innerHTML = botones.map(([id, t, c]) => `<button class="boton ${c}" type="button" data-accion="${id}">${t}</button>`).join('');
+  bot.innerHTML = botones.map(([id, t, c]) => `<button class="boton ${c}" type="button" data-accion="${id}"><span>${t}</span></button>`).join('');
   $('#acciones').hidden = !hay3D || (!texto && !botones.length);
   const bolsa = $('#bolsa'); bolsa.hidden = !(hay3D && estadoCubo === 'mano' && estado !== 'menu'); bolsa.setAttribute('aria-pressed', invAbierto);
   if (estadoCubo !== 'mano' || estado === 'menu') invAbierto = false;
@@ -620,7 +697,7 @@ function pintarEstado() {
 }
 $('#acciones').addEventListener('click', e => {
   const b = e.target.closest('[data-accion]'); if (!b) return;
-  ({ agarrar: agarrarCubo, soltar: () => devolverCubo(false), dejar: dejarCubo, recoger: recogerCubo, levantarse })[b.dataset.accion]();
+  ({ agarrar: agarrarCubo, soltar: () => devolverCubo(false), dejar: dejarCubo, recoger: recogerCubo, levantarse, volver: () => alejarObjeto(false) })[b.dataset.accion]();
 });
 $('#bolsa').addEventListener('click', () => { invAbierto = !invAbierto; pintarEstado(); });
 $('#cerrar-inv').addEventListener('click', () => { invAbierto = false; pintarEstado(); });
@@ -631,6 +708,7 @@ function ir(id, abrir) {
   if (estado === 'menu') { if (SALAS.some(s => s.id === id) && caraFrente !== id) irCara(id, abrir); else mostrar(id, abrir); return; }
   if (estado === 'cerca') devolverCubo(true);
   if (estado === 'sentado') { const misma = sala(id) === actual; levantarse(); if (misma) { mostrar(id, abrir); return; } }
+  if (estado === 'objeto') { const misma = sala(id) === actual; alejarObjeto(!misma); if (misma) { mostrar(id, abrir); return; } }
   irA(id, abrir);
 }
 tira.addEventListener('click', e => { const b = e.target.closest('[data-sala]'); if (b) ir(b.dataset.sala); });
@@ -643,6 +721,7 @@ addEventListener('keydown', e => {
     else if (hay3D && estado === 'menu') cerrarMenu();
     else if (hay3D && estado === 'cerca') devolverCubo(false);
     else if (hay3D && estado === 'sentado') levantarse();
+    else if (hay3D && estado === 'objeto') alejarObjeto(false);
     return;
   }
   if (hay3D && estado === 'menu' && /^Arrow/.test(e.key)) { e.preventDefault(); moverVentana(e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0, e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0); return; }
@@ -660,6 +739,7 @@ function girar() {
 }
 pintarEstado();
 mostrar('inicio');
+setInterval(() => { const el = document.getElementById('hora-grande'); if (el) el.textContent = horaLarga(); }, 1000);
 
 // ---------- Escena ----------
 const lienzo = $('#mundo');
@@ -855,8 +935,99 @@ function construirRuleta() {
   TABURETES.forEach(([x, z], i) => { poner(new THREE.CylinderGeometry(0.42, 0.42, 0.14, 32), M.papel, x, 0.86, z, { sentarse: i }); cil(0.07, 0.1, 0.8, M.tinta, x, 0.4, z, 12); cil(0.34, 0.34, 0.05, M.tinta, x, 0.03, z, 24); });
   // Lamparas colgantes
   caja(L + GROSOR, 0.24, 0.32, M.tinta, 0, ALTO + 0.12, 0);
-  for (const x of [-2.2, 1.8]) { poner(new THREE.ConeGeometry(0.85, 0.7, 32, 1, true), mat(TINTA, { doble: true }), x, 3.55, 0); cil(0.025, 0.025, 0.85, M.tinta, x, 4.3, 0, 8); poner(new THREE.SphereGeometry(0.16, 16, 10), mat(PAPEL, { trama: 0 }), x, 3.2, 0); }
+  for (const x of [-2.2, 1.8]) { poner(new THREE.ConeGeometry(0.85, 0.7, 32, 1, true), mat(TINTA, { doble: true }), x, 3.55, 0, { tema: true }); cil(0.025, 0.025, 0.85, M.tinta, x, 4.3, 0, 8); poner(new THREE.SphereGeometry(0.16, 16, 10), mat(PAPEL, { trama: 0 }), x, 3.2, 0, { tema: true }); }
   for (const otra of SALAS) if (otra.dir) cartelPuerta(otra);
+}
+
+// ---------- Rincón de la Ruleta: reloj de pared y calendario con la bitácora ----------
+const PARED_N = -L / 2 + GROSOR / 2, RELOJ = { x: -6.6, y: 2.95 }, CAL = { x: -3.85, y: 2.42 };
+let agujas = null, placaCv = null, placaTex = null, placaSeg = -1, calCv = null, calTex = null;
+const CAL_W = 520, CAL_H = 672, CAL_BANDA = 112, CAL_SEM = 158, CAL_FILA = (CAL_H - CAL_SEM - 14) / 6, CAL_M = 14, CAL_CW = (CAL_W - 2 * CAL_M) / 7;
+function construirRincon() {
+  const s = sala('inicio'), z = PARED_N;
+  // Reloj clásico de 12 horas con sus tres agujas
+  poner(new THREE.CylinderGeometry(0.74, 0.74, 0.06, 56), M.tinta, RELOJ.x, RELOJ.y, z + 0.03).rotation.x = Math.PI / 2;
+  const esfera = textura(512, 512, (c, w, h) => {
+    const cx = w / 2, cy = h / 2; c.fillStyle = PAPEL; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2, r0 = i % 5 ? 222 : 200; c.lineWidth = i % 5 ? 4 : 11; c.strokeStyle = TINTA; c.beginPath(); c.moveTo(cx + Math.sin(a) * r0, cy - Math.cos(a) * r0); c.lineTo(cx + Math.sin(a) * 240, cy - Math.cos(a) * 240); c.stroke(); }
+    c.fillStyle = TINTA; c.font = `58px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    for (let i = 1; i <= 12; i++) { const a = i / 12 * Math.PI * 2; c.fillText(String(i), cx + Math.sin(a) * 158, cy - Math.cos(a) * 158 + 3); }
+    c.fillStyle = s.color; c.font = `40px ${ROT}`; c.fillText('時', cx, cy + 82);
+  });
+  poner(new THREE.CircleGeometry(0.66, 64), mat(PAPEL, { mapa: esfera, trama: 0 }), RELOJ.x, RELOJ.y, z + 0.065, { objeto: 'reloj' });
+  poner(new THREE.TorusGeometry(0.68, 0.055, 10, 64), M.tinta, RELOJ.x, RELOJ.y, z + 0.07);
+  agujas = {};
+  const aguja = (largo, ancho, material, cola, zz) => { const g = new THREE.BoxGeometry(ancho, largo + cola, 0.014); g.translate(0, (largo - cola) / 2, 0); const m = poner(g, material, RELOJ.x, RELOJ.y, z + zz); return m; };
+  agujas.h = aguja(0.36, 0.05, M.tinta, 0.06, 0.09); agujas.m = aguja(0.52, 0.032, M.tinta, 0.07, 0.105); agujas.s = aguja(0.56, 0.014, mat(s.color, { trama: 0 }), 0.12, 0.12);
+  poner(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 20), M.tinta, RELOJ.x, RELOJ.y, z + 0.135).rotation.x = Math.PI / 2;
+  // Debajo, la hora en números
+  caja(1.08, 0.36, 0.03, M.tinta, RELOJ.x, 1.98, z + 0.015);
+  [placaCv, placaTex] = lienzoTex(400, 120);
+  poner(new THREE.PlaneGeometry(1.0, 0.3), mat(PAPEL, { mapa: placaTex, trama: 0 }), RELOJ.x, 1.98, z + 0.035, { objeto: 'reloj' });
+  // Calendario de pared
+  caja(1.44, 1.86, 0.05, M.tinta, CAL.x, CAL.y, z + 0.025);
+  [calCv, calTex] = lienzoTex(CAL_W, CAL_H);
+  poner(new THREE.PlaneGeometry(1.34, 1.34 * CAL_H / CAL_W), mat(PAPEL, { mapa: calTex, trama: 0 }), CAL.x, CAL.y, z + 0.055, { objeto: 'calendario' });
+  for (const dx of [-0.42, 0.42]) poner(new THREE.TorusGeometry(0.06, 0.016, 8, 20), M.tinta, CAL.x + dx, CAL.y + 0.93, z + 0.07);
+  pintarCalendario3D();
+}
+function actualizarReloj() {
+  if (!agujas) return;
+  const d = new Date(), s = d.getSeconds(), m = d.getMinutes() + s / 60, h = (d.getHours() % 12) + m / 60;
+  agujas.s.rotation.z = -s / 60 * Math.PI * 2; agujas.m.rotation.z = -m / 60 * Math.PI * 2; agujas.h.rotation.z = -h / 12 * Math.PI * 2;
+  if (s === placaSeg) return;
+  placaSeg = s; const c = placaCv.getContext('2d'); c.fillStyle = TINTA; c.fillRect(0, 0, 400, 120);
+  sieteSeg(c, horaLarga(), 200, 22, 76, sala('inicio').color, 360); placaTex.needsUpdate = true;
+}
+function pintarCalendario3D() {
+  if (!calCv) return;
+  const c = calCv.getContext('2d'), s = sala('inicio'), { y, m } = calMes, pd = cambiosPorDia(), dias = new Date(y, m + 1, 0).getDate(), hueco = (new Date(y, m, 1).getDay() + 6) % 7, sel = diaDelMes(), hoy = hoyISO(), cw = CAL_CW;
+  c.fillStyle = PAPEL; c.fillRect(0, 0, CAL_W, CAL_H);
+  c.fillStyle = s.color; c.fillRect(0, 0, CAL_W, CAL_BANDA);
+  c.fillStyle = PAPEL; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `50px ${ROT}`; c.fillText(MESES[m][0].toUpperCase() + MESES[m].slice(1), CAL_W / 2, 50);
+  c.font = `500 26px ${TXT}`; c.fillText(String(y), CAL_W / 2, 92);
+  c.font = `56px ${ROT}`; c.fillText('‹', 40, 58); c.fillText('›', CAL_W - 40, 58);
+  c.fillStyle = TINTA; c.font = `700 24px ${TXT}`; ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach((d, i) => c.fillText(d, CAL_M + cw * i + cw / 2, CAL_BANDA + 24));
+  for (let d = 1; d <= dias; d++) {
+    const k = isoDia(y, m, d), pos = hueco + d - 1, col = pos % 7, fila = Math.floor(pos / 7), x = CAL_M + col * cw, yy = CAL_SEM + fila * CAL_FILA, n = (pd.get(k) || []).length;
+    if (k === sel) { c.fillStyle = TINTA; c.fillRect(x + 3, yy + 3, cw - 6, CAL_FILA - 6); }
+    if (n) { c.fillStyle = s.color; c.beginPath(); c.moveTo(x + cw - 4, yy + CAL_FILA - 30); c.lineTo(x + cw - 4, yy + CAL_FILA - 4); c.lineTo(x + cw - 30, yy + CAL_FILA - 4); c.closePath(); c.fill(); }
+    c.fillStyle = k === sel ? PAPEL : TINTA; c.font = `${n ? 700 : 500} 28px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText(String(d), x + 10, yy + 9);
+    if (k === hoy) { c.strokeStyle = k === sel ? PAPEL : s.color; c.lineWidth = 4; c.beginPath(); c.arc(x + 25, yy + 24, 22, 0, Math.PI * 2); c.stroke(); }
+  }
+  c.strokeStyle = TINTA; c.lineWidth = 2;
+  for (let i = 1; i < 7; i++) { c.beginPath(); c.moveTo(CAL_M + i * cw, CAL_SEM); c.lineTo(CAL_M + i * cw, CAL_H - 14); c.stroke(); }
+  for (let i = 0; i <= 6; i++) { c.beginPath(); c.moveTo(CAL_M, CAL_SEM + i * CAL_FILA); c.lineTo(CAL_W - CAL_M, CAL_SEM + i * CAL_FILA); c.stroke(); }
+  c.lineWidth = 12; c.strokeRect(6, 6, CAL_W - 12, CAL_H - 12);
+  calTex.needsUpdate = true;
+}
+// Clic sobre el calendario de la pared: las flechas cambian de mes, un día muestra sus cambios
+function clicCalendario(uv) {
+  if (!uv) return;
+  const px = uv.x * CAL_W, py = (1 - uv.y) * CAL_H;
+  if (py < CAL_BANDA) { if (px < 110 || px > CAL_W - 110) { const d = new Date(calMes.y, calMes.m + (px < 110 ? -1 : 1), 1); calMes = { y: d.getFullYear(), m: d.getMonth() }; calDia = null; } }
+  else if (py > CAL_SEM) {
+    const pos = THREE.MathUtils.clamp(Math.floor((px - CAL_M) / CAL_CW), 0, 6) + Math.floor((py - CAL_SEM) / CAL_FILA) * 7, dia = pos - (new Date(calMes.y, calMes.m, 1).getDay() + 6) % 7 + 1;
+    if (dia >= 1 && dia <= new Date(calMes.y, calMes.m + 1, 0).getDate()) calDia = isoDia(calMes.y, calMes.m, dia);
+  }
+  pintarCalendario3D(); if (seccionActual === 'calendario') pintarVineta(true); else mostrar('calendario');
+}
+const LIM_OBJETO = { th: 0.22, ph0: -0.1, ph1: 0.1, sway: 0, zoom: false };
+const vistaObjeto = id => id === 'reloj'
+  ? { pos: new THREE.Vector3(RELOJ.x, 2.6, PARED_N + 3.3), mira: new THREE.Vector3(RELOJ.x, 2.42, PARED_N) }
+  : { pos: new THREE.Vector3(CAL.x, 2.5, PARED_N + 3.2), mira: new THREE.Vector3(CAL.x, 2.3, PARED_N) };
+function acercarObjeto(id) {
+  if (viaje || estado === 'menu' || estado === 'cerca') return;
+  if (actual.id !== 'inicio') { irA('inicio'); return; }
+  asiento = null; estado = 'objeto'; objeto = id;
+  volar(vistaObjeto(id), 1100, LIM_OBJETO);
+  mostrar(id); pintarEstado();
+}
+function alejarObjeto(sinVuelo) {
+  if (estado !== 'objeto') return;
+  estado = 'sala'; objeto = null;
+  if (!sinVuelo) { volar(vista(actual), 950, LIM_SALA); mostrar('inicio'); }
+  pintarEstado();
 }
 
 // ---------- Blog: la mesa de siete cartas ----------
@@ -1105,11 +1276,11 @@ function pantallasDe(id) {
   t[4] = { tipo: 'titulo', kanji: s.kanji, etiqueta: s.seccion, accion: { seccion: id } };
   if (id === 'inicio') {
     t[0] = { tipo: 'texto', etiqueta: 'Sobre mí', lineas: [tx((D.perfil || {}).presentacion)], accion: { seccion: 'inicio' } };
-    t[1] = { tipo: 'digital', etiqueta: 'Hora', valor: horaAhora() };
+    t[1] = { tipo: 'digital', etiqueta: 'Hora', valor: horaAhora(), accion: { seccion: 'reloj' } };
     t[2] = { tipo: 'texto', etiqueta: 'Frase del día', lineas: [fraseHoy() || 'Sin frase hoy'], accion: { seccion: 'inicio' } };
     t[3] = { tipo: 'texto', etiqueta: 'Últimas jugadas', lineas: jugadas().slice(0, 5).map(x => `${fechaCorta(x.f)}  ${x.titulo}`), accion: { seccion: 'inicio', abrir: { ancla: 'jugadas' } } };
     t[5] = { tipo: 'digital', etiqueta: 'Ruleta', valor: tiradas[0] ? String(tiradas[0].n) : '--', accion: { girar: true } };
-    t[6] = { tipo: 'texto', etiqueta: 'Bitácora', lineas: [...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).slice(0, 3).map(c => `${fechaCorta(c.fecha)}  ${tx(c.texto)}`), accion: { seccion: 'inicio', abrir: { ancla: 'bitacora' } } };
+    t[6] = { tipo: 'texto', etiqueta: 'Bitácora', lineas: [...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).slice(0, 3).map(c => `${fechaCorta(c.fecha)}  ${tx(c.texto)}`), accion: { seccion: 'calendario' } };
     t[7] = { tipo: 'texto', etiqueta: 'Enlaces', lineas: (D.enlaces || []).slice(0, 4).map(e => e.nombre), accion: { seccion: 'inicio', abrir: { ancla: 'enlaces' } } };
     t[8] = { tipo: 'interruptor', etiqueta: 'Modo oscuro', valor: esOscuro(), accion: { tema: true } };
   } else if (id === 'blog') {
@@ -1332,6 +1503,7 @@ function devolverCubo(inmediato) {
 // En la ruleta: sentarse en un taburete, dejar el cubo sobre la mesa
 function sentarse(i) {
   if (viaje || vuelo || estado === 'menu' || estado === 'cerca') return;
+  objeto = null;
   if (actual.id !== 'inicio') { irA('inicio'); return; }
   asiento = i; estado = 'sentado'; volar(vistaAsiento(i), 1000, LIM_SENTADO); pintarEstado();
 }
@@ -1517,7 +1689,7 @@ function tocado(e) {
   apuntar(e);
   if (estado === 'menu' || estado === 'cerca') return tocaCubo();
   const h = ray.intersectObjects(clicables, false).find(x => !(x.object.userData.accion && x.object.userData.accion.cubo) || soporteCubo.visible);
-  return h ? h.object.userData.accion : null;
+  return h ? { ...h.object.userData.accion, uv: h.uv } : null;
 }
 const enCubo = () => estado === 'menu' || estado === 'cerca';
 const girandoCubo = () => estado === 'cerca';
@@ -1559,7 +1731,9 @@ lienzo.addEventListener('pointerup', e => {
   const acc = tocado(e); if (!acc) return;
   if (acc.girar) girar();
   else if (acc.cubo) { if (estadoCubo === 'estante') acercarCubo(); }
-  else if (acc.sentarse != null) sentarse(acc.sentarse);
+  else if (acc.tema) $('#tema').click();
+  else if (acc.objeto) { if (estado === 'objeto' && objeto === 'calendario' && acc.objeto === 'calendario') clicCalendario(acc.uv); else acercarObjeto(acc.objeto); }
+  else if (acc.sentarse != null) { objeto = null; sentarse(acc.sentarse); }
   else if (acc.panel != null) tocarPanel(acc.panel);
   else if (acc.rondaSig) { if (actual.id === 'galeria' && !viaje) cambiarRonda(ronda + 1); else ir('galeria'); }
   else if (acc.obra != null) marcarObra(acc.obra);
@@ -1655,6 +1829,7 @@ function cuadro(ahora) {
     tmp.set(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(r).add(base.mira);
     camara.position.lerp(tmp, 1 - Math.exp(-dt * 7)); camara.lookAt(base.mira);
   }
+  actualizarReloj();
   // Ruleta: la rueda gira, la bola corre en contra, frena y cae en una casilla
   if (giro) {
     const g = (ahora - giro.t0) / 1000;
@@ -1693,13 +1868,13 @@ function cuadro(ahora) {
 
 async function empezar() {
   try { await Promise.race([Promise.all([document.fonts.load(`40px "Dela Gothic One"`), document.fonts.load(`700 40px "Zen Kaku Gothic New"`)]), new Promise(r => setTimeout(r, 2500))]); } catch (err) {}
-  construirRuleta(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); crearCubo();
+  construirRuleta(); construirRincon(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); crearCubo();
   hay3D = true; medir();
   const h = location.hash.slice(1), ini = sala(h) ? h : (sala(seccionActual) ? seccionActual : 'inicio'), s = sala(ini);
   if (s !== actual) { actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); }
   mostrar(ini, ini === seccionActual ? ultima : {}); pintarEstado();
   setInterval(() => repintarPantalla('inicio', 1), 20000);
-  window.prueba = { ir, ampliar, girar, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
+  window.prueba = { ir, ampliar, girar, acercarObjeto, alejarObjeto, clicCalendario, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
   requestAnimationFrame(cuadro);
 }
 empezar();

@@ -43,6 +43,12 @@
 - En el menú el cubo flota sobre la mesa para no atravesarla al girar.
 - Zoom real: la cámara queda muy cerca y se ven 4 pantallas grandes (una ventana de 2x2 de la cara); las demás quedan cortadas y en la esquina asoma la mesa. Flechas o arrastrar para moverse; al pasar el borde se dobla a la cara vecina. Clic en la mesa o Esc para salir.
 
+### Versión 5 (17/11/2026)
+- Los dos focos sobre la ruleta prenden y apagan el modo oscuro (el botón de la luna sigue en la tira).
+- Rincón de la Ruleta (pared del fondo, junto a la puerta de Escritos): reloj clásico de 12 horas con 3 agujas y la hora en números debajo; calendario de pared con la bitácora por día (clic en un día muestra sus cambios; flechas para cambiar de mes). Cada uno se mira de cerca por separado.
+- Inspiración de Persona 5: títulos de sección como recortes (letras sueltas, tipos y giros mezclados), sala actual inclinada con mancha de tinta dentada, botones de acción en paralelogramo, fila elegida con barra de tinta inclinada, entrada del contenido con barrido en diagonal.
+- Frix dijo que ya lo subiría; falta su visto bueno final para integrarlo al sitio en vivo.
+
 ## Siguiente paso
 1. Que Frix lo recorra y diga qué cambiar.
 2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.
