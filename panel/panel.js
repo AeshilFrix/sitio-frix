@@ -4,7 +4,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const copia = o => JSON.parse(JSON.stringify(o));
-  const VACIO = { perfil: { nombre: 'Frix', avatar: '', desde: '', discord: '', lema: { es: '', en: '' }, presentacion: { es: '', en: '' }, gustos: [], frases: [] }, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [], cambios: [] };
+  const VACIO = { perfil: { nombre: 'Frix', avatar: '', desde: '', discord: '', lema: { es: '', en: '' }, presentacion: { es: '', en: '' }, gustos: [], frases: [], reglas: [] }, blog: [], diario: [], escritos: [], obras: [], galeria: [], musica: [], enlaces: [], cambios: [] };
   let datos = Object.assign(copia(VACIO), copia(window.DATOS || {}));
   let original = JSON.stringify(datos); // lo publicado: el datos.js de la carpeta o, si hay clave de GitHub, el del repositorio
   let pestana = 'blog', editando = null, borrarPendiente = null;
@@ -298,6 +298,7 @@
       ${campoHTML(['presentacion.en', 'Presentación en inglés (se traduce sola)', 'textarea', 0, AYUDA_EN], p.presentacion && p.presentacion.en)}
       ${campoHTML(['gustos', 'Cosas que me gustan', 'textarea', 0, 'Una por línea. Se traducen solas al inglés; si quieres poner tu propia traducción, sepárala con una barra: Ajedrez | Chess'], gustos)}
       ${campoHTML(['frases', 'Frases del día', 'textarea', 0, 'Una por línea; el inicio muestra una distinta cada día. Se traducen solas, o pon la tuya con una barra: Frase | Quote'], aTexto(p.frases))}
+      ${campoHTML(['reglas', 'Reglas de la mesa', 'textarea', 0, 'Una por línea, en orden; salen en la página Reglas. Se traducen solas, o pon la tuya con una barra: Regla | Rule'], aTexto(p.reglas))}
       ${campoHTML(['discord', 'ID de usuario de Discord (para mostrar lo que escuchas)', 'text', 0, 'Para que funcione tienes que estar en el servidor de Discord de Lanyard. Déjalo vacío para no mostrar nada.'], p.discord)}
       <div class="acciones"><button class="btn" type="submit">Guardar perfil</button></div></form>`;
     $('#form-perfil').addEventListener('submit', async e => {
@@ -310,11 +311,12 @@
       const r = await completarIngles(nuevo, antes, ['lema', 'presentacion'], avisar);
       const g = await gustosDesde(f['gustos'].value, antes.gustos || [], avisar);
       const fr = await gustosDesde(f['frases'].value, antes.frases || [], avisar);
+      const rg = await gustosDesde(f['reglas'].value, antes.reglas || [], avisar);
       boton.disabled = false;
-      nuevo.gustos = g.gustos; nuevo.frases = fr.gustos; datos.perfil = nuevo;
+      nuevo.gustos = g.gustos; nuevo.frases = fr.gustos; nuevo.reglas = rg.gustos; datos.perfil = nuevo;
       guardarBorrador();
-      const fallo = r.fallo || g.fallo || fr.fallo;
-      avisar(fallo ? `Perfil guardado, pero no se pudo traducir al inglés (${fallo.message}). Puedes intentarlo luego en Publicar.` : (r.hechos + g.hechos + fr.hechos ? 'Perfil guardado y traducido al inglés.' : 'Perfil guardado en el borrador.'));
+      const fallo = r.fallo || g.fallo || fr.fallo || rg.fallo;
+      avisar(fallo ? `Perfil guardado, pero no se pudo traducir al inglés (${fallo.message}). Puedes intentarlo luego en Publicar.` : (r.hechos + g.hechos + fr.hechos + rg.hechos ? 'Perfil guardado y traducido al inglés.' : 'Perfil guardado en el borrador.'));
       if (pestana === 'perfil') pintar();
     });
   }
@@ -502,7 +504,7 @@
     const mirar = o => { if (o && typeof o === 'object' && (o.es || '').trim() && !(o.en || '').trim()) lista.push([o, false]); };
     ['blog', 'diario', 'galeria', 'cambios'].forEach(k => (datos[k] || []).forEach(it => SECCIONES[k].bilingue.forEach(r => mirar(it[r]))));
     mirar(datos.perfil.lema); mirar(datos.perfil.presentacion);
-    [...(datos.perfil.gustos || []), ...(datos.perfil.frases || [])].forEach(g => { if (g.es && (!g.en || (g.en === g.es && !g.auto))) lista.push([g, true]); });
+    [...(datos.perfil.gustos || []), ...(datos.perfil.frases || []), ...(datos.perfil.reglas || [])].forEach(g => { if (g.es && (!g.en || (g.en === g.es && !g.auto))) lista.push([g, true]); });
     return lista;
   }
 

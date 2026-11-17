@@ -63,6 +63,23 @@ Traductor: el de Chrome si el navegador lo tiene; si no, [MyMemory](https://myme
 - **Bitácora de la mesa**: lo que cambia en el sitio; se escribe en la pestaña *Bitácora*.
 - **Fichas**: contador de visitas (una por visita) con [Abacus](https://abacus.jasoncameron.dev/).
 
+### La mesa: menú, brújula y reglas
+
+- **Menú**: al tocar el avatar se reparten cuatro cartas, como la mesa de Usogui: ♠ Tiempo (Blog, Bitácora),
+  ♥ Hombres (Inicio, Escritos), ♦ Lugar (Galería, Obras) y ♣ Reglas (Reglas de la mesa, Enlázame).
+- **Brújula** (abajo a la izquierda, en pantallas anchas): el Cerco de los Cuatro Dioses. Norte ♠, Este ♦, Sur ♥ y
+  Oeste ♣ llevan a la primera página de cada carta. Las flechas ← → del teclado giran la mesa a la página anterior
+  o siguiente (no en el lector ni con el visor de la galería abierto).
+- **Reglas** (`reglas.html`): las reglas de la casa (*Perfil → Reglas de la mesa*, se traducen solas), la bitácora
+  completa, el botón 88×31 para que otros te enlacen (`boton-frix.png`) y los créditos.
+- **Pañuelos**: hay siete escondidos, uno en cada página (inicio, blog, escritos, obras, galería, lector y reglas).
+  Se guardan en el navegador de cada visitante; al juntar los siete se abre el tema **Mesa de juego** (paño verde),
+  que se prende y se apaga arriba, junto al idioma.
+- **Decoración**: cursores de peón y caballo, palos y fichas que caen en los costados vacíos de la pantalla
+  (nunca detrás del texto; se apagan si el sistema pide menos movimiento) y un cambio suave entre páginas.
+- **Puerta**: de 4:00 a 4:59 (hora de quien visita) la pantalla de acceso dice que el sitio está en mantenimiento.
+  La esquina sigue funcionando.
+
 ### Obras (buscador)
 
 Anime y manga (AniList), series (TVMaze), libros y cómics (Open Library), películas, juegos y otros

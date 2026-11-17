@@ -55,6 +55,7 @@
   const MESES = { es: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'], en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] };
   const mesAnio = iso => { const m = /^(\d{4})-(\d{2})/.exec(iso || ''); return m ? t(`${MESES.es[+m[2] - 1]} ${m[1]}`, `${MESES.en[+m[2] - 1]} ${m[1]}`) : '-'; };
   const porFecha = (a, b) => String(b.fecha || b.actualizado || '').localeCompare(String(a.fecha || a.actualizado || ''));
+  const porFechaId = (a, b) => porFecha(a, b) || (Number(b.id) || 0) - (Number(a.id) || 0); // mismo dia: lo ultimo anotado primero
   const ejemplo = o => o && o.ejemplo ? `<span class="ejemplo">${t('ejemplo', 'example')}</span>` : '';
   const azar = arr => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
   // Capitulos: el HTML viene del panel (convertido desde .tintero). Solo se dejan etiquetas de formato simples.
@@ -78,19 +79,31 @@
   const TIPO_ESCRITO = { novela: ['Novela', 'Novel'], relato: ['Relato', 'Short story'], mundo: ['Mundo', 'World'], poema: ['Poema', 'Poem'], otro: ['Otro', 'Other'] };
   const nombreDe = (tabla, k) => { const v = tabla[k] || tabla.otro || ['-', '-']; return t(v[0], v[1]); };
 
+  // Orden de las paginas: el pie y las flechas del teclado (que giran la mesa de una a otra)
   const PAGINAS = [
-    ['inicio.html', 'inicio', '&#9818;', 'Inicio', 'Home', ''],
-    ['blog.html', 'blog', '&#9829;', 'Blog', 'Blog', 'rojo'],
-    ['escritos.html', 'escritos', '&#9830;', 'Escritos', 'Writing', 'rojo'],
-    ['obras.html', 'obras', '&#9827;', 'Obras', 'Watched & read', ''],
-    ['galeria.html', 'galeria', '&#9635;', 'Galería', 'Gallery', '']
+    ['inicio.html', 'inicio', 'Inicio', 'Home'], ['blog.html', 'blog', 'Blog', 'Blog'], ['escritos.html', 'escritos', 'Escritos', 'Writing'],
+    ['obras.html', 'obras', 'Obras', 'Watched & read'], ['galeria.html', 'galeria', 'Galería', 'Gallery'], ['reglas.html', 'reglas', 'Reglas', 'Rules']
   ];
+  // El menu son cuatro cartas, una por cada carta de la mesa de Usogui: Tiempo, Hombres, Lugar y Reglas.
+  // Cada una tiene su punto cardinal y su guardian (el Cerco de los Cuatro Dioses), que usa la brujula.
+  const GRUPOS = [
+    { palo: '&#9824;', rojo: false, es: 'Tiempo', en: 'Time', pos: 'n', punto: ['Norte', 'North'], dios: ['Tortuga negra', 'Black Tortoise'],
+      paginas: [['blog.html', 'blog', 'Blog', 'Blog'], ['reglas.html#bitacora', '', 'Bitácora', 'Log']] },
+    { palo: '&#9829;', rojo: true, es: 'Hombres', en: 'People', pos: 's', punto: ['Sur', 'South'], dios: ['Ave bermellón', 'Vermilion Bird'],
+      paginas: [['inicio.html', 'inicio', 'Inicio', 'Home'], ['escritos.html', 'escritos', 'Escritos', 'Writing']] },
+    { palo: '&#9830;', rojo: true, es: 'Lugar', en: 'Place', pos: 'e', punto: ['Este', 'East'], dios: ['Dragón azul', 'Azure Dragon'],
+      paginas: [['galeria.html', 'galeria', 'Galería', 'Gallery'], ['obras.html', 'obras', 'Obras', 'Watched & read']] },
+    { palo: '&#9827;', rojo: false, es: 'Reglas', en: 'Rules', pos: 'o', punto: ['Oeste', 'West'], dios: ['Tigre blanco', 'White Tiger'],
+      paginas: [['reglas.html', 'reglas', 'Reglas de la mesa', 'House rules'], ['reglas.html#enlazame', '', 'Enlázame', 'Link to me']] }
+  ];
+  const GRUPO = GRUPOS.find(g => g.paginas.some(p => p[1] && p[1] === PAGINA))
+    || (PAGINA === 'leer' ? GRUPOS[/^#b-/.test(location.hash) ? 0 : 1] : null);
 
-  // ---------- Cabecera, menu del avatar y pie ----------
+  // ---------- Cabecera, menu de cartas y pie ----------
   const avatarHTML = P.avatar ? `<img src="${esc(P.avatar)}" alt="">` : esc((P.nombre || 'F')[0]);
   const cab = $('#cabecera');
   if (cab) cab.innerHTML = `
-    <div class="mini"><div class="idioma" role="group" aria-label="Idioma / Language">[<button type="button" data-l="es" aria-pressed="true">Español</button>/<button type="button" data-l="en" aria-pressed="false">English</button>]</div></div>
+    <div class="mini"><button type="button" class="tema-mesa" id="tema-mesa" aria-pressed="false" hidden>[${t('Mesa de juego', 'Card table')}]</button><div class="idioma" role="group" aria-label="Idioma / Language">[<button type="button" data-l="es" aria-pressed="true">Español</button>/<button type="button" data-l="en" aria-pressed="false">English</button>]</div></div>
     <header class="cabecera">
       <a class="logo" href="inicio.html">${esc(P.nombre)}</a>
       <span class="lema">${tx(P.lema)}</span>
@@ -104,25 +117,60 @@
         </div>
         <button type="button" class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-controls="menu-perfil" aria-label="Menú">${avatarHTML}</button>
       </div>
-      <nav class="menu-perfil" id="menu-perfil" hidden>
-        <div class="quien">${esc(P.nombre)}</div>
-        <ul>${PAGINAS.map(([href, id, palo, es, en, c]) => `<li><a href="${href}"${id === PAGINA ? ' aria-current="page"' : ''}><span class="palo ${c}">${palo}</span>${t(es, en)}</a></li>`).join('')}</ul>
+      <nav class="menu-perfil" id="menu-perfil" hidden aria-label="${esc(P.nombre)}">
+        <div class="quien">${esc(P.nombre)}<span>${t('Elige una carta', 'Pick a card')}</span></div>
+        <ul class="cartas">${GRUPOS.map((g, i) => `<li class="carta${g.rojo ? ' roja' : ''}${g === GRUPO ? ' actual' : ''}" style="--i:${i}">
+          <div class="cara"><span class="indice" aria-hidden="true">${g.palo}</span><b>${t(g.es, g.en)}</b>
+            <ul>${g.paginas.map(([href, id, es, en]) => `<li><a href="${href}"${id && id === PAGINA ? ' aria-current="page"' : ''}>${t(es, en)}</a></li>`).join('')}</ul>
+            <span class="indice abajo" aria-hidden="true">${g.palo}</span></div>
+          <div class="dorso" aria-hidden="true"></div></li>`).join('')}</ul>
       </nav>
     </header>`;
   const pie = $('#pie');
   if (pie) pie.innerHTML = `<footer class="pie">
-      <div>[${PAGINAS.map(([href, , , es, en]) => `<a href="${href}">${t(es, en)}</a>`).join(' / ')}]</div>
-      <div class="botones"><span class="b88 f">${esc((P.nombre || 'FRIX').toUpperCase())}</span><span class="b88 m">MyAnimeList</span><span class="b88 c"><b>&#9824;&#9829;&#9830;&#9827;</b></span></div>
+      <div>[${PAGINAS.map(([href, , es, en]) => `<a href="${href}">${t(es, en)}</a>`).join(' / ')}]</div>
+      <div class="botones"><a href="reglas.html#enlazame" title="${esc(P.nombre)}"><img src="boton-frix.png" width="88" height="31" alt="${esc(P.nombre)}"></a><span class="b88 m">MyAnimeList</span><span class="b88 c"><b>&#9824;&#9829;&#9830;&#9827;</b></span></div>
+      <div class="cuenta-panuelos" id="cuenta-panuelos" hidden></div>
       <div>${t('Hecho a mano. Se ve bien en cualquier navegador.', 'Handmade. Looks fine in any browser.')}</div>
     </footer>`;
 
   const menuBtn = $('#avatar-btn'), menu = $('#menu-perfil');
   if (menuBtn) {
-    const abrir = v => { menu.hidden = !v; menuBtn.setAttribute('aria-expanded', String(v)); };
-    menuBtn.addEventListener('click', e => { e.stopPropagation(); abrir(menu.hidden); });
-    document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target)) abrir(false); });
+    const abrir = (v, foco) => {
+      menu.hidden = !v; menuBtn.setAttribute('aria-expanded', String(v));
+      if (v && foco) { const a = menu.querySelector('.actual a') || menu.querySelector('a'); if (a) a.focus(); }
+    };
+    // Con teclado (Enter o espacio) el foco pasa a la carta de la pagina actual
+    menuBtn.addEventListener('click', e => { e.stopPropagation(); abrir(menu.hidden, e.detail === 0); });
+    document.addEventListener('click', e => { if (!menu.hidden && (!menu.contains(e.target) || e.target.closest('a'))) abrir(false); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { abrir(false); menuBtn.focus(); } });
   }
+
+  // ---------- Brujula: los cuatro puntos llevan a la primera pagina de cada carta ----------
+  // Las flechas izquierda y derecha giran la mesa a la pagina anterior o siguiente.
+  const brujula = document.createElement('nav');
+  brujula.className = 'brujula'; brujula.setAttribute('aria-label', 'Brújula / Compass');
+  brujula.innerHTML = `<p class="rotulo" aria-hidden="true"><span class="pista">${t('&larr; &rarr; gira la mesa', '&larr; &rarr; turns the table')}</span>
+      ${GRUPOS.map(g => `<span class="r-${g.pos}">${t(`${g.punto[0]}: ${g.es}<br>${g.dios[0]}`, `${g.punto[1]}: ${g.en}<br>${g.dios[1]}`)}</span>`).join('')}</p>
+    <div class="rosa">${GRUPOS.map(g => `<a class="dir d-${g.pos}${g.rojo ? ' roja' : ''}${g === GRUPO ? ' actual' : ''}" href="${g.paginas[0][0]}" data-pos="${g.pos}" aria-label="${g.punto[0]}: ${g.es} / ${g.punto[1]}: ${g.en}">${g.palo}</a>`).join('')}
+      <span class="centro${GRUPO && GRUPO.rojo ? ' roja' : ''}" aria-hidden="true">${GRUPO ? GRUPO.palo : '&middot;'}</span></div>`;
+  document.body.appendChild(brujula);
+  const verRotulo = e => { const d = e.target.closest && e.target.closest('[data-pos]'); brujula.dataset.ver = d ? d.dataset.pos : ''; };
+  brujula.addEventListener('mouseover', verRotulo); brujula.addEventListener('focusin', verRotulo);
+  brujula.addEventListener('mouseleave', () => { brujula.dataset.ver = ''; }); brujula.addEventListener('focusout', () => { brujula.dataset.ver = ''; });
+  const menosMovimiento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented || PAGINA === 'leer') return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable) return;
+    if (document.querySelector('.visor:not([hidden])') || !menu.hidden) return;
+    const i = PAGINAS.findIndex(p => p[1] === PAGINA); if (i < 0) return;
+    const der = e.key === 'ArrowRight', destino = PAGINAS[(i + (der ? 1 : -1) + PAGINAS.length) % PAGINAS.length][0];
+    if (menosMovimiento) { location.href = destino; return; }
+    $('.rosa', brujula).classList.add(der ? 'gira-der' : 'gira-izq');
+    setTimeout(() => { location.href = destino; }, 200);
+  });
+  addEventListener('pageshow', e => { if (e.persisted) $('.rosa', brujula).classList.remove('gira-der', 'gira-izq'); });
 
   // ---------- Idioma (se recuerda en el navegador) ----------
   const leer = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
@@ -154,6 +202,104 @@
     if (!grande && a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: 'nearest' });
   });
   idioma(leer('idioma', 'es') === 'en' ? 'en' : 'es');
+
+  // ---------- Panuelos: siete escondidos, uno por pagina. Juntarlos todos abre la Mesa de juego ----------
+  const PANUELOS = ['inicio', 'blog', 'escritos', 'obras', 'galeria', 'leer', 'reglas'];
+  const SVG_PANUELO = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M2.5 3.5 12 2l1.6 9.6L4 13.8Z" fill="currentColor" fill-opacity=".22" stroke="currentColor" stroke-linejoin="round"/><path d="M4.5 5.3l6.1-1 1 6-6.1 1.4Z" fill="none" stroke="currentColor" stroke-width=".8" stroke-dasharray="1.2 1.1"/><path d="M12 2l-.5 2.5 2.1-.3" fill="none" stroke="currentColor" stroke-width=".9" stroke-linejoin="round"/></svg>';
+  const hallados = () => { const h = leer('panuelos', []); return PANUELOS.filter(p => Array.isArray(h) && h.includes(p)); };
+  const panuelo = id => hallados().includes(id) ? '' : `<button type="button" class="panuelo" data-panuelo="${id}" aria-label="Pañuelo / Handkerchief">${SVG_PANUELO}</button>`;
+  const mesaAbierta = () => hallados().length === PANUELOS.length;
+  const progresoPanuelos = () => {
+    const h = hallados();
+    return `<div class="panuelos-mesa">${PANUELOS.map(p => `<span class="hueco${h.includes(p) ? ' lleno' : ''}">${SVG_PANUELO}</span>`).join('')}</div>
+      <p>${h.length === PANUELOS.length ? t('Los encontraste todos. La Mesa de juego se prende y se apaga arriba, junto al idioma.', 'You found them all. Turn the card table on or off at the top, next to the language.')
+        : t(`Encontraste ${h.length} de ${PANUELOS.length}. Hay uno escondido en cada página. Si juntas los siete, la mesa cambia.`, `You found ${h.length} of ${PANUELOS.length}. One is hidden on each page. Collect all seven and the table changes.`)}</p>`;
+  };
+  function aviso(html) {
+    let a = $('#aviso');
+    if (!a) { a = document.createElement('div'); a.id = 'aviso'; a.className = 'aviso'; a.setAttribute('role', 'status'); document.body.appendChild(a); }
+    a.innerHTML = html; a.classList.add('sale');
+    clearTimeout(aviso.reloj); aviso.reloj = setTimeout(() => a.classList.remove('sale'), 4500);
+  }
+  function tema(mesa) {
+    if (mesa) document.documentElement.dataset.tema = 'mesa'; else delete document.documentElement.dataset.tema;
+    guardar('tema', mesa ? 'mesa' : '');
+    document.dispatchEvent(new Event('tema'));
+    pintarPanuelos();
+  }
+  function pintarPanuelos() {
+    const n = hallados().length, c = $('#cuenta-panuelos'), b = $('#tema-mesa'), r = $('#progreso-panuelos');
+    if (c && n) { c.hidden = false; c.innerHTML = `${SVG_PANUELO}<span>${t('Pañuelos', 'Handkerchiefs')}: ${n}/${PANUELOS.length}</span>`; }
+    if (b) { b.hidden = !mesaAbierta(); b.setAttribute('aria-pressed', String(document.documentElement.dataset.tema === 'mesa')); }
+    if (r) r.innerHTML = progresoPanuelos();
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('#tema-mesa')) { tema(document.documentElement.dataset.tema !== 'mesa'); return; }
+    const p = e.target.closest('[data-panuelo]'); if (!p) return;
+    const lista = hallados(); if (lista.includes(p.dataset.panuelo)) return;
+    lista.push(p.dataset.panuelo); guardar('panuelos', lista);
+    p.disabled = true; p.classList.add('vuela'); setTimeout(() => p.remove(), 600);
+    if (lista.length === PANUELOS.length) {
+      tema(true);
+      aviso(t('Encontraste los siete pañuelos. La mesa cambió: puedes volver a la de siempre arriba, en [Mesa de juego].', 'You found all seven handkerchiefs. The table changed: switch back at the top, in [Card table].'));
+    } else {
+      aviso(SVG_PANUELO + ' ' + t(`Encontraste un pañuelo. Llevas ${lista.length} de ${PANUELOS.length}.`, `You found a handkerchief. ${lista.length} of ${PANUELOS.length} so far.`));
+      pintarPanuelos();
+    }
+  });
+  pintarPanuelos();
+
+  // ---------- Lluvia de palos y fichas en los costados vacios de la pantalla ----------
+  // Solo cae fuera de la columna del sitio (nunca detras del texto), se para con la pestana oculta
+  // y no aparece si el sistema pide menos movimiento.
+  (function lluvia() {
+    if (menosMovimiento) return;
+    const cv = document.createElement('canvas'); cv.className = 'lluvia'; cv.setAttribute('aria-hidden', 'true');
+    const ctx = cv.getContext('2d'); if (!ctx) return;
+    document.body.prepend(cv);
+    const ANCHO = 980, PALOS = ['♠', '♥', '♦', '♣'], FICHAS = ['#af0a0f', '#1d3f8f', '#1b1b1b', '#1e7a3b'];
+    let w = 0, h = 0, g = 0, cosas = [], col = {}, corriendo = false, antes = 0;
+    const nueva = arriba => {
+      const izq = Math.random() < 0.5, x = 14 + Math.random() * (g - 28);
+      return { x: izq ? x : w - x, y: arriba ? -30 - Math.random() * 80 : Math.random() * h, v: 12 + Math.random() * 20, r: Math.random() * 6.3,
+        vr: (Math.random() - 0.5) * 0.7, f: Math.random() * 6.3, s: 14 + Math.random() * 14, k: Math.floor(Math.random() * 6), c: FICHAS[Math.floor(Math.random() * 4)] };
+    };
+    function colores() { const cs = getComputedStyle(document.documentElement); col = { negro: cs.getPropertyValue('--texto').trim() || '#000', rojo: cs.getPropertyValue('--rojo').trim() || '#a00' }; }
+    function medir() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      w = innerWidth; h = innerHeight; g = (w - ANCHO) / 2 - 8;
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cosas = g < 70 ? [] : Array.from({ length: Math.round(Math.min(16, g / 15)) }, () => nueva(false));
+      ctx.clearRect(0, 0, w, h);
+    }
+    function paso(ahora) {
+      if (!corriendo) return;
+      const dt = Math.min(0.05, (ahora - antes) / 1000); antes = ahora;
+      ctx.clearRect(0, 0, w, h);
+      for (const c of cosas) {
+        c.y += c.v * dt; c.r += c.vr * dt; c.f += dt * 0.8;
+        if (c.y > h + 30) Object.assign(c, nueva(true));
+        ctx.save(); ctx.translate(c.x + Math.sin(c.f) * 8, c.y); ctx.rotate(c.r);
+        if (c.k < 4) {
+          ctx.globalAlpha = c.k % 3 === 0 ? 0.1 : 0.13; ctx.fillStyle = c.k % 3 === 0 ? col.negro : col.rojo;
+          ctx.font = `${c.s}px Georgia, serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(PALOS[c.k], 0, 0);
+        } else {
+          const r = c.s * 0.45;
+          ctx.globalAlpha = 0.16; ctx.fillStyle = c.c; ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.3); ctx.fill();
+          ctx.globalAlpha = 0.3; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.6; ctx.setLineDash([2.4, 2.4]); ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, 6.3); ctx.stroke(); ctx.setLineDash([]);
+        }
+        ctx.restore();
+      }
+      requestAnimationFrame(paso);
+    }
+    const arrancar = () => { if (corriendo || !cosas.length || document.hidden) return; corriendo = true; antes = performance.now(); requestAnimationFrame(paso); };
+    const parar = () => { corriendo = false; };
+    document.addEventListener('visibilitychange', () => { if (document.hidden) parar(); else arrancar(); });
+    let espera; addEventListener('resize', () => { clearTimeout(espera); espera = setTimeout(() => { parar(); medir(); arrancar(); }, 150); });
+    document.addEventListener('tema', colores);
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', colores);
+    colores(); medir(); arrancar();
+  })();
 
   // ---------- Musica aleatoria ----------
   // Neocities gratis no acepta mp3: las canciones subidas a musica/ se toman de la copia del sitio en GitHub Pages
@@ -353,8 +499,8 @@
             ${caja('Me gusta', 'I like', P.gustos.length ? `<ul class="gustos">${P.gustos.map(g => `<li>${tx(g)}</li>`).join('')}</ul>` : vacio('Agrega tus gustos en el panel.', 'Add what you like in the panel.'))}
             ${caja('Estadísticas', 'Stats', estadisticas(), `<a href="obras.html">${t('Ver todo', 'View all')}</a>`)}
             ${caja('Galería', 'Gallery', galeria.length ? `<div class="mini-galeria">${galeria.map(([g, n]) => `<a href="galeria.html#g-${n}" title="${esc(par(g.texto)[0])}"><img src="${esc(g.archivo)}" alt="${esc(par(g.texto)[0])}" loading="lazy"></a>`).join('')}</div>` : vacio('Sube imágenes y agrégalas en el panel.', 'Upload images and add them in the panel.'), `<a href="galeria.html">${t('Ver todo', 'View all')}</a>`)}
-            ${(D.cambios || []).length ? caja('Bitácora de la mesa', 'Table log', `<ul class="bitacora">${[...D.cambios].sort(porFecha).slice(0, 6).map(c => `<li><span class="tenue">${fechaCorta(c.fecha)}</span> ${tx(c.texto)}</li>`).join('')}</ul>`) : ''}
-            ${caja('Fichas', 'Chips', `<div class="fichas" id="fichas" role="img" aria-label="…"></div><table class="datos"><tr><td>${t('Abierto', 'Opened')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Actualizado', 'Updated')}</td><td>${fechaCorta(ultimaActualizacion())}</td></tr></table>`)}
+            ${(D.cambios || []).length ? caja('Bitácora de la mesa', 'Table log', `<ul class="bitacora">${[...D.cambios].sort(porFechaId).slice(0, 6).map(c => `<li><span class="tenue">${fechaCorta(c.fecha)}</span> ${tx(c.texto)}</li>`).join('')}</ul>`) : ''}
+            ${caja('Fichas', 'Chips', `<div class="fichas" id="fichas" role="img" aria-label="…"></div><table class="datos"><tr><td>${t('Abierto', 'Opened')}</td><td>${mesAnio(P.desde)}</td></tr><tr><td>${t('Actualizado', 'Updated')}</td><td>${fechaCorta(ultimaActualizacion())}</td></tr></table>`, panuelo('inicio'))}
             ${caja('Enlaces', 'Links', D.enlaces.length ? `<ul class="enlaces-lista">${D.enlaces.map(l => `<li><a href="${esc(l.url)}">${esc(l.nombre)}</a><span>${esc(l.detalle || '')}</span></li>`).join('')}</ul>` : vacio('Sin enlaces.', 'No links.'))}
           </aside>
           <main class="principal">
@@ -370,7 +516,7 @@
       setInterval(() => { if (!document.hidden) pintarDiscord(); }, 30000);
     },
     blog() {
-      C.innerHTML = tituloTablon('fx', 'Blog', 'Blog') + `<section class="seccion"><p class="nota">${t('Cosas sobre mí: lo que veo, leo y juego.', 'Things about me: what I watch, read and play.')}</p>
+      C.innerHTML = tituloTablon('fx', 'Blog', 'Blog') + `<section class="seccion"><p class="nota">${t('Cosas sobre mí: lo que veo, leo y juego.', 'Things about me: what I watch, read and play.')}${panuelo('blog')}</p>
         ${[...D.blog].sort(porFecha).map(p => postHTML(p, 'b', true)).join('') || vacio('Todavía no hay entradas.', 'No posts yet.')}</section>`;
     },
     diario() {
@@ -383,7 +529,7 @@
         <td>${nombreDe(TIPO_ESCRITO, e.tipo)}</td><td class="n">${capsDe(e).length || '-'}</td><td>${nombreDe(ESTADO_ESCRITO, e.estado)}</td><td>${fechaCorta(e.actualizado)}</td></tr>`).join('');
       C.innerHTML = tituloTablon('esc', 'Escritos', 'Writing') + `<section class="seccion"><p class="nota">${t('Todo lo que escribo, ordenado como una lista.', 'Everything I write, sorted like a list.')}</p>
         ${filas ? `<div class="tabla-wrap"><table class="lista"><thead><tr><th></th><th>#</th><th>${t('Título', 'Title')}</th><th>${t('Tipo', 'Type')}</th><th>${t('Caps.', 'Ch.')}</th><th>${t('Estado', 'Status')}</th><th>${t('Actualizado', 'Updated')}</th></tr></thead><tbody>${filas}</tbody></table></div>
-        <div class="leyenda">${[1, 2, 3, 4, 5].map(k => `<span><i class="s-${k}"></i>${nombreDe(ESTADO_ESCRITO, k)}</span>`).join('')}</div>` : vacio('Todavía no hay escritos.', 'No writing yet.')}</section>`;
+        <div class="leyenda">${[1, 2, 3, 4, 5].map(k => `<span><i class="s-${k}"></i>${nombreDe(ESTADO_ESCRITO, k)}</span>`).join('')}${panuelo('escritos')}</div>` : vacio('Todavía no hay escritos.', 'No writing yet.')}</section>`;
     },
     obras() {
       let fTipo = 'todo', fEstado = 'todo';
@@ -398,7 +544,7 @@
       };
       const tipos = Object.keys(TIPOS).filter(k => D.obras.some(o => o.tipo === k));
       C.innerHTML = tituloTablon('obr', 'Obras', 'Watched & read') + `<div class="cuerpo">
-        <aside class="lado">${caja('Estadísticas', 'Stats', estadisticas())}</aside>
+        <aside class="lado">${caja('Estadísticas', 'Stats', estadisticas(), panuelo('obras'))}</aside>
         <main class="principal"><section class="seccion"><p class="nota">${t('Todo lo que veo, leo y juego: anime, manga, series, películas, libros, cómics y más.', 'Everything I watch, read and play: anime, manga, series, movies, books, comics and more.')}</p>
           <div class="filtros"><b>${t('Tipo:', 'Type:')}</b><button type="button" data-ft="todo">${t('Todo', 'All')}</button>${tipos.map(k => `<button type="button" data-ft="${k}">${nombreDe(TIPOS, k)}</button>`).join('')}</div>
           <div class="filtros"><b>${t('Estado:', 'Status:')}</b><button type="button" data-fe="todo">${t('Todo', 'All')}</button>${[1, 2, 3, 4, 5].map(k => `<button type="button" data-fe="${k}">${nombreDe(ESTADO_OBRA, k)}</button>`).join('')}</div>
@@ -409,7 +555,7 @@
     },
     galeria() {
       const G = D.galeria;
-      C.innerHTML = tituloTablon('gal', 'Galería', 'Gallery') + `<section class="seccion"><p class="nota">${t('Fotos y GIF. Haz clic en una para verla en grande.', 'Photos and GIFs. Click one to see it full size.')}</p>
+      C.innerHTML = tituloTablon('gal', 'Galería', 'Gallery') + `<section class="seccion"><p class="nota">${t('Fotos y GIF. Haz clic en una para verla en grande.', 'Photos and GIFs. Click one to see it full size.')}${panuelo('galeria')}</p>
         <p class="extra-diario"${diarioAbierto() ? '' : ' hidden'}><a class="boton-leer" href="diario.html"><span aria-hidden="true">&#9824;</span> ${t('Diario', 'Journal')}</a></p>
         ${G.length ? `<div class="galeria">${G.map((g, n) => `<button type="button" data-g="${n}"><img src="${esc(g.archivo)}" alt="${esc(par(g.texto)[0])}" loading="lazy"><span>${tx(g.texto)}</span></button>`).join('')}</div>` : vacio('Todavía no hay imágenes.', 'No images yet.')}</section>
         <div class="visor" id="visor" hidden role="dialog" aria-modal="true" aria-label="Imagen">
@@ -422,6 +568,42 @@
       C.addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) abrir(+b.dataset.g); const v = e.target.closest('[data-v]'); if (v) { if (v.dataset.v === 'cerrar') cerrar(); if (v.dataset.v === 'ant') abrir(actual - 1); if (v.dataset.v === 'sig') abrir(actual + 1); } });
       document.addEventListener('keydown', e => { if (visor.hidden) return; if (e.key === 'Escape') cerrar(); if (e.key === 'ArrowLeft') abrir(actual - 1); if (e.key === 'ArrowRight') abrir(actual + 1); });
       const m = /^#g-(\d+)$/.exec(location.hash); if (m) abrir(+m[1]);
+    },
+    reglas() {
+      const reglas = (P.reglas || []).filter(r => par(r)[0]);
+      const sitio = 'https://aeshilfrix.neocities.org/';
+      const codigo = `<a href="${sitio}"><img src="${sitio}boton-frix.png" alt="${esc(P.nombre || 'Frix')}" width="88" height="31"></a>`;
+      const creditos = [
+        ['Cubo 3D', '3D cube', 'three.js', 'https://threejs.org/'],
+        ['Contador de visitas', 'Visit counter', 'Abacus', 'https://abacus.jasoncameron.dev/'],
+        ['Traducción automática', 'Automatic translation', 'MyMemory', 'https://mymemory.translated.net/'],
+        ...(P.discord ? [['Lo que escucho', 'What I listen to', 'Lanyard', 'https://github.com/Phineas/lanyard']] : []),
+        ['Alojado en', 'Hosted on', 'Neocities', 'https://neocities.org/']
+      ];
+      C.innerHTML = tituloTablon('mesa', 'Reglas de la mesa', 'House rules') + `<div class="cuerpo">
+        <aside class="lado">
+          ${caja('Pañuelos', 'Handkerchiefs', `<div id="progreso-panuelos">${progresoPanuelos()}</div>`)}
+          ${caja('Créditos', 'Credits', `<ul class="enlaces-lista">${creditos.map(([es, en, n, u]) => `<li><span>${t(es, en)}</span><a href="${u}" target="_blank" rel="noopener">${n}</a></li>`).join('')}</ul>${panuelo('reglas')}`)}
+        </aside>
+        <main class="principal">
+          <section class="seccion" id="reglas"><h2><span aria-hidden="true">&#9827;</span>${t('Reglas', 'Rules')}</h2>
+            ${reglas.length ? `<ol class="reglas">${reglas.map(r => `<li>${tx(r)}</li>`).join('')}</ol>` : vacio('Escribe las reglas de tu mesa en el panel (Perfil).', 'Write your house rules in the panel (Profile).')}</section>
+          <section class="seccion" id="bitacora"><h2><span aria-hidden="true">&#9824;</span>${t('Bitácora de la mesa', 'Table log')}</h2>
+            ${(D.cambios || []).length ? `<ul class="bitacora larga">${[...D.cambios].sort(porFechaId).map(c => `<li><span class="tenue">${fechaCorta(c.fecha)}</span> ${tx(c.texto)}</li>`).join('')}</ul>` : vacio('Todavía no hay nada anotado.', 'Nothing logged yet.')}</section>
+          <section class="seccion" id="enlazame"><h2><span class="rojo" aria-hidden="true">&#9830;</span>${t('Enlázame', 'Link to me')}</h2>
+            <div class="enlazame"><img src="boton-frix.png" width="88" height="31" alt="${esc(P.nombre)}">
+              <div><p class="nota">${t('Si quieres poner mi botón en tu sitio, copia este código:', 'To put my button on your site, copy this code:')}</p>
+                <textarea id="codigo-boton" rows="3" readonly spellcheck="false" aria-label="Código del botón / Button code">${esc(codigo)}</textarea>
+                <p><button type="button" class="boton-leer" id="copiar-boton">${t('Copiar código', 'Copy code')}</button> <span class="tenue" id="copiado" role="status"></span></p></div></div></section>
+        </main></div>`;
+      $('#copiar-boton').addEventListener('click', async () => {
+        const area = $('#codigo-boton'); let ok = false;
+        try { await navigator.clipboard.writeText(area.value); ok = true; } catch (e) { area.select(); try { ok = document.execCommand('copy'); } catch (err) {} }
+        $('#copiado').innerHTML = ok ? t('Copiado.', 'Copied.') : t('Selecciónalo y cópialo a mano.', 'Select it and copy it by hand.');
+      });
+      // Si se llega con #bitacora o #enlazame, ir a esa parte (el contenido se arma despues de cargar)
+      if (location.hash) { const s = document.getElementById(location.hash.slice(1)); if (s) s.scrollIntoView(); }
+      addEventListener('hashchange', () => { const s = document.getElementById(location.hash.slice(1)); if (s) s.scrollIntoView(); });
     },
     leer() {
       const progreso = id => leer('leido-e' + id, 0);
@@ -479,7 +661,8 @@
         const destino = ev.key === 'ArrowLeft' ? navegar.ant : ev.key === 'ArrowRight' ? navegar.sig : null;
         if (destino) location.hash = destino;
       });
-      addEventListener('hashchange', () => { pintar(); scrollTo(0, 0); }); pintar();
+      const mostrar = () => { pintar(); const m = $('.lector .meta'); if (m) m.insertAdjacentHTML('beforeend', panuelo('leer')); };
+      addEventListener('hashchange', () => { mostrar(); scrollTo(0, 0); }); mostrar();
     }
   };
   if (C && R[PAGINA]) R[PAGINA]();

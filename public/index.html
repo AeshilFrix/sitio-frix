@@ -20,6 +20,7 @@
   input:focus-visible, button:focus-visible { outline: 2px solid var(--tenue); outline-offset: 1px; }
   button { font: inherit; color: #fff; background: var(--boton); border: 0; border-radius: 4px; padding: 7px 14px; cursor: pointer; }
   button:disabled, input:disabled { opacity: .5; cursor: default; }
+  [hidden] { display: none !important; }
   #m { min-height: 21px; margin: 10px 0 0; color: var(--error); font-size: 13px; }
   .temblor { animation: temblor .3s; }
   @keyframes temblor { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -60,6 +61,14 @@
   try { if (sessionStorage.getItem('puerta')) return pasar(); } catch (e) {}
 
   document.querySelector('.x').addEventListener('click', pasar);
+
+  // De 4:00 a 4:59 (hora de quien visita) la mesa esta cerrada: no hay formulario. La esquina sigue funcionando.
+  if (new Date().getHours() === 4) {
+    document.querySelector('h1').textContent = L('Sitio en mantenimiento|Site under maintenance');
+    document.querySelector('main p').textContent = L('Vuelve a partir de las 5:00.|Come back after 5:00.');
+    document.getElementById('f').hidden = true; document.getElementById('m').hidden = true;
+    return;
+  }
 
   var f = document.getElementById('f'), c = document.getElementById('c'), b = document.getElementById('b'), m = document.getElementById('m');
   var intentos = 0, MAX = 5;
