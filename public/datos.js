@@ -233,5 +233,11 @@ window.DATOS = {
         "en": "The ← → arrow keys move from one page to the next."
       }
     }
-  ]
+  ],
+  "ajustes": {
+    "llavePruebas": {
+      "x": "bSzsBUkeviO8xfUTBTr-olighQVmRJCkVZTUe35N6eM",
+      "y": "BMVZvqAKdYfDt3-tgnj_k4_NeYyv4CCxEgbawx3nGRc"
+    }
+  }
 };
