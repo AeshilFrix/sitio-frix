@@ -85,3 +85,6 @@
 - npx skills@latest add emilkowalski/skills -g -a claude-code -s '*' -y --copy
 - npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend" -g -a claude-code -y --copy
 - impeccable: el zip que Frix adjuntó (impeccable-main.zip); copiar .claude/skills/impeccable a ~/.claude/skills/
+
+## Caché de Neocities (17/11/2026)
+- El CDN de Neocities guarda copias viejas de las URLs sin versión (x-cached: HIT). Toda página que lea datos.js debe pedirlo con ?v= (por minuto). casa.html lo hace desde construir.py (CARGA_DATOS); las páginas clásicas ya lo hacían con V.
