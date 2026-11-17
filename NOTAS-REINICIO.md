@@ -64,13 +64,22 @@
 - "Frix" en la tira abre un menú: Mis logros, Apostar, Versión clásica.
 - Panel → pestaña Pruebas: crea un enlace firmado (ECDSA, llave privada solo en la PC de Frix; la pública va en `datos.ajustes.llavePruebas`) que cambia el dinero en su navegador. Hay que publicar una vez para que el sitio conozca la llave. El dinero puesto desde el panel no da logros.
 
+### Versión 8 (17/11/2026) — publicada
+- La viga de las lámparas va solo entre sus dos columnas. Logros en filas horizontales tipo Steam (5 por página, barras de progreso). Tragamonedas jugables (3 rodillos, una línea; RTP cerca de 90 %).
+
+### Versión 9 (17/11/2026) — casino grande con mapa
+- Planta inspirada en planos reales (Bellagio, Palms, Venetian): piso octogonal de 64 × 56 con pasillos en grilla y diagonales. Entrada de vidrio al sur (0, 30); salas por puertas en los muros: Blog al oeste, Escritos al norte, Obras al este, Galería al sur (pasillo corto de 4).
+- Lugares del casino (`LUGARES` en la plantilla): Entrada, Club de jugadores (tarjeta de socio con el Sobre mí), Bar con rocola (pronto), Sala VIP (cerrada), Ruleta (centro), Chinchirorin, Blackjack, Keno (reloj y calendario), Apuestas (pantallas: Últimas jugadas y Lo que estoy viendo), Tragamonedas y logros (2 islas, 23 máquinas + la de logros), Caja, Pozo (palabras escritas, pared este).
+- Mapa chico arriba a la izquierda: clic en un lugar → caminas por los pasillos (grafo `NODOS`/`ARISTAS`, Dijkstra). Botón de agrandar o tecla M → plano completo; clic o Enter en un lugar → caes desde arriba ("ドン"). Flechas ← → recorren los lugares. Ya no están los botones de salas abajo (siguen sin 3D).
+- Blackjack: zapato de 6 mazos, pedir / plantarse / doblar, blackjack paga 3 a 2, la banca se planta en 17. Chinchirorin: la banca tira hasta 3 veces; pinzoro ×5, arashi ×3, shigoro ×2, hifumi paga doble, punto contra punto. Logros nuevos: Natural, Shigoro, Pinzoro (17 en total).
+- Frix pidió no llenar más por ahora: hay espacio libre en el piso para lo que venga.
+- Script de armado: `empalmar-v9.py` arma la v9 desde `plantilla-v8.html` + bloques (`bloque-planta.js`, `bloque-lugares.js`, `bloque-viaje.js`, `bloque-juegos.js`); copia final en `tres/plantilla-v9.html`.
+
 ## Ideas anotadas para después (Frix)
 - Libro de recuerdos (álbum de fotos) con los logos y enlaces de sus redes; falta decidir dónde va.
 - Galería: cambiar el sistema de paneles por libros (no en la librería) y usar la sala para juegos no-casino, p. ej. apuestas en carreras de caballos.
-- "Sobre mí" va a otro lugar (por decidir).
-- Más juegos de casino en el salón (las 2 máquinas y la mesa de dados ya están puestas como "pronto").
 - Inventario: objetos repartidos por el mapa que desbloquean o hacen cosas.
-- Sala propia de Usogui (easter egg), juego de la ruleta más profundo, versión en inglés del 3D, música en el 3D.
+- Sala propia de Usogui (easter egg), juego de la ruleta más profundo, versión en inglés del 3D, música en el 3D (la rocola del bar ya está puesta para eso), Discord/Lanyard, GIFs de MAL.
 
 ## Skills usadas (reinstalar en una sesión nueva)
 - npx skills@latest add emilkowalski/skills -g -a claude-code -s '*' -y --copy

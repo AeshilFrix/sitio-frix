@@ -368,7 +368,48 @@
   .aviso-flota.sale { opacity: 0; transform: translateX(40px) skewX(-10deg); }
   .aviso3d { position: fixed; left: 16px; top: 140px; max-width: 360px; margin: 0; padding: 10px 14px; background: var(--papel); border: var(--borde) solid var(--tinta); }
 
+  /* Mapa chico (arriba a la izquierda) y plano grande */
+  .mapa { position: fixed; z-index: 1; top: calc(16px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px)); width: 280px; height: 232px; background: var(--papel); border: var(--borde) solid var(--tinta); box-shadow: 6px 6px 0 var(--tinta); }
+  .mapa canvas { display: block; width: 100%; height: 100%; }
+  .mapa .aqui { position: absolute; left: -3px; top: calc(100% + 6px); margin: 0; padding: 4px 12px 5px; max-width: calc(100% - 8px); background: var(--tinta); color: var(--papel); font: 400 14px/1.2 var(--f-rotulo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: skewX(-8deg); transform-origin: left; }
+  .mapa .aqui:empty { display: none; }
+  .mapa button { all: unset; box-sizing: border-box; position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 32px; height: 32px; cursor: pointer; background: var(--papel); color: var(--tinta); border: 2px solid var(--tinta); }
+  .mapa button:hover { background: var(--tinta); color: var(--papel); }
+  .mapa button:focus-visible { outline: 3px solid var(--sala); outline-offset: 2px; }
+  .mapa button svg { width: 17px; height: 17px; }
+  body.con-mapa .inventario { top: calc(16px + 232px + 46px + env(safe-area-inset-top, 0px)); }
+  .plano { position: fixed; inset: 0; z-index: 6; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--tinta) 55%, transparent); animation: aparece 0.2s ease-out; }
+  .plano-caja { display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(1180px, 100%); height: min(820px, 100%); background: var(--papel); border: var(--borde) solid var(--tinta); box-shadow: 10px 10px 0 var(--bermellon); }
+  .plano-caja header { display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; padding: 8px 8px 8px 18px; background: var(--tinta); color: var(--papel); }
+  .plano-caja h2 { margin: 0; font: 400 24px/1.2 var(--f-rotulo); }
+  .plano-caja header p { margin: 0; font-size: 13px; color: color-mix(in srgb, var(--papel) 78%, var(--tinta)); }
+  .plano-caja header button { all: unset; box-sizing: border-box; margin-left: auto; width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; font-size: 26px; line-height: 1; border: 2px solid var(--papel); }
+  .plano-caja header button:hover, .plano-caja header button:focus-visible { background: var(--papel); color: var(--tinta); outline: none; }
+  .plano-lienzo { position: relative; min-height: 0; overflow: hidden; }
+  .plano-lienzo canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .plano-etiquetas button { all: unset; box-sizing: border-box; position: absolute; transform: translate(-50%, -50%); cursor: pointer; padding: 4px 10px; background: var(--papel); color: var(--tinta); border: 2px solid var(--tinta);
+    font: 700 14px/1.2 var(--f-texto); white-space: nowrap; transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease-out; }
+  .plano-etiquetas button.sala { display: grid; justify-items: center; padding: 6px 14px; background: var(--c); color: var(--papel); border-width: 3px; }
+  .plano-etiquetas button.sala b { font: 400 19px/1.1 var(--f-rotulo); }
+  .plano-etiquetas button.sala small { font-size: 12px; font-weight: 500; }
+  .plano-etiquetas button:hover, .plano-etiquetas button:focus-visible { background: var(--tinta); color: var(--papel); transform: translate(-50%, -50%) rotate(-2deg) scale(1.08); box-shadow: 4px 4px 0 var(--bermellon); z-index: 1; outline: none; }
+  .plano-etiquetas button[aria-current="location"] { background: var(--bermellon); color: var(--papel); }
+  .plano-etiquetas .corto { display: none; }
+  .plano-etiquetas button[aria-current="location"]::before { content: "Estás aquí"; position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); padding: 1px 7px; background: var(--tinta); color: var(--papel); font: 700 11px/1.4 var(--f-texto); }
+  /* La onomatopeya de la caída */
+  .onomato { position: fixed; left: 50%; top: 40%; z-index: 4; margin: 0; pointer-events: none; font: 400 clamp(72px, 13vw, 168px)/1 var(--f-rotulo); color: var(--papel);
+    -webkit-text-stroke: 7px var(--tinta); paint-order: stroke fill; text-shadow: 9px 9px 0 var(--bermellon); transform: translate(-50%, -50%) rotate(-9deg); opacity: 0; }
+  @keyframes don { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-9deg) scale(1.9); } 22% { opacity: 1; transform: translate(-50%, -50%) rotate(-9deg) scale(0.94); } 34% { transform: translate(-50%, -50%) rotate(-9deg) scale(1); } 72% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) rotate(-9deg) scale(1.04); } }
+  .onomato.sale { animation: don 0.66s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
   @media (max-width: 760px) {
+    .mapa { width: 200px; height: 166px; }
+    body.con-mapa .inventario { top: calc(16px + 166px + 46px + env(safe-area-inset-top, 0px)); }
+    .plano-etiquetas button { font-size: 12px; padding: 3px 7px; }
+    .plano-etiquetas button.sala b { font-size: 15px; }
+    .plano-etiquetas button.sala small, .plano-etiquetas .largo { display: none; }
+    .plano-etiquetas .corto { display: inline; }
     .vineta { left: 12px; right: 12px; width: auto; top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); max-height: 42vh; }
     .vineta.amplia { width: auto; right: 12px; top: 12px; max-height: none; padding: 0 16px 20px; }
     .amplia .dos, .gal-dos { grid-template-columns: minmax(0, 1fr); }
@@ -385,7 +426,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .vineta, .sala-btn, .boton, .icono, #mundo { transition: none; }
-    .contenido.entra, .libro, .aviso-flota, .cartera.sube, .cartera.baja { animation: none; }
+    .contenido.entra, .libro, .aviso-flota, .cartera.sube, .cartera.baja, .plano { animation: none; }
+    .plano-etiquetas button { transition: none; }
     .ficha-btn { transition: none; }
     .hoja { transition: none; }
   }
@@ -394,6 +436,18 @@
 
 <canvas id="mundo" aria-label="Las salas en 3D. Arrastra para mirar alrededor; haz clic en las mesas y los objetos."></canvas>
 <div class="velocidad" id="velocidad" aria-hidden="true"></div>
+<p class="onomato" id="onomato" aria-hidden="true" hidden></p>
+<div class="mapa" id="mapa" hidden>
+  <canvas id="mapa-cv" role="img" aria-label="Mapa del casino. Haz clic en un lugar para ir caminando."></canvas>
+  <p class="aqui" id="mapa-aqui" aria-live="polite"></p>
+  <button type="button" id="mapa-agrandar" aria-expanded="false" aria-controls="mapa-g" aria-label="Ver el plano completo (M)" title="Ver el plano completo (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+</div>
+<div class="plano" id="mapa-g" hidden role="dialog" aria-modal="true" aria-labelledby="plano-titulo">
+  <div class="plano-caja">
+    <header><h2 id="plano-titulo">Plano de la casa</h2><p>Elige un lugar y caes ahí. En el mapa chico, un clic te lleva caminando.</p><button type="button" id="mapa-cerrar" aria-label="Cerrar el plano">&times;</button></header>
+    <div class="plano-lienzo"><canvas id="mapa-g-cv" aria-hidden="true"></canvas><div class="plano-etiquetas" id="mapa-g-etiquetas"></div></div>
+  </div>
+</div>
 <section class="vineta" id="vineta"><div class="herr"><button type="button" id="cerrar-vineta" hidden aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg></button><button type="button" id="ampliar" aria-pressed="false" aria-label="Ampliar la viñeta" title="Ampliar (doble clic en la viñeta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button></div><div class="contenido" id="contenido" aria-live="polite"></div></section>
 <nav class="tira" aria-label="Salas">
   <span class="marca" id="marca">Frix</span>
@@ -401,7 +455,7 @@
   <div class="cartera" id="cartera" title="Tu dinero en la casa"><span>Dinero</span><b id="dinero">¥0</b></div>
   <button class="icono" type="button" id="bolsa" hidden aria-pressed="false" aria-label="Inventario" title="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.5H6.2Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
   <button class="icono" type="button" id="tema" aria-pressed="false" aria-label="Modo oscuro" title="Modo oscuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
-  <p class="ayuda">Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala</p>
+  <p class="ayuda">Arrastra para mirar<br><kbd>M</kbd> plano &nbsp;<kbd>&larr;</kbd> <kbd>&rarr;</kbd> lugares</p>
 </nav>
 <div class="hud" id="hud" hidden>
   <p class="resultado" id="hud-resultado" aria-live="polite"></p>
@@ -425,6 +479,23 @@
     <button class="boton claro" type="button" data-slot="volver"><span>Volver</span></button>
   </div>
   <p class="ayuda-hud">Espacio o la palanca: tirar. Elige cuánto apuestas por giro.</p>
+</div>
+<div class="hud" id="hud-juego" hidden>
+  <p class="resultado" id="juego-resultado" aria-live="polite"></p>
+  <div class="barra">
+    <div class="fichas" id="juego-fichas" role="group" aria-label="Apuesta"></div>
+    <div class="monto" id="juego-m1"></div>
+    <div class="monto" id="juego-m2"></div>
+    <button class="boton" type="button" data-j="repartir"><span>Repartir</span></button>
+    <button class="boton" type="button" data-j="pedir" hidden><span>Pedir carta</span></button>
+    <button class="boton claro" type="button" data-j="plantarse" hidden><span>Plantarse</span></button>
+    <button class="boton claro" type="button" data-j="doblar" hidden><span>Doblar</span></button>
+    <button class="boton" type="button" data-j="jugar" hidden><span>Jugar</span></button>
+    <button class="boton" type="button" data-j="tirar" hidden><span>Tirar los dados</span></button>
+    <button class="boton" type="button" data-j="prestamo" hidden><span>Pedir préstamo</span></button>
+    <button class="boton claro" type="button" data-j="volver"><span>Volver</span></button>
+  </div>
+  <p class="ayuda-hud" id="juego-ayuda"></p>
 </div>
 <div class="avisos" id="avisos"></div>
 <div class="menu-marca" id="menu-marca" hidden></div>
@@ -465,13 +536,18 @@ const SALAS = [
 // El diario no es una sala: se abre con el cubo de la librería y es la sexta cara del formato cubo
 // El diario y la cara sin señal no son salas: solo se llega a ellos dentro del cubo
 const SECCIONES = [...SALAS, { id: 'diario', nombre: 'Diario', seccion: 'Diario', kanji: '日', color: PAPEL, v: '--tinta', dir: null }, { id: 'oculta', nombre: 'Sin señal', seccion: 'Sin señal', kanji: '', color: PAPEL, v: '--tenue', dir: null },
+  { id: 'club', nombre: 'Club de jugadores', seccion: 'Sobre mí', kanji: '会', color: '#e0362c', v: '--bermellon', dir: null },
   { id: 'reloj', nombre: 'Reloj', seccion: 'Reloj', kanji: '時', color: '#e0362c', v: '--bermellon', dir: null }, { id: 'calendario', nombre: 'Calendario', seccion: 'Calendario', kanji: '暦', color: '#e0362c', v: '--bermellon', dir: null }];
 const sala = id => SALAS.find(s => s.id === id);
 const seccion = id => SECCIONES.find(s => s.id === id);
-const L = 18, ALTO = 4.6, GROSOR = 0.36, PUERTA = 4.6, DINTEL = 3.9, DIST = 26;
-// El salón principal es más grande que las otras salas: mitad de su ancho (x) y de su fondo (z)
-const HX = 14, HZ = 12, mitadHub = d => Math.abs(d.x) > 0.5 ? HX : HZ;
-for (const s of SALAS) s.c = s.dir ? new THREE.Vector3(s.dir[0] * DIST, 0, s.dir[1] * DIST) : new THREE.Vector3();
+const L = 18, ALTO = 4.6, GROSOR = 0.36, PUERTA = 4.6, DINTEL = 3.9, CORR = 4;
+// Cada sala abre al casino por una puerta en su muro; entre la puerta y la sala hay un pasillo corto
+const PUERTA_SALA = { blog: [-32, -4], escritos: [0, -26], obras: [32, -4], galeria: [16, 22] };
+for (const s of SALAS) {
+  if (!s.dir) { s.c = new THREE.Vector3(); continue; }
+  s.puerta = new THREE.Vector3(PUERTA_SALA[s.id][0], 0, PUERTA_SALA[s.id][1]);
+  s.c = s.puerta.clone().add(new THREE.Vector3(s.dir[0], 0, s.dir[1]).multiplyScalar(CORR + L / 2));
+}
 
 const guardar = (k, v) => { try { localStorage.setItem('frix3d-' + k, v); } catch (err) {} };
 const leer = k => { try { return localStorage.getItem('frix3d-' + k); } catch (err) { return null; } };
@@ -491,7 +567,7 @@ const yenes = n => '¥' + String(Math.floor(Math.max(0, n))).replace(/\B(?=(\d{3
 const leerJSON = (k, d) => { try { const v = JSON.parse(leer(k)); return v && typeof v === 'object' ? v : d; } catch (e) { return d; } };
 let dinero = leer('dinero') !== null && Number.isFinite(+leer('dinero')) ? Math.max(0, Math.floor(+leer('dinero'))) : DINERO_INICIAL;
 let logros = leerJSON('logros', {});
-const STATS0 = { tiradas: 0, apuestas: 0, ganadas: 0, perdidas: 0, plenos: 0, mayorPremio: 0, record: DINERO_INICIAL, prestamos: 0, racha: 0, mejorRacha: 0, giros: 0 };
+const STATS0 = { tiradas: 0, apuestas: 0, ganadas: 0, perdidas: 0, plenos: 0, mayorPremio: 0, record: DINERO_INICIAL, prestamos: 0, racha: 0, mejorRacha: 0, giros: 0, manos: 0, ganadasBJ: 0, rondasCH: 0 };
 let stats = Object.assign({}, STATS0, leerJSON('stats', {}));
 const guardarStats = () => guardar('stats', JSON.stringify(stats));
 const LOGROS = [
@@ -508,7 +584,10 @@ const LOGROS = [
   { id: 'focos', nombre: 'A oscuras', desc: 'Apaga la sala con los focos de la ruleta.', k: '灯', secreto: true },
   { id: 'lector', nombre: 'Lector', desc: 'Lee un capítulo hasta la última página.', k: '読' },
   { id: 'tragamonedas', nombre: 'Primer giro', desc: 'Juega una tragamonedas por primera vez.', k: '回' },
-  { id: 'siete', nombre: 'Triple siete', desc: 'Saca tres 7 en una tragamonedas.', k: '七' }
+  { id: 'siete', nombre: 'Triple siete', desc: 'Saca tres 7 en una tragamonedas.', k: '七' },
+  { id: 'natural', nombre: 'Natural', desc: 'Saca blackjack con tus dos primeras cartas.', k: '札' },
+  { id: 'shigoro', nombre: 'Shigoro', desc: 'Saca 4-5-6 en el Chinchirorin.', k: '四' },
+  { id: 'pinzoro', nombre: 'Pinzoro', desc: 'Saca tres unos en el Chinchirorin.', k: '壱' }
 ];
 function lograr(id) {
   const l = LOGROS.find(x => x.id === id); if (!l || logros[id]) return;
@@ -777,6 +856,7 @@ const VISTAS = {
     return `<h2 class="rotulo">Sobre mí</h2><p>${esc(tx(p.presentacion))}</p>${frase ? `<p class="frase">${esc(frase)}</p>` : ''}${extra}
       ${window.DATOS ? '<p class="tenue"><a href="inicio.html">Ver la versión clásica del sitio</a>, con la música, el contador y en inglés.</p>' : ''}`;
   },
+  club() { return VISTAS.inicio(); },
   blog(a) {
     if (a.detalle != null) { const i = blog.findIndex(p => p.id === a.detalle); if (i >= 0) return detallePost(i); }
     if (!blog.length) return `<h2 class="rotulo">Blog</h2><p>Todavía no hay entradas. Cada una aparece como una carta sobre la mesa.</p>`;
@@ -996,7 +1076,7 @@ function pintarTema() {
   b.setAttribute('aria-pressed', o); b.setAttribute('aria-label', o ? 'Modo claro' : 'Modo oscuro'); b.title = o ? 'Modo claro' : 'Modo oscuro';
   b.querySelector('svg').innerHTML = o ? ICONO_SOL : ICONO_LUNA;
   if (compuesto) compuesto.uniforms.uOscuro.value = o ? 1 : 0;
-  if (hay3D) repintarPantalla('inicio', 8);
+  if (hay3D) { repintarPantalla('inicio', 8); pintarMapa(true); }
 }
 $('#tema').addEventListener('click', () => { raiz.dataset.theme = esOscuro() ? 'light' : 'dark'; guardar('tema', raiz.dataset.theme); pintarTema(); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', pintarTema);
@@ -1009,7 +1089,7 @@ function pintarEstado() {
   const nota = $('#acciones-nota'), bot = $('#acciones-botones'), botones = [];
   let texto = '';
   if (estado === 'cerca') { texto = 'Arrastra para girarlo. Haz clic en una pieza para mover su fila.'; botones.push(['agarrar', 'Agarrar', ''], ['soltar', 'Dejarlo', 'claro']); }
-  else if (estado === 'objeto') { texto = objeto === 'maquina' ? 'Las flechas de la pantalla pasan de página. La palanca muestra tus datos.' : objeto === 'tablero' ? 'Clic en una jugada para ir a verla.' : objeto === 'calendario' ? 'Haz clic en un día para ver qué cambió. Las flechas de arriba cambian de mes.' : objeto === 'pantalla' ? 'Elige una historia: su libro sale del estante.' : ''; botones.push(['volver', 'Volver', 'claro']); }
+  else if (estado === 'objeto') { texto = objeto === 'maquina' ? 'Las flechas de la pantalla pasan de página. La palanca muestra tus datos.' : objeto === 'tablero' ? 'Clic en una jugada para ir a verla.' : objeto === 'encurso' ? 'Clic en la pantalla para ir a la sala de las obras.' : objeto === 'club' ? `La tarjeta de socio de ${nombreAutor()}.` : objeto === 'calendario' ? 'Haz clic en un día para ver qué cambió. Las flechas de arriba cambian de mes.' : objeto === 'pantalla' ? 'Elige una historia: su libro sale del estante.' : ''; botones.push(['volver', 'Volver', 'claro']); }
   else if (estado === 'libro') botones.push(['abrir', 'Abrir el libro', ''], ['devolver', 'Devolver al estante', 'claro'], ['salirLibro', 'Volver', 'claro']);
   else if (estado === 'leyendo') botones.push(['ant', '‹ Anterior', 'claro'], ['indice', 'Índice', 'claro'], ['sig', 'Siguiente ›', 'claro'], ['cerrarLibro', 'Cerrar el libro', '']);
   else if (estado === 'sentado') {
@@ -1019,15 +1099,15 @@ function pintarEstado() {
   }
   nota.textContent = texto;
   bot.innerHTML = botones.map(([id, t, c]) => `<button class="boton ${c}" type="button" data-accion="${id}"><span>${t}</span></button>`).join('');
-  $('#acciones').hidden = !hay3D || estado === 'apostando' || estado === 'tragamonedas' || (!texto && !botones.length);
-  pintarHud(); pintarHudSlot();
+  $('#acciones').hidden = !hay3D || estado === 'apostando' || estado === 'tragamonedas' || estado === 'juego' || (!texto && !botones.length);
+  pintarHud(); pintarHudSlot(); pintarHudJuego(); pintarMapa(true);
   const bolsa = $('#bolsa'); bolsa.hidden = !(hay3D && estadoCubo === 'mano' && estado !== 'menu'); bolsa.setAttribute('aria-pressed', invAbierto);
   if (estadoCubo !== 'mano' || estado === 'menu') invAbierto = false;
   $('#inventario').hidden = !invAbierto;
   $('#ranuras').innerHTML = Array.from({ length: 8 }, (_, i) => i === 0 && estadoCubo === 'mano' ? `<div class="ranura llena" title="Cubo de pantallas">${ICONO_CUBO}</div>` : '<div class="ranura"></div>').join('');
   $('#inv-nota').innerHTML = estadoCubo === 'mano' ? `<b>Cubo de pantallas</b>${estado === 'sentado' && actual && actual.id === 'inicio' ? 'Usa Dejar el cubo para ponerlo sobre la ruleta.' : 'Llévalo a la Ruleta, siéntate en un taburete y déjalo en la mesa.'}${hay3D && estado === 'sala' && actual && actual.id === 'escritos' ? '<br>O devuélvelo a su hueco: haz clic en el estante o aquí.<br><button class="enlace" type="button" data-accion="estante">Dejarlo en el estante</button>' : ''}` : '';
   $('.tira').classList.toggle('menu', estado === 'menu');
-  $('.ayuda').innerHTML = estado === 'tragamonedas' ? 'Espacio: tirar<br>Esc vuelve a la sala' : estado === 'apostando' ? 'Clic en la rueda: girar<br>Esc vuelve a la sala' : estado === 'leyendo' ? '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> pasan de página<br>Esc cierra el libro' : estado === 'libro' ? 'Clic en el libro para abrirlo<br>Esc vuelve a la sala' : estado === 'menu' ? 'Arrastra o usa las flechas<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
+  $('.ayuda').innerHTML = estado === 'juego' ? (juegoActual === 'blackjack' ? 'Espacio: repartir o pedir<br>Esc vuelve a la sala' : 'Espacio: jugar o tirar<br>Esc vuelve a la sala') : estado === 'tragamonedas' ? 'Espacio: tirar<br>Esc vuelve a la sala' : estado === 'apostando' ? 'Clic en la rueda: girar<br>Esc vuelve a la sala' : estado === 'leyendo' ? '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> pasan de página<br>Esc cierra el libro' : estado === 'libro' ? 'Clic en el libro para abrirlo<br>Esc vuelve a la sala' : estado === 'menu' ? 'Arrastra o usa las flechas<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>M</kbd> plano &nbsp;<kbd>&larr;</kbd> <kbd>&rarr;</kbd> lugares';
 }
 $('#acciones').addEventListener('click', e => {
   const b = e.target.closest('[data-accion]'); if (!b) return;
@@ -1040,11 +1120,11 @@ const marca = $('#marca'), menuMarca = $('#menu-marca');
   b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', 'menu-marca'); b.title = 'Menú'; marca.replaceWith(b);
 }
 function pintarMenuMarca() {
-  menuMarca.innerHTML = `${hay3D ? '<button type="button" data-m="logros">Mis logros<small>La máquina del salón principal</small></button><button type="button" data-m="mesa">Apostar en la ruleta<small>Tienes ' + yenes(disponible()) + '</small></button>' : ''}
+  menuMarca.innerHTML = `${hay3D ? '<button type="button" data-m="mapa">Plano de la casa<small>Elige un lugar y caes ahí (M)</small></button><button type="button" data-m="logros">Mis logros<small>La máquina roja de las tragamonedas</small></button><button type="button" data-m="mesa">Apostar en la ruleta<small>Tienes ' + yenes(disponible()) + '</small></button>' : ''}
     ${window.DATOS ? '<a href="inicio.html">Versión clásica<small>Con la música, el contador y en inglés</small></a>' : ''}`;
 }
 $('#marca').addEventListener('click', () => { const abrir = menuMarca.hidden; pintarMenuMarca(); menuMarca.hidden = !abrir || !menuMarca.innerHTML.trim(); $('#marca').setAttribute('aria-expanded', !menuMarca.hidden); });
-menuMarca.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (!b) return; menuMarca.hidden = true; $('#marca').setAttribute('aria-expanded', 'false'); if (b.dataset.m === 'logros') acercarObjeto('maquina'); else entrarApuestas(); });
+menuMarca.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (!b) return; menuMarca.hidden = true; $('#marca').setAttribute('aria-expanded', 'false'); if (b.dataset.m === 'mapa') abrirMapaGrande(); else if (b.dataset.m === 'logros') acercarObjeto('maquina'); else entrarApuestas(); });
 addEventListener('pointerdown', e => { if (!menuMarca.hidden && !e.target.closest('#menu-marca, #marca')) { menuMarca.hidden = true; $('#marca').setAttribute('aria-expanded', 'false'); } });
 $('#cerrar-inv').addEventListener('click', () => { invAbierto = false; pintarEstado(); });
 $('#inventario').addEventListener('click', e => { if (e.target.closest('[data-accion="estante"]')) dejarEnEstante(); });
@@ -1060,6 +1140,7 @@ function ir(id, abrir) {
   if (id === 'escritos' && abrir && abrir.cap != null && actual.id === 'escritos' && !viaje) { if (estado === 'objeto') alejarObjeto(true); elegirHistoria(abrir.hist ?? 0, abrir.cap); return; }
   if (estado === 'apostando') { const misma = sala(id) === actual; salirApuestas(!misma); if (misma) { mostrar(id, abrir); return; } }
   if (estado === 'tragamonedas') { if (tragas[slotActual] && tragas[slotActual].girando) return; const misma = sala(id) === actual; salirSlot(!misma); if (misma) { mostrar(id, abrir); return; } }
+  if (estado === 'juego') { if (juegoOcupado()) { notificar('Termina la jugada antes de irte.'); return; } const misma = sala(id) === actual; salirJuego(!misma); if (misma) { mostrar(id, abrir); return; } }
   if (estado === 'cerca') devolverCubo(true);
   if (estado === 'sentado') { const misma = sala(id) === actual; levantarse(); if (misma) { mostrar(id, abrir); return; } }
   if (estado === 'objeto') { const misma = sala(id) === actual; alejarObjeto(!misma); if (misma) { mostrar(id, abrir); return; } }
@@ -1068,6 +1149,8 @@ function ir(id, abrir) {
 tira.addEventListener('click', e => { const b = e.target.closest('[data-sala]'); if (b) ir(b.dataset.sala); });
 addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (hay3D && !mapaG.hidden) { if (e.key === 'Escape' || e.key === 'm' || e.key === 'M') { e.preventDefault(); cerrarMapaGrande(); } return; }
+  if (hay3D && (e.key === 'm' || e.key === 'M') && !e.target.closest('button, a')) { e.preventDefault(); abrirMapaGrande(); return; }
   if (e.key === 'Escape') {
     if (galSel != null && seccionActual === 'galeria') { if (hay3D) voltear(galSel % 6, false); galSel = null; pintarVineta(true); }
     else if (!menuMarca.hidden) { menuMarca.hidden = true; $('#marca').setAttribute('aria-expanded', 'false'); }
@@ -1076,6 +1159,7 @@ addEventListener('keydown', e => {
     else if (invAbierto) { invAbierto = false; pintarEstado(); }
     else if (hay3D && estado === 'apostando') salirApuestas(false);
     else if (hay3D && estado === 'tragamonedas') salirSlot(false);
+    else if (hay3D && estado === 'juego') salirJuego(false);
     else if (hay3D && estado === 'leyendo') cerrarLibro();
     else if (hay3D && estado === 'libro') salirDeLibro();
     else if (hay3D && estado === 'menu') cerrarMenu();
@@ -1086,9 +1170,11 @@ addEventListener('keydown', e => {
   }
   if (hay3D && estado === 'leyendo' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); pasar(e.key === 'ArrowRight' ? 1 : -1); return; }
   if (hay3D && estado === 'tragamonedas' && (e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) { e.preventDefault(); tirarSlot(); return; }
-  if (hay3D && (estado === 'animLibro' || (estado === 'apostando' && girando) || (estado === 'tragamonedas' && tragas[slotActual] && tragas[slotActual].girando)) && /^Arrow/.test(e.key)) { e.preventDefault(); return; }
+  if (hay3D && estado === 'juego' && (e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) { e.preventDefault(); accionJuego(); return; }
+  if (hay3D && (estado === 'animLibro' || (estado === 'apostando' && girando) || (estado === 'tragamonedas' && tragas[slotActual] && tragas[slotActual].girando) || (estado === 'juego' && juegoOcupado())) && /^Arrow/.test(e.key)) { e.preventDefault(); return; }
   if (hay3D && estado === 'menu' && /^Arrow/.test(e.key)) { e.preventDefault(); moverVentana(e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0, e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0); return; }
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  if (hay3D) { e.preventDefault(); const n = ORDEN_LUGARES.length, i = Math.max(0, ORDEN_LUGARES.indexOf(viaje ? viaje.lugar : lugarActual)); caminarA(ORDEN_LUGARES[(i + (e.key === 'ArrowRight' ? 1 : -1) + n) % n]); return; }
   const id = destino ? destino.id : seccionActual;
   const i = Math.max(0, SALAS.findIndex(s => s.id === id)), n = SALAS[(i + (e.key === 'ArrowRight' ? 1 : -1) + SALAS.length) % SALAS.length];
   e.preventDefault(); ir(n.id);
@@ -1225,7 +1311,7 @@ const texAlfombra = color => textura(512, 512, (c, w, h) => {
 
 // Paredes de una sala con puertas en los lados indicados
 function salaCaja(s, puertas) {
-  const { x: cx, z: cz } = s.c, hx = s.dir ? L / 2 : HX, hz = s.dir ? L / 2 : HZ;
+  const { x: cx, z: cz } = s.c, hx = L / 2, hz = L / 2;
   const piso = plano(2 * hx, 2 * hz, mat(PAPEL, { mapa: texPiso(), rep: [hx / 3, hz / 3] }), cx, 0, cz);
   piso.userData.piso = true;
   const lado = (eje, fijo, desde, hasta) => {
@@ -1242,15 +1328,12 @@ function salaCaja(s, puertas) {
   muro('z', cx + hx, cz, puertas.includes('E')); muro('z', cx - hx, cz, puertas.includes('W'));
 }
 function pasillo(s) {
-  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), ini = mitadHub(d), fin = DIST - L / 2, medio = d.clone().multiplyScalar((ini + fin) / 2), largo = fin - ini, ancho = PUERTA + 0.8;
-  const horizontal = Math.abs(d.x) > 0;
-  plano(horizontal ? largo : ancho, horizontal ? ancho : largo, mat(PAPEL, { mapa: texPiso(), rep: 1.4 }), medio.x, 0.002, medio.z);
-  for (const lado of [-1, 1]) {
-    if (horizontal) caja(largo, ALTO, GROSOR, M.papel, medio.x, ALTO / 2, lado * ancho / 2); else caja(GROSOR, ALTO, largo, M.papel, lado * ancho / 2, ALTO / 2, medio.z);
-  }
+  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), medio = s.puerta.clone().addScaledVector(d, CORR / 2), largo = CORR + 0.1, ancho = PUERTA + 0.8, hor = Math.abs(d.x) > 0;
+  plano(hor ? largo : ancho, hor ? ancho : largo, mat(PAPEL, { mapa: texPiso(), rep: 1.4 }), medio.x, 0.002, medio.z);
+  for (const lado of [-1, 1]) { if (hor) caja(largo, ALTO, GROSOR, M.papel, medio.x, ALTO / 2, medio.z + lado * ancho / 2); else caja(GROSOR, ALTO, largo, M.papel, medio.x + lado * ancho / 2, ALTO / 2, medio.z); }
 }
 
-// Cartel colgado sobre cada puerta de la sala central
+// Cartel sobre la puerta de cada sala, del lado del casino
 function cartelPuerta(s) {
   const t = textura(1024, 256, (c, w, h) => {
     c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.fillStyle = s.color; c.fillRect(0, 0, 256, h);
@@ -1259,18 +1342,208 @@ function cartelPuerta(s) {
     c.font = `500 46px ${TXT}`; c.fillStyle = '#5b5751'; c.fillText(s.seccion, 300, 196);
     c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16); c.beginPath(); c.moveTo(256, 0); c.lineTo(256, h); c.stroke();
   });
-  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), p = d.clone().multiplyScalar(mitadHub(d) - 0.45);
+  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), p = s.puerta.clone().addScaledVector(d, -0.45);
   const m = plano(3.8, 0.95, mat(PAPEL, { mapa: t, trama: 0 }), p.x, 4.25, p.z, 0, Math.atan2(-d.x, -d.z), { ir: s.id });
-  caja(4.0, 1.07, 0.12, M.tinta, p.x + d.x * 0.08, 4.25, p.z + d.z * 0.08);
+  caja(d.x ? 0.12 : 4.0, 1.07, d.x ? 4.0 : 0.12, M.tinta, p.x + d.x * 0.08, 4.25, p.z + d.z * 0.08);
   return m;
 }
 
-// ---------- Sala central: la ruleta del casino ilegal ----------
+// ---------- Planta del casino: un piso grande, inspirado en el del Bellagio ----------
+// x hacia el este, z hacia el sur. La entrada está en la punta sur; las salas de las secciones salen por los costados.
+const NORTE = -26;
+const PISO = [[-24, -26], [24, -26], [32, -18], [32, 14], [24, 22], [8, 22], [8, 30], [-8, 30], [-8, 22], [-24, 22], [-32, 14], [-32, -18]];
+const PUERTAS = [
+  { p: [0, NORTE], ancho: PUERTA }, { p: [-32, -4], ancho: PUERTA }, { p: [32, -4], ancho: PUERTA }, { p: [16, 22], ancho: PUERTA },
+  { p: [-16, 22], ancho: PUERTA, vip: true }, { p: [0, 30], ancho: 6, entrada: true }
+];
+function sueloCasino() {
+  const forma = new THREE.Shape(PISO.map(([x, z]) => new THREE.Vector2(x, -z)));
+  const geo = new THREE.ShapeGeometry(forma); geo.rotateX(-Math.PI / 2);
+  poner(geo, mat(PAPEL, { mapa: texPiso(), rep: [1 / 3, 1 / 3] }), 0, 0, 0);
+}
+// Muros siguiendo el borde del piso, con huecos donde van las puertas
+function murosCasino() {
+  const n = PISO.length;
+  for (let i = 0; i < n; i++) {
+    const [ax, az] = PISO[i], [bx, bz] = PISO[(i + 1) % n], largo = Math.hypot(bx - ax, bz - az), ux = (bx - ax) / largo, uz = (bz - az) / largo, ang = Math.atan2(-uz, ux);
+    const cortes = PUERTAS.map(q => ({ q, t: (q.p[0] - ax) * ux + (q.p[1] - az) * uz, off: Math.abs((q.p[0] - ax) * uz - (q.p[1] - az) * ux) }))
+      .filter(c => c.off < 0.05 && c.t > 0 && c.t < largo).sort((a, b) => a.t - b.t);
+    const tramo = (a, b, y0, y1) => { if (b - a < 0.01) return; const m = (a + b) / 2; poner(new THREE.BoxGeometry(b - a, y1 - y0, GROSOR), M.papel, ax + ux * m, (y0 + y1) / 2, az + uz * m).rotation.y = ang; };
+    let t0 = -GROSOR / 2;
+    for (const c of cortes) { tramo(t0, c.t - c.q.ancho / 2, 0, ALTO); tramo(c.t - c.q.ancho / 2, c.t + c.q.ancho / 2, DINTEL, ALTO); t0 = c.t + c.q.ancho / 2; }
+    tramo(t0, largo + GROSOR / 2, 0, ALTO);
+  }
+}
+// Un cartel de papel con marco de tinta, colgado de cara hacia donde mira `ry`
+function cartel(texto, sub, color, x, y, z, ry, ancho = 3.6, accion) {
+  const t = textura(1024, 256, (c, w, h) => {
+    c.fillStyle = color; c.fillRect(0, 0, w, h); c.fillStyle = color === PAPEL ? TINTA : PAPEL; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = `${sub ? 104 : 120}px ${ROT}`; c.fillText(texto, w / 2, sub ? 104 : h / 2 + 6);
+    if (sub) { c.font = `500 44px ${TXT}`; c.fillText(sub, w / 2, 204); }
+    c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16);
+  });
+  plano(ancho, ancho / 4, mat(PAPEL, { mapa: t, trama: 0 }), x, y, z, 0, ry, accion);
+  const b = poner(new THREE.BoxGeometry(ancho + 0.2, ancho / 4 + 0.12, 0.1), M.tinta, x - Math.sin(ry) * 0.07, y, z - Math.cos(ry) * 0.07); b.rotation.y = ry;
+}
+function silla(x, z, ry, color = PAPEL) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; mundo.add(g);
+  const m = (geo, mt, px, py, pz) => { const me = new THREE.Mesh(geo, mt); me.position.set(px, py, pz); g.add(me); };
+  m(new THREE.BoxGeometry(0.62, 0.1, 0.6), mat(color), 0, 0.5, 0); m(new THREE.BoxGeometry(0.62, 0.7, 0.1), mat(color), 0, 0.9, 0.28);
+  m(new THREE.CylinderGeometry(0.05, 0.07, 0.46, 10), M.tinta, 0, 0.23, 0);
+}
+// Entrada de vidrio con el nombre de la casa encima
+function construirEntrada() {
+  for (const s of [-1, 1]) caja(2.86, DINTEL - 0.06, 0.08, mat(GRIS, { trama: 0.4 }), s * 1.5, (DINTEL - 0.06) / 2, 30);
+  caja(0.14, DINTEL, 0.16, M.tinta, 0, DINTEL / 2, 30); caja(6.1, 0.14, 0.16, M.tinta, 0, DINTEL - 0.04, 30);
+  plano(14, 6, mat(PAPEL, { mapa: texPiso(), rep: [2.3, 1] }), 0, 0.001, 33);
+  cartel('Casa de juego de Frix', 'Entrada', sala('inicio').color, 0, 4.22, 29.7, Math.PI, 5.6);
+}
+// La sala VIP: puerta cerrada, por ahora
+function construirVIP() {
+  poner(new THREE.BoxGeometry(PUERTA - 0.1, DINTEL - 0.04, 0.16), M.tinta, -16, (DINTEL - 0.04) / 2, 22, { vip: true });
+  caja(0.5, 0.5, 0.06, mat('#d4921a', { trama: 0 }), -16, 1.7, 21.9);
+  cartel('VIP', 'Solo socios', TINTA, -16, 4.22, 21.7, Math.PI, 3.2, { vip: true });
+}
+// Bar redondo en medio del piso, con su rocola
+let ROCOLA = null;
+function construirBar() {
+  const x = -16, z = 15, roj = sala('inicio').color;
+  cil(2.6, 2.6, 1.05, M.papel, x, 0.525, z, 48);
+  poner(new THREE.TorusGeometry(2.6, 0.12, 10, 64), M.tinta, x, 1.08, z).rotation.x = Math.PI / 2;
+  cil(1.15, 1.3, 2.4, M.tinta, x, 1.2, z, 32);
+  const colores = [roj, PAPEL, '#d4921a', '#108f84', PAPEL, '#2747c8'];
+  for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, y = i % 2 ? 1.55 : 1.95; cil(0.07, 0.07, 0.34, mat(colores[i % 6], { trama: 0 }), x + Math.cos(a) * 1.36, y, z + Math.sin(a) * 1.36, 10); }
+  const banda = textura(1024, 128, (c, w, h) => { c.fillStyle = roj; c.fillRect(0, 0, w, h); c.fillStyle = PAPEL; c.font = `78px ${ROT}`; c.textBaseline = 'middle'; c.textAlign = 'center'; for (let i = 0; i < 4; i++) c.fillText(i % 2 ? 'バー' : 'BAR', w / 8 + i * w / 4, h / 2 + 4); });
+  poner(new THREE.CylinderGeometry(1.42, 1.42, 0.55, 48, 1, true), mat(PAPEL, { mapa: banda, trama: 0 }), x, 2.75, z);
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.2; cil(0.3, 0.3, 0.1, M.papel, x + Math.cos(a) * 3.25, 0.82, z + Math.sin(a) * 3.25, 24); cil(0.05, 0.08, 0.8, M.tinta, x + Math.cos(a) * 3.25, 0.4, z + Math.sin(a) * 3.25, 10); }
+  // Rocola contra la pared sur
+  const g = new THREE.Group(); g.position.set(-21.5, 0, 21.1); g.rotation.y = Math.PI; mundo.add(g);
+  const add = (geo, mt, px, py, pz) => { const me = new THREE.Mesh(geo, mt); me.position.set(px, py, pz); me.userData.accion = { rocola: true }; clicables.push(me); g.add(me); return me; };
+  add(new THREE.BoxGeometry(1.3, 1.4, 0.7), M.papel, 0, 0.7, 0);
+  const arco = add(new THREE.CylinderGeometry(0.65, 0.65, 0.7, 32, 1, false, 0, Math.PI), mat(roj), 0, 1.4, 0); arco.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+  const frente = textura(256, 256, (c, w, h) => { c.fillStyle = TINTA; c.fillRect(0, 0, w, h); c.strokeStyle = roj; c.lineWidth = 8; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(30, 60 + i * 44); c.lineTo(w - 30, 60 + i * 44); c.stroke(); } c.fillStyle = PAPEL; c.font = `40px ${ROT}`; c.textAlign = 'center'; c.fillText('♪ Rocola', w / 2, 34); });
+  add(new THREE.PlaneGeometry(1.1, 1.1), mat(PAPEL, { mapa: frente, trama: 0 }), 0, 0.85, 0.36);
+  ROCOLA = g;
+}
+// Club de jugadores: tu "Sobre mí" como tarjeta de socio
+let CLUB = null;
+function texTarjeta() {
+  const p = D.perfil || {}, roj = sala('inicio').color, frase = fraseHoy();
+  return textura(1280, 808, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h);
+    c.fillStyle = roj; c.fillRect(0, 0, w, 150); c.fillStyle = PAPEL; c.font = `70px ${ROT}`; c.textBaseline = 'middle'; c.fillText('Club de jugadores', 52, 80);
+    c.textAlign = 'right'; c.font = `500 34px ${TXT}`; c.fillText('Socio N.º 000001', w - 52, 80); c.textAlign = 'left';
+    c.fillStyle = TINTA; c.fillRect(52, 196, 220, 260); c.fillStyle = PAPEL; c.font = `170px ${ROT}`; c.textAlign = 'center'; c.fillText((p.nombre || 'F')[0], 162, 330); c.textAlign = 'left';
+    c.fillStyle = TINTA; c.font = `92px ${ROT}`; c.fillText(p.nombre || 'Frix', 316, 236);
+    c.font = `500 30px ${TXT}`; c.fillStyle = '#5b5751'; c.fillText([tx(p.lema), p.desde ? `Socio desde ${p.desde}` : ''].filter(Boolean).join('   ·   '), 320, 300);
+    c.fillStyle = TINTA; c.font = `500 34px ${TXT}`; envolver(c, tx(p.presentacion), 320, 362, w - 380, 46, 4);
+    c.fillStyle = TINTA; c.fillRect(52, 560, w - 104, 4);
+    c.font = `700 28px ${TXT}`; c.fillStyle = roj; c.fillText('Frase del día', 52, 608);
+    c.font = `500 34px ${TXT}`; c.fillStyle = TINTA; envolver(c, frase || '—', 52, 660, w - 104, 46, 2);
+    const g = (p.gustos || []).map(x => tx(x) || String(x)).filter(Boolean).slice(0, 5);
+    if (g.length) { let gx = 52; c.font = `700 26px ${TXT}`; g.forEach(t => { const ww = c.measureText(t).width + 36; c.fillStyle = TINTA; c.fillRect(gx, 740, ww, 44); c.fillStyle = PAPEL; c.fillText(t, gx + 18, 763); gx += ww + 12; }); }
+    c.lineWidth = 18; c.strokeStyle = TINTA; c.strokeRect(9, 9, w - 18, h - 18);
+  });
+}
+function construirClub() {
+  const x = -8 + GROSOR / 2;
+  caja(1.1, 1.1, 3.6, M.papel, x + 1.0, 0.55, 26); caja(1.22, 0.08, 3.72, M.tinta, x + 1.0, 1.14, 26);
+  caja(0.08, 1.84, 2.92, M.tinta, x + 0.04, 2.6, 26);
+  const m = plano(2.8, 2.8 * 808 / 1280, mat(PAPEL, { mapa: texTarjeta(), trama: 0 }), x + 0.1, 2.6, 26, 0, Math.PI / 2, { objeto: 'club' });
+  m.updateMatrixWorld(); CLUB = { centro: m.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(1, 0, 0) };
+  cartel('会員', 'Club de jugadores', PAPEL, x + 0.1, 4.05, 26, Math.PI / 2, 2.6, { objeto: 'club' });
+}
+// El pozo: un letrero gigante con las palabras que llevas escritas
+function construirPozo() {
+  const x = 32 - GROSOR / 2, z = -13, roj = sala('inicio').color, total = historias.reduce((n, h) => n + palabrasDe(h), 0);
+  caja(0.14, 2.3, 5.6, M.tinta, x - 0.07, 3.1, z);
+  const t = textura(1200, 480, (c, w, h) => {
+    c.fillStyle = TINTA; c.fillRect(0, 0, w, h); c.fillStyle = roj; c.fillRect(0, 0, w, 110);
+    c.fillStyle = PAPEL; c.font = `76px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('POZO  ·  積立', w / 2, 60);
+    sieteSeg(c, String(total).padStart(6, '0'), w / 2, 150, 210, roj, w - 120);
+    c.fillStyle = PAPEL; c.font = `500 40px ${TXT}`; c.fillText('palabras escritas en total', w / 2, 428);
+    c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16);
+  });
+  plano(5.4, 2.16, mat(PAPEL, { mapa: t, trama: 0 }), x - 0.16, 3.1, z, 0, -Math.PI / 2, { ir: 'escritos' });
+}
+// Apuestas deportivas: las pantallas con tus últimas jugadas y lo que estás viendo
+let enCursoCv = null, enCursoTex = null, ENCURSO = null;
+function construirApuestas() {
+  const z = NORTE + GROSOR / 2;
+  caja(5.9, 3.3, 0.14, M.tinta, 18.6, 2.5, z + 0.07);
+  [enCursoCv, enCursoTex] = lienzoTex(TAB_W, TAB_H);
+  const m = plano(5.6, 3.0, mat(PAPEL, { mapa: enCursoTex, trama: 0 }), 18.6, 2.5, z + 0.15, 0, 0, { objeto: 'encurso' });
+  m.updateMatrixWorld(); ENCURSO = { centro: m.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1) };
+  pintarEnCurso();
+  for (const fila of [-21.2, -19.4]) for (let x = 7.6; x <= 22; x += 2.0) silla(x, fila, 0);
+  cartel('Apuestas', 'Pantallas', sala('inicio').color, 15.3, 4.3, z + 0.2, 0, 3.0);
+}
+function pintarEnCurso() {
+  if (!enCursoCv) return;
+  const c = enCursoCv.getContext('2d'), w = TAB_W, h = TAB_H, ver = '#108f84';
+  c.fillStyle = TINTA; c.fillRect(0, 0, w, h); c.fillStyle = ver; c.fillRect(0, 0, w, 92);
+  c.fillStyle = TINTA; c.fillRect(24, 14, 120, 64); c.fillStyle = PAPEL; c.font = `46px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('視聴', 84, 48);
+  c.textAlign = 'left'; c.fillStyle = TINTA; c.font = `48px ${ROT}`; c.fillText('Lo que estoy viendo', 170, 48);
+  const L = (D.obras || []).filter(o => o.estado === 1 || o.estado === 3).slice(0, 6), todas = (D.obras || []).slice(-6).reverse(), lista = L.length ? L : todas;
+  if (!L.length && todas.length) { c.fillStyle = '#a29c91'; c.font = `500 26px ${TXT}`; c.fillText('Nada en curso. Lo último que agregaste:', 30, 128); }
+  lista.forEach((o, i) => {
+    const y = 150 + i * 72; c.fillStyle = 'rgba(251, 250, 246, 0.14)'; if (i) c.fillRect(24, y - 4, w - 48, 2);
+    c.fillStyle = ver; c.fillRect(30, y + 14, 150, 44); c.fillStyle = PAPEL; c.font = `700 24px ${TXT}`; c.textAlign = 'center'; c.fillText(recortar(c, TIPO_OBRA[o.tipo] || o.tipo || '', 140), 105, y + 37);
+    c.textAlign = 'left'; c.font = `700 34px ${TXT}`; c.fillText(recortar(c, o.titulo, w - 420), 200, y + 37);
+    c.textAlign = 'right'; c.fillStyle = '#a29c91'; c.font = `500 26px ${TXT}`; c.fillText(`${ESTADO_OBRA[o.estado] || ''}${o.nota != null ? ` · ${o.nota}/10` : ''}`, w - 30, y + 37); c.textAlign = 'left';
+  });
+  if (!lista.length) { c.fillStyle = PAPEL; c.font = `500 30px ${TXT}`; c.fillText('Todavía no hay obras.', 30, 150); }
+  c.fillStyle = 'rgba(251, 250, 246, 0.05)'; for (let y = 0; y < h; y += 4) c.fillRect(0, y, w, 1);
+  c.lineWidth = 12; c.strokeStyle = TINTA; c.strokeRect(6, 6, w - 12, h - 12);
+  enCursoTex.needsUpdate = true;
+}
+// Keno: el reloj y el calendario, con mesitas
+function construirKeno() {
+  const z = NORTE + GROSOR / 2;
+  cartel('キノ  Keno', '', PAPEL, -14.2, 4.25, z + 0.2, 0, 2.8);
+  for (const [x, zz] of [[-19, -21], [-10.5, -21], [-19, -17.5]]) { cil(0.55, 0.55, 0.06, M.papel, x, 0.78, zz, 28); cil(0.06, 0.08, 0.75, M.tinta, x, 0.38, zz, 10); silla(x - 1.0, zz, -Math.PI / 2); silla(x + 1.0, zz, Math.PI / 2); }
+}
+// Mesa de blackjack: media luna, la banca del lado recto
+const BJ_T = new THREE.Vector3(-18, 1.07, -12.4);
+function construirBlackjack() {
+  const { x, z } = BJ_T, roj = sala('inicio').color, R = 2.3, pts = [];
+  for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI; pts.push(new THREE.Vector2(Math.cos(a) * R, -Math.sin(a) * R)); }
+  const forma = new THREE.Shape(pts), cuerpo = new THREE.ExtrudeGeometry(forma, { depth: 0.18, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.05, bevelSegments: 2 });
+  cuerpo.rotateX(-Math.PI / 2); poner(cuerpo, M.papel, x, 0.84, z, { juego: 'blackjack' });
+  const forma2 = new THREE.Shape(pts.map(p => p.clone().multiplyScalar(0.93))), paño = new THREE.ShapeGeometry(forma2);
+  const uv = paño.attributes.uv, pos = paño.attributes.position;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) + R) / (2 * R), (pos.getY(i) + R) / R);
+  paño.rotateX(-Math.PI / 2);
+  const tex = textura(1024, 512, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); const cx = w / 2, cy = 0;
+    // 222,6 px por unidad: la banca deja sus cartas a 0,66 del borde recto, tú a 1,47 y tu apuesta va en el círculo
+    c.strokeStyle = roj; c.lineWidth = 4; c.beginPath(); c.arc(cx, cy, 214, 0, Math.PI); c.stroke(); c.lineWidth = 9; c.beginPath(); c.arc(cx, cy, 270, 0, Math.PI); c.stroke();
+    c.fillStyle = roj; c.font = `30px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const curva = (t, r, a0, a1) => { const n = t.length; for (let i = 0; i < n; i++) { const a = a0 + (a1 - a0) * (i + 0.5) / n; c.save(); c.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r); c.rotate(a - Math.PI / 2); c.fillText(t[i], 0, 0); c.restore(); } };
+    curva('BLACKJACK PAGA 3 A 2', 242, Math.PI * 0.9, Math.PI * 0.1);
+    c.lineWidth = 5; c.strokeStyle = TINTA; c.beginPath(); c.arc(cx, 420, 40, 0, Math.PI * 2); c.stroke();
+  });
+  poner(paño, mat(PAPEL, { mapa: tex, trama: 0 }), x, 1.074, z, { juego: 'blackjack' });
+  caja(0.9, 0.82, 0.9, M.tinta, x, 0.41, z + 0.9);
+  caja(1.4, 0.1, 0.42, M.tinta, x - 0.3, 1.11, z + 0.2);
+  const zapato = poner(new THREE.BoxGeometry(0.36, 0.22, 0.6), M.tinta, x + 1.55, 1.18, z + 0.4); zapato.rotation.y = -0.4;
+  for (let i = 0; i < 5; i++) { const a = (0.15 + i * 0.175) * Math.PI, r = R + 0.75; silla(x + Math.cos(a) * r, z + Math.sin(a) * r, Math.atan2(Math.cos(a), Math.sin(a))); }
+  silla(x, z - 0.7, Math.PI, roj);
+}
+
+// Todo el piso del casino, de la entrada a las mesas
+function construirCasino() {
+  sueloCasino(); murosCasino(); construirEntrada(); construirVIP(); construirBar(); construirClub();
+  construirRuleta(); construirBlackjack(); construirDados(); construirKeno(); construirApuestas(); construirTablero();
+  construirSlots(); construirPozo(); construirCaja();
+  for (const s of SALAS) if (s.dir) cartelPuerta(s);
+}
+
+// ---------- La ruleta, en el centro del casino ----------
 const lamparas = [];
 let rueda, bola, velRueda = 0.35, anguloBola = 0, bolaFija = { idx: Math.floor(Math.random() * 38), t0: 0 };
 function construirRuleta() {
   const s = sala('inicio');
-  salaCaja(s, ['N', 'S', 'E', 'W']);
   plano(10, 6.4, mat(s.color, { mapa: texAlfombra(s.color), trama: 0 }), 0, 0.01, 0);
   // Mesa: cuerpo de papel con borde de tinta y paño con el tablero de apuestas
   const forma = new THREE.Shape(); const W = 7.4, P = 3.4, r = 1.2;
@@ -1323,20 +1596,17 @@ function construirRuleta() {
   caja(13.6, 0.24, 0.32, M.tinta, -0.2, ALTO - 0.32, 0);
   for (const x of [-7, 6.6]) { caja(0.62, ALTO - 0.2, 0.62, M.papel, x, (ALTO - 0.2) / 2, 0); caja(0.78, 0.18, 0.78, M.tinta, x, 0.09, 0); caja(0.78, 0.18, 0.78, M.tinta, x, ALTO - 0.29, 0); }
   for (const x of [-2.2, 1.8]) lamparas.push(poner(new THREE.ConeGeometry(0.85, 0.7, 32, 1, true), mat(TINTA, { doble: true }), x, 3.55, 0, { tema: true }), cil(0.025, 0.025, 0.3, M.tinta, x, 4.03, 0, 8), poner(new THREE.SphereGeometry(0.16, 16, 10), mat(PAPEL, { trama: 0 }), x, 3.2, 0, { tema: true }));
-  for (const otra of SALAS) if (otra.dir) cartelPuerta(otra);
-  construirTablero(); construirDados(); construirCaja();
-  [5.2, 7.4, 9.6].forEach((x, i) => hacerMaquina(x, -HZ + GROSOR / 2 + 0.56, i === 1));
 }
 
 // ---------- Salón del casino: tablero de últimas jugadas, máquinas, mesa de dados y caja ----------
 let tableroCv = null, tableroTex = null, TABLERO = null, maquinaCv = null, maquinaTex = null, MAQUINA = null, paginaMaquina = 0, selLogro = -1, palanca = null;
 const TAB_W = 1120, TAB_H = 600, TAB_Y0 = 112, TAB_FILA = 78;
 function construirTablero() {
-  const x = -HX + GROSOR / 2, z = -7.2, y = 2.5;
-  caja(0.14, 3.3, 5.9, M.tinta, x + 0.07, y, z);
+  const x = 12, z = NORTE + GROSOR / 2, y = 2.5;
+  caja(5.9, 3.3, 0.14, M.tinta, x, y, z + 0.07);
   [tableroCv, tableroTex] = lienzoTex(TAB_W, TAB_H);
-  const m = plano(5.6, 3.0, mat(PAPEL, { mapa: tableroTex, trama: 0 }), x + 0.15, y, z, 0, Math.PI / 2, { objeto: 'tablero' });
-  m.updateMatrixWorld(); TABLERO = { centro: m.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(1, 0, 0) };
+  const m = plano(5.6, 3.0, mat(PAPEL, { mapa: tableroTex, trama: 0 }), x, y, z + 0.15, 0, 0, { objeto: 'tablero' });
+  m.updateMatrixWorld(); TABLERO = { centro: m.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1) };
   pintarTablero();
 }
 function pintarTablero() {
@@ -1366,36 +1636,40 @@ function clicTablero(uv) {
   if (y >= TAB_Y0 && i < 6 && j) ir(j.ir, j.abrir);
 }
 
-// Máquinas tragamonedas: la del medio enseña tus logros y tus datos; las otras llegan pronto
-function hacerMaquina(x, z, logros) {
-  const g = new THREE.Group(); g.position.set(x, 0, z); mundo.add(g);
+// Máquinas: una enseña tus logros y tus datos; las demás son tragamonedas. ry: hacia dónde mira la pantalla
+let GEO_MQ = null; const LETRERO_MQ = {};
+function hacerMaquina(x, z, logros, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; mundo.add(g);
   const roj = sala('inicio').color, add = (geo, m, px, py, pz, acc) => { const me = new THREE.Mesh(geo, m); me.position.set(px, py, pz); g.add(me); if (acc) { me.userData.accion = acc; clicables.push(me); } return me; };
-  const pronto = logros ? null : { slot: tragas.length };
-  add(new THREE.BoxGeometry(1.5, 1.05, 1.0), M.papel, 0, 0.525, 0, pronto);
-  add(new THREE.BoxGeometry(1.52, 0.12, 1.02), mat(logros ? roj : TINTA), 0, 1.0, 0);
-  add(new THREE.BoxGeometry(1.5, 1.45, 0.78), M.papel, 0, 1.78, -0.11, pronto);
-  add(new THREE.BoxGeometry(1.3, 0.1, 0.36), M.tinta, 0, 1.12, 0.36);
-  const letrero = textura(512, 160, (c, w, h) => {
+  if (!GEO_MQ) GEO_MQ = { base: new THREE.BoxGeometry(1.5, 1.05, 1.0), filo: new THREE.BoxGeometry(1.52, 0.12, 1.02), cuerpo: new THREE.BoxGeometry(1.5, 1.45, 0.78), repisa: new THREE.BoxGeometry(1.3, 0.1, 0.36),
+    corona: new THREE.BoxGeometry(1.6, 0.5, 0.86), letrero: new THREE.PlaneGeometry(1.52, 0.46), pant: new THREE.PlaneGeometry(1.24, 0.93), brazo: new THREE.CylinderGeometry(0.035, 0.035, 0.75, 12),
+    bola: new THREE.SphereGeometry(0.11, 18, 12), eje: new THREE.BoxGeometry(0.12, 0.3, 0.3), roj: mat(roj) };
+  const G = GEO_MQ, pronto = logros ? null : { slot: tragas.length };
+  add(G.base, M.papel, 0, 0.525, 0, pronto);
+  add(G.filo, logros ? G.roj : M.tinta, 0, 1.0, 0);
+  add(G.cuerpo, M.papel, 0, 1.78, -0.11, pronto);
+  add(G.repisa, M.tinta, 0, 1.12, 0.36);
+  const letrero = LETRERO_MQ[!!logros] || (LETRERO_MQ[!!logros] = mat(PAPEL, { trama: 0, mapa: textura(512, 160, (c, w, h) => {
     c.fillStyle = logros ? roj : TINTA; c.fillRect(0, 0, w, h); c.fillStyle = PAPEL; c.textAlign = 'center'; c.textBaseline = 'middle';
     c.font = `78px ${ROT}`; c.fillText(logros ? '実績  Logros' : '７７７  Slot', w / 2, h / 2 + 4); c.lineWidth = 12; c.strokeStyle = TINTA; c.strokeRect(6, 6, w - 12, h - 12);
-  });
-  add(new THREE.BoxGeometry(1.6, 0.5, 0.86), M.tinta, 0, 2.75, -0.1);
-  add(new THREE.PlaneGeometry(1.52, 0.46), mat(PAPEL, { mapa: letrero, trama: 0 }), 0, 2.75, 0.335, logros ? { objeto: 'maquina' } : pronto);
+  }) }));
+  add(G.corona, M.tinta, 0, 2.75, -0.1);
+  add(G.letrero, letrero, 0, 2.75, 0.335, logros ? { objeto: 'maquina' } : pronto);
   let pant;
   if (logros) {
     [maquinaCv, maquinaTex] = lienzoTex(1000, 750);
-    pant = add(new THREE.PlaneGeometry(1.24, 0.93), mat(PAPEL, { mapa: maquinaTex, trama: 0 }), 0, 1.84, 0.285, { objeto: 'maquina' });
+    pant = add(G.pant, mat(PAPEL, { mapa: maquinaTex, trama: 0 }), 0, 1.84, 0.285, { objeto: 'maquina' });
   } else pant = hacerTraga(add, g);
   // Palanca a la derecha
   const p = new THREE.Group(); p.position.set(0.84, 1.55, 0.05); g.add(p);
-  const brazo = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.75, 12), M.tinta); brazo.position.y = 0.37; p.add(brazo);
-  const bola = new THREE.Mesh(new THREE.SphereGeometry(0.11, 18, 12), mat(logros ? roj : TINTA)); bola.position.y = 0.78; p.add(bola);
-  add(new THREE.BoxGeometry(0.12, 0.3, 0.3), M.tinta, 0.8, 1.55, 0.05);
+  const brazo = new THREE.Mesh(G.brazo, M.tinta); brazo.position.y = 0.37; p.add(brazo);
+  const bola = new THREE.Mesh(G.bola, logros ? G.roj : M.tinta); bola.position.y = 0.78; p.add(bola);
+  add(G.eje, M.tinta, 0.8, 1.55, 0.05);
   const acc = logros ? { palanca: true } : { palancaSlot: tragas.length - 1 }; [brazo, bola].forEach(m => { m.userData.accion = acc; clicables.push(m); });
   if (!logros) { tragas[tragas.length - 1].palanca = p; pintarTraga(tragas[tragas.length - 1]); }
   if (logros) {
     palanca = p; g.updateMatrixWorld(true);
-    MAQUINA = { centro: pant.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1) };
+    MAQUINA = { centro: pant.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1).applyQuaternion(g.quaternion) };
     pintarMaquina();
   }
 }
@@ -1457,7 +1731,8 @@ function pintarMaquina() {
   } else {
     const filas = [['Dinero', yenes(dinero)], ['Récord de dinero', yenes(stats.record)], ['Tiradas de ruleta', stats.tiradas], ['Apuestas hechas', stats.apuestas],
       ['Tiradas ganadas', stats.ganadas], ['Tiradas perdidas', stats.perdidas], ['Plenos', stats.plenos], ['Mejor racha', stats.mejorRacha],
-      ['Giros en tragamonedas', stats.giros], ['Mayor premio', yenes(stats.mayorPremio)], ['Préstamos', stats.prestamos], ['Secretos', `${LOGROS.filter(l => l.secreto && logros[l.id]).length} de ${LOGROS.filter(l => l.secreto).length}`]];
+      ['Giros en tragamonedas', stats.giros], ['Mayor premio', yenes(stats.mayorPremio)], ['Blackjack ganadas', `${stats.ganadasBJ || 0} de ${stats.manos || 0}`], ['Rondas de chinchirorin', stats.rondasCH || 0],
+      ['Préstamos', stats.prestamos], ['Secretos', `${LOGROS.filter(l => l.secreto && logros[l.id]).length} de ${LOGROS.filter(l => l.secreto).length}`]];
     filas.forEach(([k, v], i) => {
       const x = 24 + (i % 2) * 486, y = 104 + Math.floor(i / 2) * 84;
       c.fillStyle = 'rgba(251, 250, 246, 0.07)'; c.fillRect(x, y, 464, 72);
@@ -1483,18 +1758,18 @@ const SIMB = ['7', '嘘', '賭', 'BAR', '♠', '♥'], PESO = [1, 2, 3, 4, 5, 5]
 const CINTAS = [11, 23, 37].map(sem => { const r = azarSemilla(sem), a = []; PESO.forEach((p, i) => { for (let k = 0; k < p; k++) a.push(i); }); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; });
 const tragas = [];
 let slotActual = -1, slotApuesta = 1000, slotMsg = '';
-const SL_W = 800, SL_H = 600, SL_RX = 40, SL_RY = 64, SL_RW = 220, SL_RG = 20, SL_FILA = 110;
+const SL_ESC = 0.8, SL_W = 800, SL_H = 600, SL_RX = 40, SL_RY = 64, SL_RW = 220, SL_RG = 20, SL_FILA = 110;
 const colorSimb = i => i === 0 ? sala('inicio').color : i === 1 ? '#c4236c' : i === 2 ? sala('inicio').color : i === 5 ? sala('inicio').color : TINTA;
 function hacerTraga(add, g) {
-  const [cv, tex] = lienzoTex(SL_W, SL_H), i = tragas.length, acc = { slot: i };
-  const pant = add(new THREE.PlaneGeometry(1.24, 0.93), mat(PAPEL, { mapa: tex, trama: 0 }), 0, 1.84, 0.285, acc);
+  const [cv, tex] = lienzoTex(SL_W * SL_ESC, SL_H * SL_ESC), i = tragas.length, acc = { slot: i };
+  const pant = add(GEO_MQ.pant, mat(PAPEL, { mapa: tex, trama: 0 }), 0, 1.84, 0.285, acc);
   g.updateMatrixWorld(true);
-  const t = { cv, tex, rod: [0, 1, 2].map(k => ({ p: Math.floor(Math.random() * 20), anim: null })), girando: false, gano: 0, linea: 0, centro: pant.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1), palanca: null };
+  const t = { cv, tex, rod: [0, 1, 2].map(k => ({ p: Math.floor(Math.random() * 20), anim: null })), girando: false, gano: 0, linea: 0, centro: pant.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1).applyQuaternion(g.quaternion), palanca: null };
   tragas.push(t); return t;
 }
 function pintarTraga(t) {
   const c = t.cv.getContext('2d'), w = SL_W, h = SL_H, roj = sala('inicio').color, dentro = slotActual === tragas.indexOf(t);
-  c.fillStyle = TINTA; c.fillRect(0, 0, w, h);
+  c.setTransform(SL_ESC, 0, 0, SL_ESC, 0, 0); c.fillStyle = TINTA; c.fillRect(0, 0, w, h);
   c.fillStyle = PAPEL; c.font = `700 26px ${TXT}`; c.textBaseline = 'middle'; c.textAlign = 'left'; c.fillText(`Apuesta ${yenes(dentro ? slotApuesta : 1000)}`, 40, 34);
   c.textAlign = 'right'; c.fillStyle = t.gano ? roj : '#8d877d'; c.fillText(t.gano ? `Premio ${yenes(t.gano)}` : t.girando ? 'Girando…' : 'Tira de la palanca', w - 40, 34);
   t.rod.forEach((r, k) => {
@@ -1564,18 +1839,26 @@ function cobrarSlot(t) {
 const LIM_SLOT = { th: 0.12, ph0: -0.06, ph1: 0.06, sway: 0, zoom: false };
 function entrarSlot(i) {
   if (viaje || vuelo || ['menu', 'cerca', 'animLibro', 'leyendo'].includes(estado)) return;
-  if (actual.id !== 'inicio') { irA('inicio'); return; }
-  if (estado === 'apostando') salirApuestas(true);
   if (estado === 'tragamonedas' && slotActual === i) { tirarSlot(); return; }
+  if (lugarActual !== 'slots' || actual.id !== 'inicio') { enLugar('slots', () => entrarSlot(i)); return; }
+  if (estado === 'tragamonedas' && tragas[slotActual] && tragas[slotActual].girando) return;
+  if (estado !== 'tragamonedas') limpiarEstado();
   asiento = null; objeto = null; invAbierto = false; estado = 'tragamonedas'; slotActual = i; slotMsg = '';
-  const t = tragas[i]; volar({ pos: t.centro.clone().add(new THREE.Vector3(0, 0.05, 1.95)), mira: t.centro.clone().add(new THREE.Vector3(0, -0.05, 0)) }, 1000, LIM_SLOT);
-  pintarTraga(t); pintarEstado();
+  const t = tragas[i];
+  volar({ pos: t.centro.clone().addScaledVector(t.normal, 1.95).add(new THREE.Vector3(0, 0.05, 0)), mira: t.centro.clone().add(new THREE.Vector3(0, -0.05, 0)) }, 1000, LIM_SLOT);
+  tragas.forEach(pintarTraga); pintarEstado();
 }
 function salirSlot(sinVuelo) {
   if (estado !== 'tragamonedas') return;
   const t = tragas[slotActual]; if (t && t.girando) return;
   estado = 'sala'; slotActual = -1; if (t) pintarTraga(t);
   if (!sinVuelo) volar(vista(actual), 900, LIM_SALA); pintarEstado();
+}
+function construirSlots() {
+  // Isla norte: fila A mira al norte, fila B al sur (la primera de la B es la máquina de logros). Isla sur: C al norte, D al sur.
+  [[-12.6, Math.PI], [-11.6, 0], [5.4, Math.PI], [6.4, 0]].forEach(([z, ry], f) => { for (let i = 0; i < 6; i++) hacerMaquina(13.6 + i * 2, z, f === 1 && i === 0, ry); });
+  cartel('スロット', 'Tragamonedas', sala('inicio').color, 18.6, 3.56, -11.1, 0, 4.2);
+  cartel('スロット', 'Tragamonedas', sala('inicio').color, 18.6, 3.56, 4.9, Math.PI, 4.2);
 }
 function pintarHudSlot() {
   const hud = $('#hud-slot'); hud.hidden = !(hay3D && estado === 'tragamonedas'); if (hud.hidden) return;
@@ -1592,21 +1875,300 @@ $('#hud-slot').addEventListener('click', e => {
   ({ tirar: tirarSlot, prestamo: () => { pedirPrestamo(); pintarHudSlot(); }, volver: () => salirSlot(false) })[b.dataset.slot]();
 });
 
-// Chinchirorin: la mesa de dados (juego que llega después)
+// ---------- Mesas de juego: blackjack con zapato de 6 mazos y chinchirorin con 3 dados en el tazón ----------
+const LUGAR_JUEGO = { blackjack: 'blackjack', chinchirorin: 'dados' };
+const LIM_JUEGO = { th: 0.14, ph0: -0.08, ph1: 0.1, sway: 0, zoom: false };
+const CH_T = new THREE.Vector3(-18, 1.1, 6);
+let juegoActual = null, juegoApuesta = 1000, juegoMsg = '';
+const esperar = ms => new Promise(r => setTimeout(r, menos ? 0 : ms));
+const vistaJuego = id => id === 'blackjack'
+  ? { pos: V3(BJ_T.x, 4.45, BJ_T.z + 3.3), mira: V3(BJ_T.x, 1.0, BJ_T.z + 1.05) }
+  : { pos: V3(CH_T.x - 0.05, 3.05, CH_T.z + 2.05), mira: V3(CH_T.x, 1.0, CH_T.z + 0.12) };
+function entrarJuego(id) {
+  if (viaje || vuelo || caida || ['menu', 'cerca', 'animLibro', 'leyendo'].includes(estado)) return;
+  // Clic en la mesa mientras juegas: reparte o tira, pero nunca pide carta por accidente
+  if (estado === 'juego' && juegoActual === id) { if (id === 'chinchirorin' || bj.fase !== 'jugando') accionJuego(); return; }
+  if (lugarActual !== LUGAR_JUEGO[id] || actual.id !== 'inicio') { enLugar(LUGAR_JUEGO[id], () => entrarJuego(id)); return; }
+  if (estado === 'juego' && juegoOcupado()) return;
+  limpiarEstado();
+  estado = 'juego'; juegoActual = id; juegoMsg = id === 'blackjack' ? (bj.fase === 'fin' ? '' : 'Elige tu ficha y reparte.') : (ch.fase === 'fin' ? '' : 'Elige tu ficha: la banca tira primero.');
+  volar(vistaJuego(id), 1000, LIM_JUEGO); pintarEstado();
+}
+function salirJuego(sinVuelo) {
+  if (estado !== 'juego' || juegoOcupado()) return;
+  estado = 'sala'; juegoActual = null;
+  if (!sinVuelo) volar(vista(actual), 900, LIM_SALA); pintarEstado();
+}
+function juegoOcupado() { return !['apuesta', 'fin'].includes(bj.fase) || !['apuesta', 'fin'].includes(ch.fase); }
+function accionJuego() {
+  if (juegoActual === 'blackjack') { if (bj.fase === 'jugando') pedir(); else repartir(); }
+  else if (juegoActual === 'chinchirorin') { if (ch.fase === 'jugador') tirarCH(); else jugarCH(); }
+}
+function sinFondos() { juegoMsg = dinero < 100 ? 'Te quedaste sin dinero. La caja presta cuando no te queda nada.' : 'No te alcanza para esa apuesta: elige una ficha más chica.'; pintarHudJuego(); }
+function cerrarRonda(txt, ganancia) {
+  if (ganancia > 0) stats.mayorPremio = Math.max(stats.mayorPremio, ganancia);
+  guardarStats();
+  if (dinero < 100) { lograr('quiebra'); txt += ' Te quedaste sin dinero.'; }
+  juegoMsg = txt; pintarHudJuego(); pintarMaquina();
+  if (estado !== 'juego') notificar(esc(txt));
+}
+
+// --- Blackjack ---
+const PALOS = ['♠', '♥', '♦', '♣'], RANGOS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const bj = { fase: 'apuesta', zapato: [], corte: 0, mano: [], banca: [], apuesta: 0, cartas: [], oculta: null, fichas: null };
+function barajar() {
+  const z = []; for (let m = 0; m < 6; m++) for (let k = 0; k < 52; k++) z.push(k);
+  for (let i = z.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [z[i], z[j]] = [z[j], z[i]]; }
+  bj.zapato = z; bj.corte = 60 + Math.floor(Math.random() * 30);
+}
+const valorCarta = c => Math.min(10, (c % 13) + 1);
+function puntos(m) { let t = 0, as = false; for (const c of m) { const v = valorCarta(c); t += v; if (v === 1) as = true; } return as && t + 10 <= 21 ? { t: t + 10, blanda: true } : { t, blanda: false }; }
+const esBJ = m => m.length === 2 && puntos(m).t === 21;
+// Con un as que vale 1 u 11 se muestran los dos totales, pero solo mientras todavía decides
+const textoMano = (m, decidiendo) => { const p = puntos(m); return decidiendo && p.blanda && p.t < 21 ? `${p.t - 10} o ${p.t}` : String(p.t); };
+const bancaVisible = () => bj.oculta ? bj.banca.slice(0, 1) : bj.banca;
+const CARTA_W = 0.3, CARTA_H = 0.42;
+let geoCarta = null, matDorso = null; const matCartas = {};
+function texCarta(k) {
+  const p = Math.floor(k / 13), r = RANGOS[k % 13], col = p === 1 || p === 2 ? sala('inicio').color : TINTA;
+  return textura(180, 252, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.lineWidth = 8; c.strokeStyle = TINTA; c.strokeRect(4, 4, w - 8, h - 8);
+    c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const esquina = () => { c.font = `${r === '10' ? 36 : 44}px ${ROT}`; c.fillText(r, 34, 38); c.font = `700 32px ${TXT}`; c.fillText(PALOS[p], 34, 78); };
+    esquina(); c.save(); c.translate(w, h); c.rotate(Math.PI); esquina(); c.restore();
+    if (/^[JQKA]$/.test(r)) { c.font = `112px ${ROT}`; c.fillText(r, w / 2, h / 2 + 6); } else { c.font = `700 104px ${TXT}`; c.fillText(PALOS[p], w / 2, h / 2 + 6); }
+  });
+}
+const texDorso = () => textura(180, 252, (c, w, h) => {
+  c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.fillStyle = TINTA; c.fillRect(10, 10, w - 20, h - 20);
+  c.save(); c.beginPath(); c.rect(18, 18, w - 36, h - 36); c.clip(); c.strokeStyle = sala('inicio').color; c.lineWidth = 5;
+  for (let i = -h; i < w; i += 16) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i + h, h); c.stroke(); }
+  c.restore(); c.fillStyle = PAPEL; c.beginPath(); c.arc(w / 2, h / 2, 40, 0, Math.PI * 2); c.fill();
+  c.fillStyle = TINTA; c.font = `50px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('賭', w / 2, h / 2 + 3);
+});
+// Una carta es una cara y un dorso pegados; voltearla es girar el grupo sobre su largo
+function hacerCarta(c) {
+  if (!geoCarta) { geoCarta = new THREE.PlaneGeometry(CARTA_W, CARTA_H); geoCarta.rotateX(-Math.PI / 2); matDorso = mat(PAPEL, { mapa: texDorso(), trama: 0 }); }
+  const k = c % 52, g = new THREE.Group();
+  const cara = new THREE.Mesh(geoCarta, matCartas[k] || (matCartas[k] = mat(PAPEL, { mapa: texCarta(k), trama: 0 })));
+  const dorso = new THREE.Mesh(geoCarta, matDorso); dorso.rotation.z = Math.PI; dorso.position.y = -0.004;
+  const acc = { juego: 'blackjack' }; cara.userData.accion = dorso.userData.accion = acc; clicables.push(cara, dorso);
+  g.add(cara, dorso); mundo.add(g); return g;
+}
+const posCarta = (quien, i) => ({ pos: V3(BJ_T.x - 0.42 + i * 0.25, 1.08 + i * 0.003, BJ_T.z + (quien === 'mano' ? 1.47 : 0.66)), ry: (Math.random() - 0.5) * 0.07 });
+const ZAPATO = () => V3(BJ_T.x + 1.55, 1.32, BJ_T.z + 0.4);
+function darCarta(quien, oculta) {
+  const c = bj.zapato.pop(), mano = quien === 'mano' ? bj.mano : bj.banca, d = posCarta(quien, mano.length), g = hacerCarta(c), z0 = ZAPATO();
+  mano.push(c); bj.cartas.push(g); if (oculta) bj.oculta = g;
+  g.position.copy(z0); g.rotation.set(0, -0.4, Math.PI);
+  animar(380, k => { const e = 1 - Math.pow(1 - k, 3); g.position.lerpVectors(z0, d.pos, e); g.position.y += Math.sin(Math.PI * k) * 0.2; g.rotation.y = -0.4 + (d.ry + 0.4) * e; g.rotation.z = oculta ? Math.PI : Math.PI * (1 - e); });
+  pintarHudJuego();
+  return esperar(400);
+}
+function voltearOculta() {
+  const g = bj.oculta; if (!g) return Promise.resolve();
+  bj.oculta = null; const y0 = g.position.y;
+  animar(420, k => { g.rotation.z = Math.PI * (1 - k); g.position.y = y0 + Math.sin(Math.PI * k) * 0.17; });
+  pintarHudJuego();
+  return esperar(450);
+}
+function limpiarCartas() {
+  bj.cartas.forEach(g => { mundo.remove(g); g.children.forEach(m => { const i = clicables.indexOf(m); if (i >= 0) clicables.splice(i, 1); }); });
+  bj.cartas = []; bj.oculta = null;
+}
+function pilaFichas(grupo, monto, x, z, y0) {
+  let resto = monto; const pila = [];
+  for (const [v, col] of [...FICHAS].reverse()) while (resto >= v && pila.length < 12) { pila.push(col); resto -= v; }
+  const geo = pintarFichas3D.geo || (pintarFichas3D.geo = new THREE.CylinderGeometry(0.12, 0.12, 0.042, 28));
+  pila.reverse().forEach((col, k) => { const m = new THREE.Mesh(geo, matFicha[col] || (matFicha[col] = mat(col))); m.position.set(x, y0 + 0.021 + k * 0.044, z); grupo.add(m); });
+}
+function pintarFichasBJ() {
+  if (!bj.fichas) { bj.fichas = new THREE.Group(); mundo.add(bj.fichas); }
+  while (bj.fichas.children.length) bj.fichas.remove(bj.fichas.children[0]);
+  if (bj.apuesta) pilaFichas(bj.fichas, bj.apuesta, BJ_T.x, BJ_T.z + 1.89, 1.074);
+}
+async function repartir() {
+  if (bj.fase !== 'apuesta' && bj.fase !== 'fin') return;
+  if (disponible() < juegoApuesta) { sinFondos(); return; }
+  let aviso = '';
+  if (bj.zapato.length < Math.max(bj.corte, 20)) { barajar(); aviso = 'La banca baraja seis mazos nuevos.'; }
+  limpiarCartas();
+  bj.apuesta = juegoApuesta; bj.mano = []; bj.banca = []; bj.fase = 'repartiendo';
+  ponerDinero(dinero - bj.apuesta); stats.manos = (stats.manos || 0) + 1; guardarStats();
+  juegoMsg = aviso; pintarFichasBJ(); pintarHudJuego();
+  await darCarta('mano'); await darCarta('banca'); await darCarta('mano'); await darCarta('banca', true);
+  const tuBJ = esBJ(bj.mano), suBJ = esBJ(bj.banca);
+  if (tuBJ || suBJ) { await voltearOculta(); terminarBJ(tuBJ && suBJ ? 'empate' : tuBJ ? 'natural' : 'pierde'); return; }
+  bj.fase = 'jugando'; juegoMsg = `Tienes ${textoMano(bj.mano, true)}. ¿Pides carta o te plantas?`; pintarHudJuego();
+}
+async function pedir() {
+  if (bj.fase !== 'jugando') return;
+  bj.fase = 'repartiendo'; juegoMsg = ''; pintarHudJuego();
+  await darCarta('mano');
+  const t = puntos(bj.mano).t;
+  if (t > 21) { await voltearOculta(); terminarBJ('pasa'); return; }
+  if (t === 21) { await jugarBanca(); return; }
+  bj.fase = 'jugando'; juegoMsg = `Tienes ${textoMano(bj.mano, true)}.`; pintarHudJuego();
+}
+async function plantarse() { if (bj.fase !== 'jugando') return; await jugarBanca(); }
+async function doblar() {
+  if (bj.fase !== 'jugando' || bj.mano.length !== 2 || disponible() < bj.apuesta) return;
+  ponerDinero(dinero - bj.apuesta); bj.apuesta *= 2; pintarFichasBJ();
+  bj.fase = 'repartiendo'; juegoMsg = 'Doblas: una sola carta más.'; pintarHudJuego();
+  await darCarta('mano');
+  if (puntos(bj.mano).t > 21) { await voltearOculta(); terminarBJ('pasa'); return; }
+  await jugarBanca();
+}
+// La banca da vuelta su carta y pide hasta llegar a 17
+async function jugarBanca() {
+  bj.fase = 'banca'; juegoMsg = 'Juega la banca…'; pintarHudJuego();
+  await voltearOculta(); await esperar(250);
+  while (puntos(bj.banca).t < 17) { await darCarta('banca'); await esperar(120); }
+  const tu = puntos(bj.mano).t, su = puntos(bj.banca).t;
+  terminarBJ(su > 21 ? 'bancaPasa' : tu > su ? 'gana' : tu < su ? 'pierde' : 'empate');
+}
+function terminarBJ(r) {
+  const a = bj.apuesta, tu = puntos(bj.mano).t, su = puntos(bj.banca).t;
+  let cobro = 0, txt;
+  if (r === 'natural') { cobro = a + Math.floor(a * 1.5); txt = `¡Blackjack! Ganaste ${yenes(cobro - a)}.`; lograr('natural'); }
+  else if (r === 'gana') { cobro = 2 * a; txt = `${tu} contra ${su}: ganaste ${yenes(a)}.`; }
+  else if (r === 'bancaPasa') { cobro = 2 * a; txt = `La banca se pasó con ${su}: ganaste ${yenes(a)}.`; }
+  else if (r === 'empate') { cobro = a; txt = esBJ(bj.mano) ? 'Blackjack contra blackjack: empate, recuperas tu apuesta.' : `Empate a ${tu}: recuperas tu apuesta.`; }
+  else if (r === 'pasa') txt = `Te pasaste con ${tu}: perdiste ${yenes(a)}.`;
+  else txt = esBJ(bj.banca) ? `La banca tiene blackjack: perdiste ${yenes(a)}.` : `${tu} contra ${su}: perdiste ${yenes(a)}.`;
+  if (cobro) ponerDinero(dinero + cobro);
+  if (cobro > a) stats.ganadasBJ = (stats.ganadasBJ || 0) + 1;
+  bj.fase = 'fin'; bj.apuesta = 0; pintarFichasBJ();
+  cerrarRonda(txt, cobro - a);
+}
+
+// --- Chinchirorin: la banca tira primero (hasta 3 veces), después tú ---
+const ch = { fase: 'apuesta', apuesta: 0, banca: null, tiros: 0 };
+let DADOS = [];
+// Qué giro deja cada número arriba (las caras del dado: +x 1, -x 6, +y 2, -y 5, +z 3, -z 4)
+const QDADO = { 1: [0, 0, Math.PI / 2], 2: [0, 0, 0], 3: [-Math.PI / 2, 0, 0], 4: [Math.PI / 2, 0, 0], 5: [Math.PI, 0, 0], 6: [0, 0, -Math.PI / 2] };
+const minus = t => t[0].toLowerCase() + t.slice(1);
+function manoDados(d) {
+  const [a, b, c] = [...d].sort((x, y) => x - y);
+  if (a === b && b === c) return a === 1 ? { tipo: 'pinzoro', mult: 5, nombre: 'Pinzoro 1-1-1' } : { tipo: 'arashi', mult: 3, nombre: `Arashi de ${a}` };
+  if (a === 4 && b === 5 && c === 6) return { tipo: 'shigoro', mult: 2, nombre: 'Shigoro 4-5-6' };
+  if (a === 1 && b === 2 && c === 3) return { tipo: 'hifumi', nombre: 'Hifumi 1-2-3' };
+  if (a === b) return { tipo: 'punto', punto: c, nombre: `Punto ${c}` };
+  if (b === c) return { tipo: 'punto', punto: a, nombre: `Punto ${a}` };
+  return null;
+}
+// Los tres dados caen al tazón dando vueltas, rebotan y quedan con su número arriba
+function tirarDados() {
+  const v = [0, 1, 2].map(() => 1 + Math.floor(Math.random() * 6)), base = Math.random() * Math.PI * 2, arriba = V3(0, 1, 0);
+  const pl = DADOS.map((d, i) => {
+    const a = base + i * Math.PI * 2 / 3 + (Math.random() - 0.5) * 0.5, r = 0.12 + Math.random() * 0.05;
+    const q1 = new THREE.Quaternion().setFromAxisAngle(arriba, Math.random() * Math.PI * 2).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...QDADO[v[i]])));
+    return { d, ini: V3(CH_T.x + (Math.random() - 0.5) * 0.2, 2.0 + Math.random() * 0.25, CH_T.z + 0.1 + Math.random() * 0.12), fin: V3(CH_T.x + Math.cos(a) * r, 1.115, CH_T.z + Math.sin(a) * r),
+      q0: d.quaternion.clone(), q1, eje: V3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), vueltas: 2 + Math.random() * 2 };
+  });
+  const q = new THREE.Quaternion(), giro = new THREE.Quaternion();
+  return new Promise(res => animar(1150, k => {
+    pl.forEach((p, i) => {
+      const kk = THREE.MathUtils.clamp(k * 1.12 - i * 0.06, 0, 1), ee = 1 - Math.pow(1 - kk, 3);
+      p.d.position.lerpVectors(p.ini, p.fin, ee);
+      p.d.position.y = p.fin.y + (p.ini.y - p.fin.y) * Math.pow(1 - kk, 3) * Math.abs(Math.cos(kk * Math.PI * 2.5));
+      q.slerpQuaternions(p.q0, p.q1, ee); giro.setFromAxisAngle(p.eje, (1 - ee) * p.vueltas * Math.PI * 2); p.d.quaternion.copy(giro).multiply(q);
+    });
+  }, () => res(v)));
+}
+async function jugarCH() {
+  if (ch.fase !== 'apuesta' && ch.fase !== 'fin') return;
+  if (disponible() < juegoApuesta) { sinFondos(); return; }
+  ch.apuesta = juegoApuesta; ch.banca = null; ch.tiros = 0; ch.fase = 'banca';
+  ponerDinero(dinero - ch.apuesta); stats.rondasCH = (stats.rondasCH || 0) + 1; guardarStats();
+  juegoMsg = 'Tira la banca…'; pintarHudJuego();
+  let m = null;
+  for (let t = 1; t <= 3 && !m; t++) {
+    const d = await tirarDados(); m = manoDados(d);
+    juegoMsg = `La banca sacó ${d.join('-')}: ${m ? minus(m.nombre) + '.' : t < 3 ? 'sin mano, vuelve a tirar…' : 'tres tiros sin mano.'}`; pintarHudJuego();
+    await esperar(m ? 650 : 550);
+  }
+  ch.banca = m || { tipo: 'menashi', nombre: 'Sin mano' };
+  if (!m) { terminarCH(1, 'La banca se quedó sin mano.'); return; }
+  if (m.tipo === 'hifumi') { terminarCH(2, 'La banca sacó hifumi y paga doble.'); return; }
+  if (m.mult) { terminarCH(-m.mult, `La banca sacó ${minus(m.nombre)} y cobra ×${m.mult}.`); return; }
+  ch.fase = 'jugador'; juegoMsg = `La banca tiene ${minus(m.nombre)}. Te toca: tres tiros para sacar una mano.`; pintarHudJuego();
+}
+async function tirarCH() {
+  if (ch.fase !== 'jugador') return;
+  ch.fase = 'tirando'; ch.tiros++; juegoMsg = ''; pintarHudJuego();
+  const d = await tirarDados(), m = manoDados(d), b = ch.banca;
+  if (m && m.tipo === 'pinzoro') lograr('pinzoro');
+  if (m && m.tipo === 'shigoro') lograr('shigoro');
+  if (!m) {
+    if (ch.tiros < 3) { ch.fase = 'jugador'; juegoMsg = `Sacaste ${d.join('-')}: sin mano. ${ch.tiros === 2 ? 'Te queda un tiro.' : 'Te quedan dos tiros.'}`; pintarHudJuego(); return; }
+    terminarCH(-1, `Sacaste ${d.join('-')}: tres tiros sin mano.`); return;
+  }
+  if (m.tipo === 'hifumi') { terminarCH(-2, 'Sacaste hifumi 1-2-3 y pagas doble.'); return; }
+  if (m.mult) { terminarCH(m.mult, `¡Sacaste ${minus(m.nombre)}! La banca paga ×${m.mult}.`); return; }
+  terminarCH(Math.sign(m.punto - b.punto), `Tu punto ${m.punto} contra el punto ${b.punto} de la banca.`);
+}
+// mult > 0: ganas tantas veces tu apuesta; < 0: la pierdes tantas veces (nunca más de lo que tienes); 0: empate
+function terminarCH(mult, motivo) {
+  const a = ch.apuesta; let neto;
+  if (mult > 0) { ponerDinero(dinero + a * (1 + mult)); neto = a * mult; }
+  else if (mult === 0) { ponerDinero(dinero + a); neto = 0; }
+  else { const extra = Math.min(dinero, a * (-mult - 1)); ponerDinero(dinero - extra); neto = -(a + extra); }
+  ch.fase = 'fin'; ch.apuesta = 0;
+  cerrarRonda(`${motivo} ${neto > 0 ? `Ganaste ${yenes(neto)}.` : neto < 0 ? `Perdiste ${yenes(-neto)}.` : 'Empate: recuperas tu apuesta.'}`, neto);
+}
+
+// --- La barra de las mesas ---
+function pintarHudJuego() {
+  const hud = $('#hud-juego'); hud.hidden = !(hay3D && estado === 'juego'); if (hud.hidden) return;
+  const esBj = juegoActual === 'blackjack', f = esBj ? bj.fase : ch.fase, libre = f === 'apuesta' || f === 'fin';
+  $('#juego-resultado').innerHTML = juegoMsg ? `<span>${esc(juegoMsg)}</span>` : '';
+  hud.querySelectorAll('.ficha-btn').forEach(b => { b.setAttribute('aria-pressed', +b.dataset.v === juegoApuesta); b.disabled = !libre; });
+  const ver = (k, v, dis) => { const b = hud.querySelector(`[data-j="${k}"]`); b.hidden = !v; b.disabled = !!dis; };
+  ver('repartir', esBj && libre); ver('pedir', esBj && !libre, f !== 'jugando'); ver('plantarse', esBj && !libre, f !== 'jugando');
+  ver('doblar', esBj && !libre, f !== 'jugando' || bj.mano.length !== 2 || disponible() < bj.apuesta);
+  ver('jugar', !esBj && libre); ver('tirar', !esBj && !libre, f !== 'jugador');
+  ver('prestamo', libre && dinero < 100); ver('volver', true, !libre);
+  hud.querySelector('[data-j="repartir"] span').textContent = f === 'fin' ? 'Otra mano' : 'Repartir';
+  hud.querySelector('[data-j="jugar"] span').textContent = f === 'fin' ? 'Otra ronda' : 'Jugar';
+  if (esBj) {
+    $('#juego-m1').innerHTML = `Tu mano<b>${bj.mano.length ? textoMano(bj.mano, f === 'jugando') : '–'}</b>`;
+    $('#juego-m2').innerHTML = `Banca<b>${bj.banca.length ? textoMano(bancaVisible()) + (bj.oculta ? ' + ?' : '') : '–'}</b>`;
+  } else {
+    $('#juego-m1').innerHTML = `Banca<b>${ch.banca ? esc(ch.banca.nombre) : '–'}</b>`;
+    $('#juego-m2').innerHTML = `Tus tiros<b>${f === 'jugador' || f === 'tirando' ? `${ch.tiros} de 3` : '–'}</b>`;
+  }
+  $('#juego-ayuda').textContent = esBj ? 'Espacio: repartir o pedir carta. La banca pide hasta 16 y se planta en 17. Blackjack paga 3 a 2.'
+    : 'Espacio: jugar o tirar. Pinzoro paga ×5, arashi ×3, shigoro ×2. Hifumi paga doble al otro.';
+}
+$('#juego-fichas').innerHTML = FICHAS.slice(0, 3).map(([v, c, t]) => `<button class="ficha-btn" type="button" data-v="${v}" style="--c1:${c};--c2:${c === '#fbfaf6' ? '#141312' : '#fbfaf6'}" aria-pressed="false" aria-label="Apostar ${yenes(v)}">${t}</button>`).join('');
+$('#hud-juego').addEventListener('click', e => {
+  const f = e.target.closest('.ficha-btn'); if (f && !f.disabled) { juegoApuesta = +f.dataset.v; pintarHudJuego(); return; }
+  const b = e.target.closest('[data-j]'); if (!b || b.disabled) return;
+  ({ repartir, pedir, plantarse, doblar, jugar: jugarCH, tirar: tirarCH, prestamo: () => { pedirPrestamo(); pintarHudJuego(); }, volver: () => salirJuego(false) })[b.dataset.j]();
+});
+
+// La mesa de Chinchirorin: redonda, con el tazón en el centro
 function construirDados() {
-  const x = -8.6, z = 6.4, roj = sala('inicio').color;
+  const { x, z } = CH_T, roj = sala('inicio').color, acc = { juego: 'chinchirorin' };
   cil(1.5, 1.5, 0.12, M.papel, x, 0.95, z, 48); cil(0.2, 0.32, 0.9, M.tinta, x, 0.45, z, 16); cil(0.7, 0.7, 0.05, M.tinta, x, 0.025, z, 32);
-  const paño = textura(512, 512, (c, w, h) => { c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.strokeStyle = roj; c.lineWidth = 18; c.beginPath(); c.arc(w / 2, h / 2, 230, 0, Math.PI * 2); c.stroke(); c.fillStyle = roj; c.font = `64px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('丁', w / 2, 80); c.fillText('半', w / 2, h - 80); });
-  const tope = new THREE.Mesh(new THREE.CircleGeometry(1.42, 48), mat(PAPEL, { mapa: paño, trama: 0 })); tope.rotation.x = -Math.PI / 2; tope.position.set(x, 1.012, z); tope.userData.accion = { pronto: 'dados' }; clicables.push(tope); mundo.add(tope);
-  const tazon = new THREE.Mesh(new THREE.SphereGeometry(0.42, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), mat(PAPEL, { doble: true })); tazon.position.set(x, 1.43, z); tazon.userData.accion = { pronto: 'dados' }; clicables.push(tazon); mundo.add(tazon);
+  const paño = textura(512, 512, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.strokeStyle = roj; c.lineWidth = 18; c.beginPath(); c.arc(w / 2, h / 2, 230, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = roj; c.font = `44px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('チンチロリン', w / 2, 82);
+    c.fillStyle = TINTA; c.font = `700 30px ${TXT}`; c.fillText('Chinchirorin', w / 2, h - 80);
+  });
+  const tope = new THREE.Mesh(new THREE.CircleGeometry(1.42, 48), mat(PAPEL, { mapa: paño, trama: 0 })); tope.rotation.x = -Math.PI / 2; tope.position.set(x, 1.012, z); tope.userData.accion = acc; clicables.push(tope); mundo.add(tope);
+  const tazon = new THREE.Mesh(new THREE.SphereGeometry(0.42, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), mat(PAPEL, { doble: true })); tazon.position.set(x, 1.43, z); tazon.userData.accion = acc; clicables.push(tazon); mundo.add(tazon);
+  poner(new THREE.TorusGeometry(0.42, 0.025, 8, 40), M.tinta, x, 1.43, z).rotation.x = Math.PI / 2;
   const cara = n => textura(128, 128, (c, w, h) => { c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); const P = { 1: [[64, 64]], 2: [[34, 34], [94, 94]], 3: [[30, 30], [64, 64], [98, 98]], 4: [[34, 34], [94, 34], [34, 94], [94, 94]], 5: [[32, 32], [96, 32], [64, 64], [32, 96], [96, 96]], 6: [[34, 28], [94, 28], [34, 64], [94, 64], [34, 100], [94, 100]] }; P[n].forEach(([a, b]) => { c.fillStyle = n === 1 ? roj : TINTA; c.beginPath(); c.arc(a, b, n === 1 ? 22 : 12, 0, Math.PI * 2); c.fill(); }); });
-  const caras = [1, 6, 2, 5, 3, 4].map(n => mat(PAPEL, { mapa: cara(n), trama: 0 }));
-  [[-0.14, 0.05, 0.3], [0.13, -0.08, 1.1], [0.02, 0.14, 2.2]].forEach(([dx, dz, r]) => { const d = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), caras); d.position.set(x + dx, 1.1, z + dz); d.rotation.y = r; mundo.add(d); });
+  const caras = [1, 6, 2, 5, 3, 4].map(n => mat(PAPEL, { mapa: cara(n), trama: 0 })), geo = new THREE.BoxGeometry(0.16, 0.16, 0.16);
+  DADOS = [[-0.14, 0.05, 0.3], [0.13, -0.08, 1.1], [0.02, 0.14, 2.2]].map(([dx, dz, r]) => { const d = new THREE.Mesh(geo, caras); d.position.set(x + dx, 1.115, z + dz); d.rotation.y = r; d.userData.accion = acc; clicables.push(d); mundo.add(d); return d; });
   [[x + 2.1, z - 0.3], [x - 0.3, z + 2.1], [x - 1.9, z - 1.1]].forEach(([a, b]) => { cil(0.38, 0.38, 0.12, M.papel, a, 0.82, b, 28); cil(0.06, 0.09, 0.76, M.tinta, a, 0.38, b, 12); });
 }
-// La caja: donde el casino cambia y presta dinero
+
+// La caja: donde el casino cambia y presta dinero (pared este)
 function construirCaja() {
-  const x = HX - GROSOR / 2 - 0.75, z = 7.4, roj = sala('inicio').color;
+  const x = 32 - GROSOR / 2 - 0.75, z = 10, roj = sala('inicio').color;
   caja(1.3, 1.15, 3.6, M.papel, x, 0.575, z); caja(1.42, 0.1, 3.72, M.tinta, x, 1.2, z);
   for (let i = 0; i < 9; i++) cil(0.025, 0.025, 1.5, M.tinta, x - 0.55, 2.0, z - 1.6 + i * 0.4, 8);
   caja(0.12, 0.12, 3.6, M.tinta, x - 0.55, 2.78, z);
@@ -1615,9 +2177,13 @@ function construirCaja() {
   plano(3.2, 0.82, mat(PAPEL, { mapa: t, trama: 0 }), x - 0.7, 3.35, z, 0, -Math.PI / 2, { caja: true });
   const mostrador = poner(new THREE.BoxGeometry(1.3, 1.15, 3.6), M.papel, x, 0.575, z, { caja: true }); mostrador.visible = false;
 }
+function accionCaja() {
+  if (dinero < 100 && !apuestas.size) pedirPrestamo();
+  else notificar(`La caja presta dinero solo cuando ya no te queda nada. Tienes ${yenes(disponible())}.`);
+}
 
-// ---------- Rincón de la Ruleta: reloj de pared y calendario con la bitácora ----------
-const PARED_N = -HZ + GROSOR / 2, RELOJ = { x: -6.6, y: 2.95 }, CAL = { x: -3.85, y: 2.42 };
+// ---------- Keno: reloj de pared y calendario con la bitácora ----------
+const PARED_N = NORTE + GROSOR / 2, RELOJ = { x: -16, y: 2.95 }, CAL = { x: -12.4, y: 2.42 };
 let agujas = null, placaCv = null, placaTex = null, placaSeg = -1, calCv = null, calTex = null;
 const CAL_W = 520, CAL_H = 672, CAL_BANDA = 112, CAL_SEM = 158, CAL_FILA = (CAL_H - CAL_SEM - 14) / 6, CAL_M = 14, CAL_CW = (CAL_W - 2 * CAL_M) / 7;
 function construirRincon() {
@@ -1691,17 +2257,18 @@ function clicCalendario(uv) {
 }
 const LIM_OBJETO = { th: 0.22, ph0: -0.1, ph1: 0.1, sway: 0, zoom: false };
 const vistaFrente = (o, dist, alto = 0) => ({ pos: o.centro.clone().addScaledVector(o.normal, dist).add(new THREE.Vector3(0, alto, 0)), mira: o.centro.clone() });
-const vistaObjeto = id => id === 'maquina' ? vistaFrente(MAQUINA, 2.05, 0.12) : id === 'tablero' ? vistaFrente(TABLERO, 5.4, 0.2) : id === 'pantalla'
+const LUGAR_OBJETO = { maquina: 'slots', tablero: 'apuestas', encurso: 'apuestas', reloj: 'keno', calendario: 'keno', club: 'club' };
+const vistaObjeto = id => id === 'maquina' ? vistaFrente(MAQUINA, 2.05, 0.12) : id === 'tablero' ? vistaFrente(TABLERO, 5.4, 0.2) : id === 'encurso' ? vistaFrente(ENCURSO, 5.4, 0.2) : id === 'club' ? vistaFrente(CLUB, 4.7, 0.15) : id === 'pantalla'
   ? { pos: PANTALLA.centro.clone().addScaledVector(PANTALLA.normal, 2.55).add(new THREE.Vector3(0, 0.05, 0)), mira: PANTALLA.centro.clone() }
   : id === 'reloj'
   ? { pos: new THREE.Vector3(RELOJ.x, 2.6, PARED_N + 3.3), mira: new THREE.Vector3(RELOJ.x, 2.42, PARED_N) }
   : { pos: new THREE.Vector3(CAL.x, 2.5, PARED_N + 3.2), mira: new THREE.Vector3(CAL.x, 2.3, PARED_N) };
 function acercarObjeto(id) {
-  if (viaje || estado === 'menu' || estado === 'cerca') return;
-  const cuarto = id === 'pantalla' ? 'escritos' : 'inicio';
-  if (actual.id !== cuarto) { irA(cuarto); return; }
+  if (viaje || caida || estado === 'menu' || estado === 'cerca') return;
+  if (id === 'pantalla') { if (actual.id !== 'escritos') { irA('escritos'); return; } }
+  else if (lugarActual !== LUGAR_OBJETO[id] || actual.id !== 'inicio') { enLugar(LUGAR_OBJETO[id], () => acercarObjeto(id)); return; }
   if (['libro', 'animLibro', 'leyendo', 'menu', 'cerca'].includes(estado)) return;
-  if (estado === 'apostando') salirApuestas(true);
+  if (estado === 'apostando' || estado === 'tragamonedas' || estado === 'juego') limpiarEstado();
   asiento = null; estado = 'objeto'; objeto = id; filaHover = -1;
   volar(vistaObjeto(id), 1100, LIM_OBJETO);
   if (seccion(id)) mostrar(id); pintarEstado();
@@ -1709,7 +2276,7 @@ function acercarObjeto(id) {
 function alejarObjeto(sinVuelo) {
   if (estado !== 'objeto') return;
   estado = 'sala'; objeto = null;
-  if (!sinVuelo) { volar(vista(actual), 950, LIM_SALA); mostrar(actual.id); }
+  if (!sinVuelo) { volar(vista(actual), 950, LIM_SALA); mostrar((!actual.dir && LUGARES[lugarActual] && LUGARES[lugarActual].seccion) || actual.id); } else if (seccionActual === 'club' || seccionActual === 'reloj' || seccionActual === 'calendario') mostrar(actual.id);
   filaHover = -1; pintarPantallaLib();
   pintarEstado();
 }
@@ -1723,8 +2290,9 @@ function vistaMesaRuleta() {
   return { pos: mira.clone().add(new THREE.Vector3(0, Math.sin(pitch) * d, Math.cos(pitch) * d)), mira };
 }
 function entrarApuestas() {
-  if (viaje || vuelo || ['menu', 'cerca', 'animLibro', 'leyendo', 'apostando'].includes(estado)) return;
-  if (actual.id !== 'inicio') { irA('inicio'); return; }
+  if (viaje || vuelo || caida || ['menu', 'cerca', 'animLibro', 'leyendo', 'apostando'].includes(estado)) return;
+  if (lugarActual !== 'ruleta' || actual.id !== 'inicio') { enLugar('ruleta', entrarApuestas); return; }
+  if (estado !== 'sala') limpiarEstado();
   asiento = null; objeto = null; invAbierto = false; estado = 'apostando';
   volar(vistaMesaRuleta(), 1000, LIM_APUESTA); pintarEstado();
 }
@@ -2538,7 +3106,8 @@ function devolverCubo(inmediato) {
 function sentarse(i) {
   if (viaje || vuelo || estado === 'menu' || estado === 'cerca') return;
   objeto = null;
-  if (actual.id !== 'inicio') { irA('inicio'); return; }
+  if (lugarActual !== 'ruleta' || actual.id !== 'inicio') { enLugar('ruleta', () => sentarse(i)); return; }
+  if (estado !== 'sala' && estado !== 'sentado') limpiarEstado();
   asiento = i; estado = 'sentado'; volar(vistaAsiento(i), 1000, LIM_SENTADO); pintarEstado();
 }
 function levantarse() {
@@ -2636,39 +3205,87 @@ const ENCUADRE = {
   obras: { atras: 7.4, lado: 2.8, alto: 9.0, miraD: 0.4, miraY: 1.0 },
   galeria: { atras: 7.0, lado: 0.4, alto: 5.0, miraD: 5.0, miraY: 1.9 }
 };
-function vista(s) {
-  if (!s.dir) return { pos: V3(9.6, 12.4, 12.2), mira: V3(-0.9, 0.4, -2.6) };
+function vistaSala(s) {
   const e = ENCUADRE[s.id], d = V3(s.dir[0], 0, s.dir[1]), perp = V3(-d.z, 0, d.x);
   const pos = s.c.clone().addScaledVector(d, -e.atras).addScaledVector(perp, e.lado); pos.y = e.alto;
   const mira = s.c.clone().addScaledVector(d, e.miraD); mira.y = e.miraY;
   return { pos, mira };
 }
-const enPasillo = (s, p) => { if (!s.dir) return false; const d = V3(s.dir[0], 0, s.dir[1]), a = p.x * d.x + p.z * d.z; return a > mitadHub(d) - 0.2 && a < DIST - L / 2 + 0.2; };
-function zonaDe(p) {
-  for (const s of SALAS) if (Math.abs(p.x - s.c.x) <= (s.dir ? L / 2 : HX) && Math.abs(p.z - s.c.z) <= (s.dir ? L / 2 : HZ)) return { s, pasillo: false };
-  for (const s of SALAS) if (enPasillo(s, p)) return { s, pasillo: true };
-  return { s: actual, pasillo: false };
+// En el casino, la vista depende del lugar donde estás; en las salas, de la sala
+function vista(s) {
+  if (s.dir) return vistaSala(s);
+  return vistaLugar(LUGARES[lugarActual] && !LUGARES[lugarActual].sala ? lugarActual : 'ruleta');
 }
-const puertaDentro = s => { const d = V3(s.dir[0], 0, s.dir[1]); return d.multiplyScalar(DIST - L / 2 + 2.2).setY(ALT_PASO); };
-const puertaFuera = s => { const d = V3(s.dir[0], 0, s.dir[1]); return d.multiplyScalar(DIST - L / 2 - 1.4).setY(ALT_PASO); };
-const angulo = s => Math.atan2(s.dir[1], s.dir[0]);
-const enArco = a => V3(Math.cos(a) * 5.6, ALT_PASO + 0.3, Math.sin(a) * 5.6);
-function arco(a0, a1) {
-  let da = a1 - a0; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-  const pasos = Math.max(1, Math.ceil(Math.abs(da) / (Math.PI / 3.2))), r = [];
-  for (let i = 1; i <= pasos; i++) r.push(enArco(a0 + (da * i) / pasos));
+// ---------- Lugares del casino: a dónde puedes ir y por qué pasillos ----------
+const NODOS = {
+  ent: [0, 26.5], s: [0, 18], sw: [-10, 18], se: [10, 18], gal: [16, 19.6], vip: [-16, 20.2], ws: [-10, 7], w: [-10, -4], blog: [-29.4, -4],
+  cs: [0, 8.5], cn: [0, -9], e: [10, -4], es: [10, -11], obras: [29.4, -4], caja: [26, 11], nw: [-10, -18], n: [0, -18], escritos: [0, -23.4], ne: [10, -18]
+};
+const ARISTAS = 'ent-s s-sw s-se s-cs sw-vip se-gal sw-ws ws-w se-e w-blog e-obras w-cn cn-e w-nw e-es es-ne nw-n n-ne n-escritos cn-n cs-ws cs-se se-caja caja-obras'.split(' ').map(a => a.split('-'));
+// vista: [posición de la cámara, a dónde mira]; mapa: dónde va la etiqueta en el plano; corto: el nombre en el mapa chico
+const LUGARES = {
+  entrada: { nombre: 'Entrada', corto: 'Entrada', sec: 'inicio', nodo: 'ent', vista: [[0, 8.5, 29.4], [0, 0.6, 4]], mapa: [0, 28.4], mapaG: [0, 32.2] },
+  club: { nombre: 'Club de jugadores', corto: 'Club', sec: 'inicio', seccion: 'club', nodo: 'ent', vista: [[-1.4, 3.3, 26.5], [-7.8, 2.4, 26.9]], mapa: [-4.8, 22], mapaG: [-2.6, 24.6] },
+  bar: { nombre: 'Bar', corto: 'Bar', sec: 'inicio', nodo: 'sw', vista: [[-9.5, 7.8, 20.6], [-17, 0.8, 14]], mapa: [-16, 15] },
+  vip: { nombre: 'Sala VIP', corto: 'VIP', sec: 'inicio', nodo: 'vip', vista: [[-10.5, 5.6, 14.2], [-16, 2, 22]], mapa: [-16, 25.2], mapaG: [-18.5, 25.4] },
+  ruleta: { nombre: 'Ruleta', corto: 'Ruleta', sec: 'inicio', nodo: 'cs', vista: [[9.6, 12.4, 12.2], [-0.9, 0.4, -2.6]], mapa: [0, 0] },
+  dados: { nombre: 'Chinchirorin', corto: 'Chinchiro', sec: 'inicio', nodo: 'ws', vista: [[-11.4, 6.2, 11.6], [-18.6, 0.6, 5.2]], mapa: [-18, 6] },
+  blackjack: { nombre: 'Blackjack', corto: 'Blackjack', sec: 'inicio', nodo: 'w', vista: [[-12.2, 7.2, -4.2], [-18.6, 0.6, -11.6]], mapa: [-18, -11] },
+  keno: { nombre: 'Keno: reloj y calendario', corto: 'Keno', sec: 'inicio', nodo: 'nw', vista: [[-14.2, 3.6, -19.4], [-14.2, 2.5, -26]], mapa: [-14.3, -21.5] },
+  apuestas: { nombre: 'Apuestas', corto: 'Apuestas', sec: 'inicio', nodo: 'ne', vista: [[15.3, 4.6, -15.2], [15.3, 2.5, -26]], mapa: [15.3, -21.5] },
+  slots: { nombre: 'Tragamonedas y logros', corto: 'Slots', sec: 'inicio', nodo: 'e', vista: [[3, 10, -3], [18.6, 0.8, -3]], mapa: [18.6, -3] },
+  caja: { nombre: 'Caja', corto: 'Caja', sec: 'inicio', nodo: 'caja', vista: [[23.6, 4.8, 15.4], [31.4, 2, 9.4]], mapa: [28.4, 10] },
+  blog: { nombre: 'Siete cartas', sec: 'blog', nodo: 'blog', sala: true },
+  escritos: { nombre: 'Librería', sec: 'escritos', nodo: 'escritos', sala: true },
+  obras: { nombre: 'Batalla naval', sec: 'obras', nodo: 'obras', sala: true },
+  galeria: { nombre: 'Paneles', sec: 'galeria', nodo: 'gal', sala: true }
+};
+// Orden de las flechas del teclado: una vuelta por el casino
+const ORDEN_LUGARES = ['entrada', 'club', 'bar', 'vip', 'dados', 'blackjack', 'blog', 'keno', 'escritos', 'apuestas', 'slots', 'obras', 'caja', 'galeria', 'ruleta'];
+let lugarActual = 'entrada', caida = null;
+function vistaLugar(lid) {
+  const L = LUGARES[lid]; if (L.sala) return vistaSala(sala(L.sec));
+  return { pos: V3(...L.vista[0]), mira: V3(...L.vista[1]) };
+}
+const mapaDe = lid => { const L = LUGARES[lid]; return L.sala ? [sala(L.sec).c.x, sala(L.sec).c.z] : L.mapa; };
+const largoArista = (u, v) => Math.hypot(NODOS[u][0] - NODOS[v][0], NODOS[u][1] - NODOS[v][1]);
+// Distancias de todos los nodos hasta el destino (prev apunta hacia el destino)
+function dijkstra(origen) {
+  const dist = { [origen]: 0 }, prev = {}, abiertos = new Set(Object.keys(NODOS));
+  while (abiertos.size) {
+    let u = null; for (const k of abiertos) if (dist[k] != null && (u === null || dist[k] < dist[u])) u = k;
+    if (u === null) break; abiertos.delete(u);
+    for (const [p, q] of ARISTAS) { const v = p === u ? q : q === u ? p : null; if (!v || !abiertos.has(v)) continue; const nd = dist[u] + largoArista(u, v); if (dist[v] == null || nd < dist[v]) { dist[v] = nd; prev[v] = u; } }
+  }
+  return { dist, prev };
+}
+// Entra a los pasillos por el nodo que deja el recorrido más corto, no por el más cercano
+function caminoDesde(p, destino) {
+  const { dist, prev } = dijkstra(destino); let mejor = destino, costo = Infinity;
+  for (const k in dist) { const c = Math.hypot(NODOS[k][0] - p.x, NODOS[k][1] - p.z) + dist[k]; if (c < costo) { costo = c; mejor = k; } }
+  const r = [mejor]; while (r[r.length - 1] !== destino) r.push(prev[r[r.length - 1]]);
   return r;
 }
-function ruta(desde, b) {
-  const { s: a, pasillo: enP } = zonaDe(desde), pts = [desde.clone()];
-  if (a === b) { if (enP) pts.push(puertaDentro(a)); pts.push(vista(b).pos); return pts; }
-  let ang;
-  if (a.dir) { if (!enP) pts.push(puertaDentro(a)); pts.push(puertaFuera(a)); pts.push(enArco(angulo(a))); ang = angulo(a); }
-  else { ang = Math.atan2(desde.z, desde.x); pts.push(enArco(ang)); }
-  if (b.dir) { pts.push(...arco(ang, angulo(b))); pts.push(puertaFuera(b), puertaDentro(b)); }
-  else pts.push(V3(Math.cos(ang) * 7.6, 5.2, Math.sin(ang) * 7.6));
-  pts.push(vista(b).pos);
-  return pts;
+const puertaDentro = s => { const d = V3(s.dir[0], 0, s.dir[1]); return s.puerta.clone().addScaledVector(d, CORR + 2.2).setY(ALT_PASO); };
+// Dónde está un punto: dentro de una sala, en su pasillo o en el casino
+function zonaEn(p) {
+  for (const s of SALAS) if (s.dir) {
+    if (Math.abs(p.x - s.c.x) <= L / 2 && Math.abs(p.z - s.c.z) <= L / 2) return { s, pasillo: false };
+    const dx = p.x - s.puerta.x, dz = p.z - s.puerta.z, a = dx * s.dir[0] + dz * s.dir[1], lat = Math.abs(dx * s.dir[1] - dz * s.dir[0]);
+    if (a >= -0.5 && a <= CORR + 0.2 && lat <= PUERTA) return { s, pasillo: true };
+  }
+  return { s: sala('inicio'), pasillo: false };
+}
+// El recorrido: salir de la sala por su puerta si estás en una, seguir los pasillos y entrar por la puerta del destino
+function rutaA(lid) {
+  const L = LUGARES[lid], dest = vistaLugar(lid), pts = [camara.position.clone()], z = zonaEn(camara.position);
+  if (L.sala && sala(L.sec) === z.s) { if (z.pasillo) pts.push(puertaDentro(z.s)); pts.push(dest.pos); return pts; }
+  let desde = camara.position;
+  if (z.s.dir) { if (!z.pasillo) pts.push(puertaDentro(z.s)); const n = NODOS[LUGARES[z.s.id].nodo]; desde = V3(n[0], 0, n[1]); }
+  for (const n of caminoDesde(desde, L.nodo)) pts.push(V3(NODOS[n][0], ALT_PASO, NODOS[n][1]));
+  if (L.sala) pts.push(puertaDentro(sala(L.sec)));
+  pts.push(dest.pos);
+  return pts.filter((p, i) => i === 0 || p.distanceTo(pts[i - 1]) > 0.6);
 }
 
 // ---------- Camara: mirar arrastrando, viajar entre salas, volar a un punto ----------
@@ -2690,27 +3307,201 @@ function volar(v, dur, lim, fin) {
   vuelo = { p0: camara.position.clone(), p1: v.pos.clone(), m0: camara.position.clone().addScaledVector(dir, d), m1: v.mira.clone(), t0: performance.now(), dur: menos ? 1 : dur, v, lim, fin };
 }
 
-function irA(id, abrir) {
-  const b = sala(id === 'diario' ? 'escritos' : id); if (!b) return;
+// Caminar hasta un lugar por los pasillos. op: { seccion, abrir, fin }
+function irLugar(lid, op = {}) {
+  const Lg = LUGARES[lid]; if (!Lg || caida) return;
+  const b = sala(Lg.sec), sec = op.seccion || Lg.seccion || Lg.sec;
   if (libroFuera && b !== actual) { guardarLibroYa(); if (['libro', 'leyendo', 'animLibro'].includes(estado)) { estado = 'sala'; pintarEstado(); } }
-  vuelo = null; destino = b; marcarTira(id);
-  if (b === actual && !viaje) { fijarBase(b); mostrar(id, abrir); return; }
-  const curva = new THREE.CatmullRomCurve3(ruta(camara.position, b), false, 'centripetal', 0.5);
-  const largo = curva.getLength();
+  vuelo = null; destino = b; marcarTira(Lg.sec);
+  if (b === actual && (Lg.sala || lid === lugarActual) && !viaje) { fijarBase(b); mostrar(sec, op.abrir); if (op.fin) op.fin(); pintarMapa(true); return; }
+  const v = vistaLugar(lid), datos = { b, id: sec, abrir: op.abrir, lugar: lid, fin: op.fin, vista: v };
   vineta.classList.add('sale');
-  if (menos) { // sin recorrido: corte directo
-    camara.position.copy(vista(b).pos); llegar(b, id, abrir); return;
-  }
+  if (menos) { camara.position.copy(v.pos); llegar(datos); return; }
+  const curva = new THREE.CatmullRomCurve3(rutaA(lid), false, 'centripetal', 0.5), largo = curva.getLength();
   const dir = new THREE.Vector3(); camara.getWorldDirection(dir);
-  viaje = { curva, b, id, abrir, t0: performance.now(), dur: Math.min(3.6, Math.max(1.7, largo / 10.5)) * 1000, miraIni: camara.position.clone().addScaledVector(dir, 6) };
+  viaje = Object.assign(datos, { curva, t0: performance.now(), dur: THREE.MathUtils.clamp(largo / 12.5, 1.3, 4.6) * 1000, miraIni: camara.position.clone().addScaledVector(dir, 6) });
+  pintarMapa(true);
+}
+function irA(id, abrir) {
+  const sec = id === 'diario' ? 'escritos' : id, b = sala(sec); if (!b) return;
+  if (sec === 'inicio') { irLugar(lugarActual && LUGARES[lugarActual] && !LUGARES[lugarActual].sala && actual === b ? lugarActual : 'ruleta', { seccion: id, abrir }); return; }
+  irLugar(sec, { seccion: id, abrir });
 }
 window.irA = irA;
-function llegar(b, id, abrir) {
-  viaje = null; actual = b; fijarBase(b); mostrar(id, abrir);
-  if (id === 'escritos' && abrir && abrir.cap != null) setTimeout(() => elegirHistoria(abrir.hist ?? 0, abrir.cap), menos ? 0 : 250);
+function llegar(v) {
+  viaje = null; actual = v.b; lugarActual = v.lugar; fijarBase(v.b); mostrar(v.id, v.abrir);
+  if (v.id === 'escritos' && v.abrir && v.abrir.cap != null) setTimeout(() => elegirHistoria(v.abrir.hist ?? 0, v.abrir.cap), menos ? 0 : 250);
   requestAnimationFrame(() => vineta.classList.remove('sale'));
   $('#velocidad').style.opacity = 0;
+  if (v.fin) v.fin();
+  pintarMapa(true);
 }
+// Si hace falta, primero caminas hasta el lugar y después pasa lo que pediste
+function enLugar(lid, fn) {
+  if (lugarActual === lid && !viaje && !caida) { fn(); return; }
+  if (viaje || caida || estado === 'menu' || estado === 'cerca' || estado === 'animLibro') return;
+  if (bloqueado()) { notificar('Termina la jugada antes de irte.'); return; }
+  limpiarEstado(); irLugar(lid, { fin: fn });
+}
+// Antes de moverte con el mapa: se cierran las mesas, el libro y las vistas de cerca, sin volar de vuelta
+const bloqueado = () => girando || tragas.some(t => t.girando) || juegoOcupado();
+function limpiarEstado() {
+  if (['libro', 'leyendo', 'animLibro'].includes(estado)) { guardarLibroYa(); estado = 'sala'; }
+  if (estado === 'apostando') salirApuestas(true);
+  if (estado === 'tragamonedas') salirSlot(true);
+  if (estado === 'juego') salirJuego(true);
+  if (estado === 'cerca') devolverCubo(true);
+  if (estado === 'sentado') { asiento = null; estado = 'sala'; }
+  if (estado === 'objeto') alejarObjeto(true);
+  invAbierto = false; pintarEstado();
+}
+function caminarA(lid) {
+  if (!hay3D || estado === 'menu' || caida) return;
+  if (bloqueado()) { notificar('Termina la jugada antes de irte.'); return; }
+  limpiarEstado(); irLugar(lid);
+}
+// Plano grande: eliges un lugar y caes ahí desde arriba
+function caer(lid) {
+  if (!hay3D || estado === 'menu' || caida) return;
+  if (bloqueado()) { notificar('Termina la jugada antes de irte.'); return; }
+  cerrarMapaGrande(); limpiarEstado();
+  const Lg = LUGARES[lid], b = sala(Lg.sec), v = vistaLugar(lid);
+  if (libroFuera && b !== actual) guardarLibroYa();
+  viaje = null; vuelo = null; destino = b; marcarTira(Lg.sec);
+  const datos = { b, id: Lg.seccion || Lg.sec, lugar: lid, vista: v };
+  if (menos) { camara.position.copy(v.pos); llegar(datos); return; }
+  const alto = v.pos.clone(); alto.y += 34;
+  caida = Object.assign(datos, { t0: performance.now(), dur: 1250, desde: alto, golpe: false });
+  camara.position.copy(alto); camara.lookAt(v.mira); vineta.classList.add('sale');
+}
+// Cada cuadro de la caída: acelera hacia abajo, golpea el piso, rebota un poco y queda en su vista
+function avanzarCaida(ahora) {
+  const k = THREE.MathUtils.clamp((ahora - caida.t0) / caida.dur, 0, 1), v = caida.vista, T = 0.74;
+  let h;
+  if (k < T) { const e = k / T; h = 34 * (1 - e * e); $('#velocidad').style.opacity = (0.12 + 0.34 * e).toFixed(3); }
+  else {
+    const f = (k - T) / (1 - T); h = -0.55 * Math.sin(Math.PI * f) * (1 - f * 0.4);
+    if (!caida.golpe) { caida.golpe = true; onomatopeya('ドン'); }
+    $('#velocidad').style.opacity = (0.46 * (1 - f)).toFixed(3);
+  }
+  camara.position.set(v.pos.x, v.pos.y + h, v.pos.z); camara.lookAt(v.mira);
+  if (k >= 1) { const d = caida; caida = null; camara.position.copy(v.pos); llegar(d); }
+}
+function onomatopeya(t) {
+  if (menos) return;
+  const el = $('#onomato'); el.textContent = t; el.hidden = false; el.classList.remove('sale'); void el.offsetWidth; el.classList.add('sale');
+  clearTimeout(onomatopeya.t); onomatopeya.t = setTimeout(() => { el.hidden = true; }, 700);
+}
+
+// ---------- El mapa: chico arriba a la izquierda; el plano completo con "Agrandar" o la tecla M ----------
+const mapaEl = $('#mapa'), mapaCv = $('#mapa-cv'), mapaG = $('#mapa-g'), mapaGCv = $('#mapa-g-cv'), etiquetasG = $('#mapa-g-etiquetas');
+let zonasChico = [], firmaMapa = '';
+const colorVar = n => getComputedStyle(raiz).getPropertyValue(n).trim() || TINTA;
+function dibujarPlano(cv, o, zonas) {
+  const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const papel = colorVar('--papel'), tinta = colorVar('--tinta'), linea = colorVar('--linea'), tenue = colorVar('--tenue'), roj = colorVar('--bermellon');
+  const X = x => (x - o.cx) * o.esc + W / 2, Y = z => (z - o.cz) * o.esc + H / 2, E = n => n * o.esc;
+  c.fillStyle = papel; c.fillRect(0, 0, W, H);
+  // Trama de fondo, como el papel de un plano
+  c.fillStyle = linea; for (let y = 6; y < H; y += 12) for (let x = (y / 12) % 2 ? 6 : 12; x < W; x += 12) c.fillRect(x, y, 1.4, 1.4);
+  // Salas de cada sección con su color, y su pasillo
+  for (const s of SALAS) if (s.dir) {
+    const d = V3(s.dir[0], 0, s.dir[1]), m = s.puerta.clone().addScaledVector(d, CORR / 2), a = PUERTA + 0.8, hor = Math.abs(d.x) > 0;
+    c.fillStyle = papel; c.strokeStyle = tinta; c.lineWidth = 1.5;
+    const pw = hor ? CORR + 0.4 : a, ph = hor ? a : CORR + 0.4; c.fillRect(X(m.x - pw / 2), Y(m.z - ph / 2), E(pw), E(ph));
+    c.beginPath(); if (hor) { c.moveTo(X(m.x - pw / 2), Y(m.z - ph / 2)); c.lineTo(X(m.x + pw / 2), Y(m.z - ph / 2)); c.moveTo(X(m.x - pw / 2), Y(m.z + ph / 2)); c.lineTo(X(m.x + pw / 2), Y(m.z + ph / 2)); } else { c.moveTo(X(m.x - pw / 2), Y(m.z - ph / 2)); c.lineTo(X(m.x - pw / 2), Y(m.z + ph / 2)); c.moveTo(X(m.x + pw / 2), Y(m.z - ph / 2)); c.lineTo(X(m.x + pw / 2), Y(m.z + ph / 2)); } c.stroke();
+    c.fillStyle = colorVar(s.v); c.fillRect(X(s.c.x - L / 2), Y(s.c.z - L / 2), E(L), E(L));
+    c.lineWidth = o.grande ? 3 : 2; c.strokeRect(X(s.c.x - L / 2), Y(s.c.z - L / 2), E(L), E(L));
+    if (o.grande) { c.fillStyle = papel; c.font = `${Math.round(E(7))}px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.globalAlpha = 0.28; c.fillText(s.kanji, X(s.c.x), Y(s.c.z) + 2); c.globalAlpha = 1; }
+  }
+  // El piso del casino
+  c.beginPath(); PISO.forEach(([x, z], i) => i ? c.lineTo(X(x), Y(z)) : c.moveTo(X(x), Y(z))); c.closePath();
+  c.fillStyle = papel; c.fill(); c.lineWidth = o.grande ? 4 : 2.5; c.strokeStyle = tinta; c.stroke();
+  for (const q of PUERTAS) { const ver = Math.abs(q.p[0]) === 32, w = ver ? 6 : E(q.ancho), h = ver ? E(q.ancho) : 6; c.fillStyle = q.vip ? tinta : papel; c.fillRect(X(q.p[0]) - w / 2, Y(q.p[1]) - h / 2, w, h); }
+  // Pasillos por donde caminas
+  c.strokeStyle = linea; c.lineWidth = Math.max(3, E(1.6)); c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const [p, q] of ARISTAS) { c.beginPath(); c.moveTo(X(NODOS[p][0]), Y(NODOS[p][1])); c.lineTo(X(NODOS[q][0]), Y(NODOS[q][1])); c.stroke(); }
+  // Muebles: ruleta, bar, mesas, máquinas, pantallas y caja
+  c.fillStyle = tenue; c.strokeStyle = tinta; c.lineWidth = 1.2;
+  const forma = f => { c.beginPath(); f(); c.fill(); c.stroke(); };
+  forma(() => c.ellipse(X(0), Y(0), E(3.9), E(1.8), 0, 0, Math.PI * 2));
+  forma(() => c.arc(X(-16), Y(15), E(2.6), 0, Math.PI * 2));
+  forma(() => { c.moveTo(X(BJ_T.x + 2.3), Y(BJ_T.z)); c.arc(X(BJ_T.x), Y(BJ_T.z), E(2.3), 0, Math.PI); c.closePath(); });
+  forma(() => c.arc(X(CH_T.x), Y(CH_T.z), E(1.5), 0, Math.PI * 2));
+  for (const z of [-12.1, 5.9]) forma(() => c.rect(X(12.8), Y(z - 1), E(11.6), E(2)));
+  c.fillStyle = tinta; c.fillRect(X(9.05), Y(NORTE) - 1, E(12.5), Math.max(3, E(0.5)));
+  c.fillRect(X(-16.8), Y(NORTE) - 1, E(5.3), Math.max(3, E(0.5)));
+  c.fillRect(X(30.4), Y(8.2), E(1.3), E(3.6)); c.fillRect(X(-7.3), Y(24.2), E(1.1), E(3.6));
+  // Etiquetas: en el mapa chico se dibujan aquí; en el plano grande son botones encima del lienzo
+  zonas.length = 0;
+  if (o.etiquetas) {
+    const fs = 11; c.textBaseline = 'middle'; c.textAlign = 'center';
+    for (const lid in LUGARES) {
+      const Lg = LUGARES[lid], s = sala(Lg.sec), [mx, mz] = mapaDe(lid), act = lid === lugarActual && !viaje && !caida, t = Lg.sala ? s.seccion : Lg.corto;
+      c.font = `${Lg.sala ? 400 : 700} ${Lg.sala ? 12 : fs}px ${Lg.sala ? ROT : TXT}`;
+      const w = c.measureText(t).width + 10, h = fs + 8, x = THREE.MathUtils.clamp(X(mx), w / 2 + 3, W - w / 2 - 3), y = THREE.MathUtils.clamp(Y(mz), h / 2 + 3, H - h / 2 - 3);
+      c.fillStyle = act ? tinta : Lg.sala ? colorVar(s.v) : papel; c.fillRect(x - w / 2, y - h / 2, w, h);
+      c.lineWidth = 1.5; c.strokeStyle = tinta; c.strokeRect(x - w / 2, y - h / 2, w, h);
+      c.fillStyle = act || Lg.sala ? papel : tinta; c.fillText(t, x, y + 0.5);
+      zonas.push({ lid, x: x - w / 2, y: y - h / 2, w, h });
+    }
+  }
+  // Tú: la flecha mira hacia donde mira la cámara
+  const p = camara.position, f = new THREE.Vector3(); camara.getWorldDirection(f);
+  const r = o.grande ? 12 : 8, px = THREE.MathUtils.clamp(X(p.x), r + 2, W - r - 2), py = THREE.MathUtils.clamp(Y(p.z), r + 2, H - r - 2);
+  c.save(); c.translate(px, py); c.rotate(Math.atan2(f.z, f.x)); c.beginPath(); c.moveTo(r, 0); c.lineTo(-r * 0.75, -r * 0.7); c.lineTo(-r * 0.3, 0); c.lineTo(-r * 0.75, r * 0.7); c.closePath();
+  c.fillStyle = roj; c.fill(); c.lineWidth = 2; c.strokeStyle = tinta; c.stroke(); c.restore();
+}
+// Mapa chico: fijo, con todo el piso del casino; las salas asoman en los bordes
+const opcionesChico = () => ({ cx: 0, cz: -2, esc: mapaCv.clientWidth / 80, etiquetas: true });
+function opcionesGrande() { const W = mapaGCv.clientWidth, H = mapaGCv.clientHeight; return { cx: 0, cz: -2, esc: Math.min((W - 24) / 112, (H - 24) / 98), grande: true }; }
+function pintarMapa(forzar) {
+  if (!hay3D) return;
+  const visible = !['menu', 'leyendo'].includes(estado) && !amplia;
+  if (mapaEl.hidden === visible) { mapaEl.hidden = !visible; document.body.classList.toggle('con-mapa', visible); forzar = true; }
+  if (!visible) return;
+  const p = camara.position, aqui = viaje || caida ? 'Caminando…' : (LUGARES[lugarActual] || {}).nombre || '';
+  const firma = `${p.x.toFixed(1)},${p.z.toFixed(1)},${lugarActual},${aqui},${esOscuro()}`;
+  if (!forzar && firma === firmaMapa) return;
+  firmaMapa = firma; dibujarPlano(mapaCv, opcionesChico(), zonasChico);
+  const el = $('#mapa-aqui'); if (el.textContent !== aqui) el.textContent = aqui;
+  if (!mapaG.hidden) { dibujarPlano(mapaGCv, opcionesGrande(), []); colocarEtiquetas(); }
+}
+function lugarEnMapa(e) {
+  const r = mapaCv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, o = opcionesChico();
+  const z = zonasChico.find(q => x >= q.x - 3 && x <= q.x + q.w + 3 && y >= q.y - 3 && y <= q.y + q.h + 3); if (z) return z.lid;
+  const wx = (x - r.width / 2) / o.esc + o.cx, wz = (y - r.height / 2) / o.esc + o.cz;
+  const enSala = SALAS.find(s => s.dir && Math.abs(wx - s.c.x) <= L / 2 && Math.abs(wz - s.c.z) <= L / 2); if (enSala) return enSala.id;
+  let mejor = null, d = Infinity;
+  for (const lid in LUGARES) if (!LUGARES[lid].sala) { const [mx, mz] = mapaDe(lid), dd = Math.hypot(mx - wx, mz - wz); if (dd < d) { d = dd; mejor = lid; } }
+  return d < 5 ? mejor : null;
+}
+mapaCv.addEventListener('click', e => { const lid = lugarEnMapa(e); if (lid) caminarA(lid); });
+mapaCv.addEventListener('pointermove', e => { mapaCv.style.cursor = lugarEnMapa(e) ? 'pointer' : 'default'; });
+// Plano grande: botones de verdad (se llega con Tab y Enter) puestos sobre el dibujo
+etiquetasG.innerHTML = Object.entries(LUGARES).map(([lid, Lg]) => { const s = sala(Lg.sec); return Lg.sala
+  ? `<button type="button" class="sala" data-lugar="${lid}" style="--c:var(${s.v})"><b>${esc(s.seccion)}</b><small>${esc(Lg.nombre)}</small></button>`
+  : `<button type="button" data-lugar="${lid}"><span class="largo">${esc(Lg.nombre)}</span><span class="corto">${esc(Lg.corto)}</span></button>`; }).join('');
+function colocarEtiquetas() {
+  const o = opcionesGrande(), W = mapaGCv.clientWidth, H = mapaGCv.clientHeight;
+  etiquetasG.querySelectorAll('[data-lugar]').forEach(b => {
+    const [mx, mz] = LUGARES[b.dataset.lugar].mapaG || mapaDe(b.dataset.lugar); b.style.left = `${((mx - o.cx) * o.esc + W / 2).toFixed(1)}px`; b.style.top = `${((mz - o.cz) * o.esc + H / 2).toFixed(1)}px`;
+    b.setAttribute('aria-current', b.dataset.lugar === lugarActual && !viaje ? 'location' : 'false');
+  });
+}
+function abrirMapaGrande() {
+  if (!hay3D || estado === 'menu' || caida) return;
+  mapaG.hidden = false; $('#mapa-agrandar').setAttribute('aria-expanded', 'true');
+  dibujarPlano(mapaGCv, opcionesGrande(), []); colocarEtiquetas();
+  (etiquetasG.querySelector('[aria-current="location"]') || $('#mapa-cerrar')).focus();
+}
+function cerrarMapaGrande() { if (mapaG.hidden) return; mapaG.hidden = true; $('#mapa-agrandar').setAttribute('aria-expanded', 'false'); $('#mapa-agrandar').focus({ preventScroll: true }); }
+$('#mapa-agrandar').addEventListener('click', abrirMapaGrande);
+$('#mapa-cerrar').addEventListener('click', cerrarMapaGrande);
+mapaG.addEventListener('click', e => { const b = e.target.closest('[data-lugar]'); if (b) { caer(b.dataset.lugar); return; } if (e.target === mapaG) cerrarMapaGrande(); });
+addEventListener('resize', () => { firmaMapa = ''; if (!mapaG.hidden) { dibujarPlano(mapaGCv, opcionesGrande(), []); colocarEtiquetas(); } });
 
 // Arrastrar: mira alrededor, o gira el cubo cuando lo tienes enfrente. Clic sin arrastre: usa lo que tocas.
 let arrastre = null;
@@ -2731,7 +3522,7 @@ function tocado(e) {
 }
 const enCubo = () => estado === 'menu' || estado === 'cerca';
 const girandoCubo = () => estado === 'cerca';
-lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
+lienzo.addEventListener('pointerdown', e => { if (caida) return; arrastre = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
 lienzo.addEventListener('pointermove', e => {
   if (!arrastre) { const t = tocado(e); if (estado === 'objeto' && objeto === 'pantalla') { const f = t && t.objeto === 'pantalla' ? filaDe(t.uv) : -1; if (f !== filaHover) { filaHover = f; pintarPantallaLib(); } } lienzo.classList.toggle('sobre', !!t && !(t.objeto === 'pantalla' && estado === 'objeto' && objeto === 'pantalla' && filaHover < 0)); lienzo.classList.toggle('salir', estado === 'menu' && !t); return; }
   const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
@@ -2768,16 +3559,18 @@ lienzo.addEventListener('pointerup', e => {
   if (a.movio || estado === 'animLibro' || estado === 'leyendo') return;
   const acc = tocado(e); if (!acc) return;
   if (acc.girar) girar();
+  else if (acc.juego) entrarJuego(acc.juego);
+  else if (acc.rocola) enLugar('bar', () => notificar('La rocola llega pronto: aquí va a sonar la música de la casa.'));
+  else if (acc.vip) enLugar('vip', () => notificar('La sala VIP está cerrada. Solo socios… por ahora.'));
   else if (acc.mesa) { if (estado === 'apostando') apostar(pixelPaño(acc.uv), false); else entrarApuestas(); }
   else if (acc.rueda) { if (estado === 'apostando') girar(); else entrarApuestas(); }
-  else if (acc.palanca) tirarPalanca();
+  else if (acc.palanca) { if (lugarActual === 'slots' && !viaje) tirarPalanca(); else acercarObjeto('maquina'); }
   else if (acc.slot != null) entrarSlot(acc.slot);
   else if (acc.palancaSlot != null) { if (estado === 'tragamonedas' && slotActual === acc.palancaSlot) tirarSlot(); else entrarSlot(acc.palancaSlot); }
-  else if (acc.pronto) notificar(acc.pronto === 'dados' ? 'Chinchirorin, el juego de dados, llega pronto.' : 'Esta máquina llega pronto.');
-  else if (acc.caja) { if (dinero < 100 && !apuestas.size) pedirPrestamo(); else notificar('La caja presta dinero solo cuando ya no te queda nada.'); }
+  else if (acc.caja) enLugar('caja', accionCaja);
   else if (acc.cubo) { if (estadoCubo === 'estante') acercarCubo(); }
   else if (acc.tema) { $('#tema').click(); if (esOscuro()) lograr('focos'); }
-  else if (acc.objeto) { if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'maquina') clicMaquina(acc.uv); else if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'tablero') clicTablero(acc.uv); else if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'calendario') clicCalendario(acc.uv); else if (estado === 'objeto' && objeto === 'pantalla' && acc.objeto === 'pantalla') clicPantalla(acc.uv); else acercarObjeto(acc.objeto); }
+  else if (acc.objeto) { if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'maquina') clicMaquina(acc.uv); else if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'tablero') clicTablero(acc.uv); else if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'calendario') clicCalendario(acc.uv); else if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'encurso') ir('obras'); else if (estado === 'objeto' && objeto === 'pantalla' && acc.objeto === 'pantalla') clicPantalla(acc.uv); else acercarObjeto(acc.objeto); }
   else if (acc.libro != null) { if (libroFuera && libroFuera.i === acc.libro && libroFuera.estado === 'mesa') abrirLibro(); else if (estado === 'sala' || estado === 'objeto') { if (estado === 'objeto') { estado = 'sala'; objeto = null; } elegirHistoria(acc.libro); } }
   else if (acc.hueco) dejarEnEstante();
   else if (acc.sentarse != null) { objeto = null; sentarse(acc.sentarse); }
@@ -2862,15 +3655,16 @@ function cuadro(ahora) {
   requestAnimationFrame(cuadro);
   if (document.hidden) { antes = ahora; return; }
   const dt = Math.min(0.05, (ahora - antes) / 1000); antes = ahora;
-  if (viaje) {
+  if (caida) avanzarCaida(ahora);
+  else if (viaje) {
     const t = THREE.MathUtils.clamp((ahora - viaje.t0) / viaje.dur, 0, 1), e = suave(t);
     viaje.curva.getPointAt(e, camara.position);
     viaje.curva.getPointAt(Math.min(1, e + 0.14), tmp);
-    const fin = vista(viaje.b).mira, w0 = 1 - THREE.MathUtils.smoothstep(t, 0, 0.18), w1 = THREE.MathUtils.smoothstep(t, 0.62, 1);
+    const fin = viaje.vista.mira, w0 = 1 - THREE.MathUtils.smoothstep(t, 0, 0.18), w1 = THREE.MathUtils.smoothstep(t, 0.62, 1);
     tmp2.copy(tmp).lerp(viaje.miraIni, w0).lerp(fin, w1);
     camara.lookAt(tmp2);
     $('#velocidad').style.opacity = (Math.sin(Math.PI * t) * 0.22).toFixed(3);
-    if (t >= 1) llegar(viaje.b, viaje.id, viaje.abrir);
+    if (t >= 1) llegar(viaje);
   } else if (vuelo) {
     const t = THREE.MathUtils.clamp((ahora - vuelo.t0) / vuelo.dur, 0, 1), e = suave(t);
     camara.position.lerpVectors(vuelo.p0, vuelo.p1, e); tmp.lerpVectors(vuelo.m0, vuelo.m1, e); camara.lookAt(tmp);
@@ -2881,7 +3675,7 @@ function cuadro(ahora) {
     tmp.set(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(r).add(base.mira);
     camara.position.lerp(tmp, 1 - Math.exp(-dt * 7)); camara.lookAt(base.mira);
   }
-  actualizarReloj(); avanzarTweens(ahora);
+  actualizarReloj(); avanzarTweens(ahora); pintarMapa();
   // Ruleta: la rueda gira, la bola corre en contra, frena y cae en una casilla
   if (giro) {
     const g = (ahora - giro.t0) / 1000;
@@ -2921,13 +3715,14 @@ function cuadro(ahora) {
 
 async function empezar() {
   try { await Promise.race([Promise.all([document.fonts.load(`40px "Dela Gothic One"`), document.fonts.load(`700 40px "Zen Kaku Gothic New"`)]), new Promise(r => setTimeout(r, 2500))]); } catch (err) {}
-  construirRuleta(); construirRincon(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); crearCubo();
-  hay3D = true; medir();
-  const h = location.hash.slice(1), ini = sala(h) ? h : (sala(seccionActual) ? seccionActual : 'inicio'), s = sala(ini);
-  if (s !== actual) { actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); }
-  mostrar(ini, ini === seccionActual ? ultima : {}); pintarEstado();
+  construirCasino(); construirRincon(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); crearCubo();
+  hay3D = true; $('#salas').hidden = true; medir();
+  // Se empieza en la entrada; #blackjack, #slots, #blog… abren directo en ese lugar
+  const h = location.hash.slice(1), lid = LUGARES[h] ? h : sala(h) && h !== 'inicio' ? h : 'entrada', L0 = LUGARES[lid], s = sala(L0.sec);
+  actual = destino = s; lugarActual = lid; const v0 = vistaLugar(lid); camara.position.copy(v0.pos); fijarVista(v0, LIM_SALA); camara.lookAt(v0.mira);
+  mostrar(L0.seccion || L0.sec, {}); pintarEstado();
   setInterval(() => repintarPantalla('inicio', 1), 20000);
-  window.prueba = { entrarSlot, tirarSlot, entrarApuestas, apostarEn: (px, py, quitar) => apostar(celdaApuesta(px, py), quitar), get dinero() { return dinero; }, get logros() { return Object.keys(logros); }, tirarPalanca, clicMaquina, elegirHistoria, abrirLibro, cerrarLibro, pasar, ponerDoc: d => ponerDoc(d, 1), dejarEnEstante, get lectura() { return lectura && { pliego: lectura.pliego, nCols: lectura.nCols }; }, ir, ampliar, girar, acercarObjeto, alejarObjeto, clicCalendario, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
+  window.prueba = { entrarSlot, tirarSlot, entrarApuestas, apostarEn: (px, py, quitar) => apostar(celdaApuesta(px, py), quitar), get dinero() { return dinero; }, get logros() { return Object.keys(logros); }, tirarPalanca, clicMaquina, elegirHistoria, abrirLibro, cerrarLibro, pasar, ponerDoc: d => ponerDoc(d, 1), dejarEnEstante, get lectura() { return lectura && { pliego: lectura.pliego, nCols: lectura.nCols }; }, ir, ampliar, girar, acercarObjeto, alejarObjeto, clicCalendario, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; }, caminarA, caer, abrirMapaGrande, cerrarMapaGrande, entrarJuego, salirJuego, accionJuego, repartir, pedir, plantarse, doblar, jugarCH, tirarCH, get lugar() { return lugarActual; }, get viajando() { return !!(viaje || caida || vuelo); }, get bj() { return { fase: bj.fase, mano: bj.mano.slice(), banca: bj.banca.slice() }; }, get ch() { return { fase: ch.fase, banca: ch.banca }; }, get stats() { return { ...stats }; } };
   requestAnimationFrame(cuadro);
 }
 empezar();
