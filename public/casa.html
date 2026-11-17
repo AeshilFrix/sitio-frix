@@ -510,7 +510,7 @@
   <button class="folio izq" id="folio-izq" type="button" data-pasar="-1"></button><button class="folio der" id="folio-der" type="button" data-pasar="1"></button></div>
 <p class="aviso3d" id="aviso3d" hidden>Tu navegador no pudo abrir las salas en 3D. El contenido sigue en la viñeta de la derecha.</p>
 
-<script src="datos.js"></script>
+<script>document.write('<script src="datos.js?v=' + Math.floor(Date.now() / 60000) + '"><\/script>');</script>
 <script type="module">
 import * as THREE from 'three';
 
