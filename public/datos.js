@@ -82,6 +82,19 @@ window.DATOS = {
         "en": "It's time to make this casino a real casino, as gambling addiction dictates. "
       },
       "id": 4
+    },
+    {
+      "fecha": "2026-11-17T13:14",
+      "titulo": {
+        "es": "ptmr otra vez",
+        "en": "PTMR again"
+      },
+      "imagen": "https://media.tenor.com/lwyR-BEUeD4AAAAM/taiga-taiga-tired.gif",
+      "texto": {
+        "es": "no se porque esta cosa siempre falla. Tengo que actualizar la cosa pa actualizar ",
+        "en": "I don't know why this thing always fails. I have to update the thing to update. "
+      },
+      "id": 5
     }
   ],
   "diario": [
