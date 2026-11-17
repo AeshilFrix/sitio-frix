@@ -29,6 +29,15 @@
 - Cubo escondido en la Librería (estante del fondo, tabla de abajo): abre el Diario y desbloquea el formato cubo (el sitio como cubo de Rubik, una cara por sección; el Diario es la sexta cara). Se recuerda en localStorage.
 - Ideas para después: sala propia de Usogui como otro easter egg.
 
+### Versión 3 (17/11/2026, de madrugada)
+- Ruleta: solo es un juego. Casillas reales de ruleta americana; la bola cae en una y el número queda en la viñeta (con las últimas 10 tiradas). Ya no te lleva a otra sala. Frix quiere profundizar después.
+- Ya no hay botón de Diario ni de formato cubo en la tira.
+- Cubo de pantallas (como el cubo con pantallas de Usogui): cada pieza es una pantalla. Con el cubo armado, cada cara es una sección y sus 9 pantallas son el menú (Inicio: sobre mí, hora en 7 segmentos, frase, jugadas, ruleta, bitácora, enlaces, modo oscuro; Blog: entradas, al azar, contador; Escritos: obras y capítulos; Obras: contadores, minitablero, última, por tipo, mejor nota; Galería: miniaturas).
+- La sexta cara (abajo) no tiene señal. 5 clics seguidos a la pantalla del centro muestran el Diario (solo por esa visita).
+- Flujo: Librería → clic al cubo (la cámara se acerca y el cubo se levanta; se puede girar y mover filas) → Agarrar → inventario (bolsa en la tira) → Ruleta → clic a un taburete para sentarse → Dejar el cubo → doble clic al cubo → se arma solo y la cámara entra a una cara; la mesa asoma alrededor → clic en la mesa (o Esc) para salir.
+- Se recuerda dónde quedó el cubo (estante, mano o mesa) en localStorage.
+- Pendiente: sala propia de Usogui (otro easter egg); profundizar el juego de la ruleta; otras pantallas posibles para el cubo (visitas, música, Discord).
+
 ## Siguiente paso
 1. Que Frix lo recorra y diga qué cambiar.
 2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.

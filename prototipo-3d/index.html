@@ -39,6 +39,7 @@
   #mundo.fundido { opacity: 0; }
   #mundo.arrastra { cursor: grabbing; }
   #mundo.sobre { cursor: pointer; }
+  #mundo.salir { cursor: zoom-out; }
 
   .vineta { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(16px + env(safe-area-inset-right, 0px));
     bottom: calc(104px + env(safe-area-inset-bottom, 0px)); width: min(410px, 34vw); background: var(--papel); border: var(--borde) solid var(--tinta);
@@ -189,6 +190,32 @@
   .velocidad { position: fixed; inset: 0; pointer-events: none; opacity: 0;
     background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 3deg, color-mix(in srgb, var(--tinta) 50%, transparent) 3deg 3.35deg);
     -webkit-mask: radial-gradient(closest-side, transparent 62%, #000 100%); mask: radial-gradient(closest-side, transparent 62%, #000 100%); }
+  .acciones { position: fixed; left: 16px; right: calc(min(410px, 34vw) + 92px); bottom: calc(104px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+  .acciones > * { pointer-events: auto; }
+  .acciones p { margin: 0; padding: 5px 12px; background: var(--papel); border: 2px solid var(--tinta); font-size: 13px; }
+  .acciones p:empty { display: none; }
+  .acciones div { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .acciones .boton { padding: 12px 22px; font-size: 15px; border: var(--borde) solid var(--tinta); }
+  .acciones .boton.claro { background: var(--papel); color: var(--tinta); }
+  .acciones .boton.claro:hover { background: var(--tinta); color: var(--papel); }
+  .inventario { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px)); width: min(300px, calc(100vw - 32px)); box-sizing: border-box;
+    background: var(--papel); border: var(--borde) solid var(--tinta); padding: 0 12px 12px; }
+  .inventario header { display: flex; justify-content: space-between; align-items: center; margin: 0 -12px 10px; padding: 6px 6px 6px 12px; background: var(--tinta); color: var(--papel); }
+  .inventario header b { font: 400 17px/1.2 var(--f-rotulo); }
+  .inventario header button { all: unset; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; font-size: 22px; line-height: 1; }
+  .inventario header button:focus-visible { outline: 3px solid var(--sala); }
+  .ranuras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .ranura { aspect-ratio: 1; border: 2px dashed var(--linea); display: grid; place-items: center; max-width: 100%; }
+  .ranura.llena { border: 2px solid var(--tinta); background: color-mix(in srgb, var(--sala) 12%, var(--papel)); }
+  .ranura svg { width: 72%; height: 72%; }
+  #inv-nota { margin: 10px 0 0; font-size: 13px; line-height: 1.45; }
+  #inv-nota b { display: block; font-size: 14px; }
+  .tiradas { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 8px; }
+  .ficha { min-width: 30px; height: 30px; padding: 0 4px; box-sizing: border-box; display: grid; place-items: center; border: 2px solid var(--tinta); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .ficha.rojo { background: var(--bermellon); color: var(--papel); }
+  .ficha.negro { background: var(--tinta); color: var(--papel); }
+  .ficha.cero { background: var(--papel); }
+  .tira.menu .salas, .tira.menu .marca { visibility: hidden; }
   .aviso3d { position: fixed; left: 16px; top: 140px; max-width: 360px; margin: 0; padding: 10px 14px; background: var(--papel); border: var(--borde) solid var(--tinta); }
 
   @media (max-width: 760px) {
@@ -197,6 +224,7 @@
     .amplia .dos, .gal-dos { grid-template-columns: minmax(0, 1fr); }
     .marcador { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .icono { width: 60px; height: 60px; }
+    .acciones { right: 16px; bottom: calc(96px + 42vh + 12px); }
     .marca, .ayuda { display: none; }
     .sala-btn { width: 132px; height: 60px; grid-template-columns: 42px minmax(0, 1fr); }
     .sala-btn .t { padding: 8px 9px; }
@@ -213,10 +241,16 @@
 <nav class="tira" aria-label="Salas">
   <span class="marca">Frix</span>
   <div class="salas" id="salas"></div>
-  <button class="icono" type="button" id="formato" hidden aria-pressed="false" aria-label="Cambiar al formato cubo" title="Formato cubo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7Z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/><path d="M7.8 4.8l8.5 4.5M16.2 4.8 7.7 9.3M3.5 12l8.5 4.6 8.5-4.6" stroke-width="1.2"/></svg></button>
+  <button class="icono" type="button" id="bolsa" hidden aria-pressed="false" aria-label="Inventario" title="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.5H6.2Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
   <button class="icono" type="button" id="tema" aria-pressed="false" aria-label="Modo oscuro" title="Modo oscuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
   <p class="ayuda">Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala</p>
 </nav>
+<div class="acciones" id="acciones" hidden><p id="acciones-nota"></p><div id="acciones-botones"></div></div>
+<aside class="inventario" id="inventario" hidden aria-label="Inventario">
+  <header><b>Inventario</b><button type="button" id="cerrar-inv" aria-label="Cerrar el inventario">&times;</button></header>
+  <div class="ranuras" id="ranuras"></div>
+  <p id="inv-nota"></p>
+</aside>
 <p class="aviso3d" id="aviso3d" hidden>Tu navegador no pudo abrir las salas en 3D. El contenido sigue en la viñeta de la derecha.</p>
 
 <script type="application/json" id="datos">{"perfil": {"nombre": "Frix", "avatar": "", "desde": "2026-11", "lema": {"es": "Todo lo que escribo, sin mentiras.", "en": "Everything I write, without lies."}, "presentacion": {"es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\n", "en": "Hi, I'm Frix. This is where I keep my diary, what I think about what I see and read, and everything I write.\n\n"}, "gustos": [], "discord": "1074051356349976727", "frases": [{"es": "Cuando veas una buena jugada, busca una mejor. (Emanuel Lasker)", "en": "When you see a good move, look for a better one. (Emanuel Lasker)"}, {"es": "En esta mesa no se miente.", "en": "No lies at this table."}, {"es": "Cada cara del cubo tiene su orden.", "en": "Every face of the cube has its order."}]}, "blog": [{"id": 1, "fecha": "2026-11-15T14:00", "imagen": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl48i2nW1soWZLD7sflHB74io-t42ChuLxEkArfVX2kQ&s=10", "titulo": {"es": "Prueba rápida y ejemplo  ", "en": "I opened this site"}, "texto": {"es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n", "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"}}, {"fecha": "2026-11-16T01:16", "titulo": {"es": "Creo que he roto algo", "en": "I think I broke something."}, "imagen": "https://media.tenor.com/RmHRq5dDMDoAAAAM/misaka-railgun.gif", "texto": {"es": "Si esto funciona god, si no, ptmr", "en": "If this works, thank God. If not, damn it."}, "id": 2}, {"fecha": "2026-11-16T01:26", "titulo": {"es": "VOLVI", "en": "VOLVI", "manual": true}, "imagen": "https://media.tenor.com/0EgQgZWi8WoAAAAM/sigh-yamadakun-and-the-seven-witches.gif", "texto": {"es": "# sepa a quien le importaría, pero logre recuperar todo, tampoco es que fuera tan difícil, pero me re complique todo. #FF0000", "en": "# I don't know who would care, but I managed to get everything back. It wasn't that difficult, but I made everything really complicated for myself. #FF0000"}, "id": 3}], "diario": [{"fecha": "2026-11-15T23:09", "titulo": {"es": "Casi un descuido, o no.", "en": "Almost an oversight, or not."}, "texto": {"es": "Ya casi a final de día sigo sin haberle felicitado a mi amiga [Maricielo] por su cumpleaños. \nLa verdad supe que no me diría nada y tampoco tenía nada preparado, el año pasado falle en mi palabra y no quería volver a mentirle de esas forma, aunque ignorarla todo el día sabiendo que es su cumpleaños sigue siendo horrible. \nNo sabría decir o que me inventaría para \"justificarlo\"\nBueno, al menos me acorde de cuando era.", "en": "It's almost the end of the day, and I still haven't wished my friend [Maricielo] a happy birthday. \nThe truth is, I knew she wouldn't tell me anything, and I hadn't prepared anything either. Last year, I broke my word, and I didn't want to lie to her like that again, even though ignoring her all day knowing it's her birthday is still horrible. \nI wouldn't know what to say or what I would make up to \"justify it.\"\nWell, at least I remembered when it was."}, "id": 1}, {"fecha": "2026-11-16T14:19", "titulo": {"es": "Cero practica", "en": "No practical experience"}, "texto": {"es": "Mañana tengo uno de mi exámenes finales y tuve todo el fin de semana para prepararme, cosa que hice a medias. No me tengo fe para mañana, la única forma que veo ahora para aprobar es no dormir, claro que si, otra vez, crj voy a dañar mi horario de sueño si sigo durmiendo así de mal. \n", "en": "Tomorrow I have one of my final exams, and I had the whole weekend to prepare, which I did half-heartedly. I don't have confidence for tomorrow. The only way I see now to pass is to not sleep. Of course, yes, again. Damn it, I'm going to mess up my sleep schedule if I keep sleeping this badly. \n"}, "id": 2}], "escritos": [{"actualizado": "2026-11-16", "estado": 1, "tipo": "novela", "idioma": "es", "titulo": {"es": "El hombre al que todo olvidan. "}, "version": "", "resumen": {"es": ""}, "notas": {"es": ""}, "texto": {"es": ""}, "id": 1, "capitulos": [{"id": 1, "titulo": "La ciudad de cristal", "fecha": "2026-11-16", "html": "<p>Me preguntaba por qué cantaban los pájaros.<\/p><p>Bajé del tren junto a un viejo carpintero que, entre anécdotas de su oficio, me habló de lo difícil que era alejarse de la familia. Tras la partida de su hijo, escuchó lo que sus oídos habían ignorado por años: el canto de los pájaros. Sus historias fueron lo único que hizo soportable aquel viaje de un día. Él, por fin, iba a ver a su hijo después de tanto tiempo. En el centro de la terminal me despedí de él. Su familia lo esperaba; yo acababa de separarme de la mía.<\/p><p>Sobre mi cabeza escuché un chirrido rítmico que subía y bajaba de tono, como un engranaje oxidado girando sin control en lo alto de los postes. Al voltear vi lo que parecía una pequeña esfera viviente montada sobre dos alambres rígidos. Estaba cubierta por capas de hojas blancas, superpuestas como escamas, y de su frente brotaba una aguja de hueso amarillento que se abría en dos cada vez que emitía ese chirrido.<\/p><p>—<i>Qué raros animales tiene la capital.<\/i><\/p><p>Me quedé inmóvil un momento; la gente pasaba a mi lado sin mirarme. Busqué algún paradero que me llevara al centro. Aunque entre tantas personas me era imposible avanzar. Sentado en lo que parecía una cafetín espere que todo se calmara, y ya sea por el cansancio o por la música caí dormido.<\/p>"}]}], "obras": [{"id": 1, "tipo": "manga", "titulo": "Usogui", "anio": 2006, "portada": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/small/bx39982-68LS2Z9075Kw.jpg", "estado": 2, "nota": 10, "fecha": "2026-11-16"}], "galeria": [], "enlaces": [{"nombre": "MyAnimeList", "url": "https://myanimelist.net/profile/AeshilFrix", "detalle": "AeshilFrix"}, {"nombre": "Anime list", "url": "https://myanimelist.net/animelist/AeshilFrix", "detalle": "MAL"}, {"nombre": "Manga list", "url": "https://myanimelist.net/mangalist/AeshilFrix", "detalle": "MAL"}], "cambios": [{"id": 1, "fecha": "2026-11-15", "texto": {"es": "Abrí el sitio: blog, escritos, obras y galería.", "en": "Opened the site: blog, writing, titles and gallery."}}, {"id": 2, "fecha": "2026-11-15", "texto": {"es": "Mis escritos ahora tienen capítulos, subidos desde Tintero.", "en": "My writing now has chapters, uploaded from Tintero."}}, {"id": 3, "fecha": "2026-11-15", "texto": {"es": "Todo se traduce solo al inglés, menos mis historias.", "en": "Everything is translated into English automatically, except my stories."}}, {"id": 4, "fecha": "2026-11-16", "texto": {"es": "Colores en el texto e imágenes que se agrandan con un clic.", "en": "Colored text and images that grow with a click."}}, {"id": 5, "fecha": "2026-11-16", "texto": {"es": "Paneles nuevos: ahora mismo, frase del día, bitácora y fichas.", "en": "New panels: right now, quote of the day, table log and chips."}}, {"id": 6, "fecha": "2026-11-16", "texto": {"es": "Las flechas ← → del teclado pasan de una página a otra.", "en": "The ← → arrow keys move from one page to the next."}}]}</script>
@@ -242,7 +276,8 @@ const SALAS = [
   { id: 'galeria', nombre: 'Paneles', seccion: 'Galería', kanji: '画', color: '#c4236c', v: '--magenta', dir: [0, 1] }
 ];
 // El diario no es una sala: se abre con el cubo de la librería y es la sexta cara del formato cubo
-const SECCIONES = [...SALAS, { id: 'diario', nombre: 'Cubo', seccion: 'Diario', kanji: '日', color: PAPEL, v: '--tinta', dir: null }];
+// El diario y la cara sin señal no son salas: solo se llega a ellos dentro del cubo
+const SECCIONES = [...SALAS, { id: 'diario', nombre: 'Diario', seccion: 'Diario', kanji: '日', color: PAPEL, v: '--tinta', dir: null }, { id: 'oculta', nombre: 'Sin señal', seccion: 'Sin señal', kanji: '', color: PAPEL, v: '--tenue', dir: null }];
 const sala = id => SALAS.find(s => s.id === id);
 const seccion = id => SECCIONES.find(s => s.id === id);
 const L = 18, ALTO = 4.6, GROSOR = 0.36, PUERTA = 4.6, DINTEL = 3.9, DIST = 26;
@@ -253,8 +288,12 @@ const leer = k => { try { return localStorage.getItem('frix3d-' + k); } catch (e
 function azarSemilla(a) { return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 // Estado compartido por la viñeta y las salas (declarado aqui para que funcione tambien sin 3D)
-let hay3D = false, modo = 'salas', seccionActual = 'inicio', ultima = {}, amplia = false;
-let cuboHallado = leer('cubo') === '1';
+let hay3D = false, seccionActual = 'inicio', ultima = {}, amplia = false;
+// estado: sala (mirar), cerca (el cubo en la mano, frente a la cámara), sentado (en un taburete de la ruleta), menu (zoom a la cara del cubo)
+let estado = 'sala', asiento = null, invAbierto = false, diarioVisto = false;
+// dónde está el cubo: estante (librería), mano (inventario) o mesa (sobre la ruleta)
+let estadoCubo = ['estante', 'mano', 'mesa'].includes(leer('cubo')) ? leer('cubo') : 'estante', asientoCubo = Math.min(5, Math.max(0, +leer('asiento') || 1));
+let girando = false, tiradas = [];
 let galDemo = false, ronda = 0, galSel = null, obrasDemo = false, obraMarcada = null, tableroPag = 0;
 let paneles = [], compuesto = null;
 
@@ -281,6 +320,15 @@ function nombreArchivo(u) {
   return n.length > 40 ? n.slice(0, 37) + '…' : n;
 }
 
+// Ruleta americana: orden real de las casillas en la rueda
+const RUEDA = [0, 28, 9, 26, 30, 11, 7, 20, 32, 17, 5, 22, 34, 15, 3, 24, 36, 13, 1, '00', 27, 10, 25, 29, 12, 8, 19, 31, 18, 6, 21, 33, 16, 4, 23, 35, 14, 2];
+const ROJOS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+function registrarTirada(idx) {
+  const n = RUEDA[idx], clase = n === 0 || n === '00' ? 'cero' : ROJOS.has(n) ? 'rojo' : 'negro';
+  tiradas = [{ n, clase }, ...tiradas].slice(0, 10); girando = false;
+  if (seccionActual === 'inicio') pintarVineta(true);
+  if (hay3D) repintarCara('inicio');
+}
 function jugadas() {
   const j = blog.map(p => ({ f: p.fecha, tipo: 'Blog', titulo: tx(p.titulo), ir: 'blog', abrir: { post: p.id } }));
   if (escrito) (escrito.capitulos || []).forEach((c, i) => j.push({ f: c.fecha || escrito.actualizado, tipo: `Capítulo ${i + 1}`, titulo: c.titulo, ir: 'escritos', abrir: { cap: i } }));
@@ -363,6 +411,7 @@ function visorHTML(G) {
 }
 const miniatura = (G, gi) => `<button type="button" data-g="${gi}" aria-pressed="${galSel === gi}" aria-label="Panel ${LETRAS[gi % 6]}: ${esc(textoImagen(G[gi]))}"><img src="${esc(srcImagen(G[gi]))}" alt="" loading="lazy"><span class="letra">${LETRAS[gi % 6]}</span></button>`;
 
+const diarioOrdenado = () => [...(D.diario || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
 const VISTAS = {
   inicio() {
     const p = D.perfil || {}, frases = (p.frases || []).map(tx).filter(Boolean);
@@ -370,12 +419,14 @@ const VISTAS = {
     return `<div class="dos"><div><h2>Sobre mí</h2>
       <p>${esc(tx(p.presentacion))}</p>
       ${frase ? `<p class="frase">${esc(frase)}</p>` : ''}
-      <div class="fila"><button class="boton" id="girar" type="button">Girar la ruleta</button><span class="tenue">Te lleva a algo al azar.</span></div>
-      <h3>Últimas jugadas</h3>
+      <h3 id="ancla-ruleta">Ruleta</h3>
+      <div class="fila"><button class="boton" id="girar" type="button"${girando ? ' disabled' : ''}>Girar la ruleta</button><span class="tenue" aria-live="polite">${girando ? 'Girando…' : tiradas[0] ? `Salió el ${tiradas[0].n}${tiradas[0].clase === 'cero' ? '' : `, ${tiradas[0].clase}`}.` : 'Por ahora es solo un juego.'}</span></div>
+      ${tiradas.length > 1 ? `<div class="tiradas" aria-label="Últimas tiradas">${tiradas.map(t => `<span class="ficha ${t.clase}">${t.n}</span>`).join('')}</div>` : ''}
+      <h3 id="ancla-jugadas">Últimas jugadas</h3>
       <ol class="lista">${jugadas().slice(0, 6).map((j, i) => `<li><button type="button" data-jugada="${i}"><span class="f">${fechaCorta(j.f)}</span><span><b>${esc(j.titulo)}</b><small>${esc(j.tipo)}</small></span></button></li>`).join('')}</ol></div>
-      <div><h3>Bitácora</h3>
+      <div><h3 id="ancla-bitacora">Bitácora</h3>
       <ul class="bitacora">${[...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)) || (b.id - a.id)).slice(0, amplia ? 10 : 4).map(c => `<li><span class="f">${fechaCorta(c.fecha)}</span><span>${esc(tx(c.texto))}</span></li>`).join('')}</ul>
-      ${(D.enlaces || []).length ? `<h3>Enlaces</h3><ul class="bitacora">${D.enlaces.map(e => `<li><span class="f">${esc(e.nombre || '')}</span><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(String(e.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))}</a></li>`).join('')}</ul>` : ''}</div></div>`;
+      ${(D.enlaces || []).length ? `<h3 id="ancla-enlaces">Enlaces</h3><ul class="bitacora">${D.enlaces.map(e => `<li><span class="f">${esc(e.nombre || '')}</span><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(String(e.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))}</a></li>`).join('')}</ul>` : ''}</div></div>`;
   },
   blog() {
     if (!blog.length) return `<h2>Blog</h2><p>Todavía no hay entradas. Cada una aparece como una carta sobre la mesa.</p>`;
@@ -431,18 +482,19 @@ const VISTAS = {
       <p><button class="enlace" type="button" data-ver-todas>Ver todas en la viñeta ampliada</button></p>`;
   },
   diario() {
-    const E = [...(D.diario || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+    const E = diarioOrdenado();
     return `<h2>Diario</h2>
-      <div class="hallazgo"><p>${modo === 'cubo' ? 'Estás en el formato cubo: una cara por sección. Arrastra el cubo para girarlo.' : 'Encontraste el cubo. Con él también puedes ver el sitio entero como un cubo de Rubik, una cara por sección.'}</p>
-      ${hay3D ? `<button class="boton" type="button" data-formato>${modo === 'cubo' ? 'Volver a las salas' : 'Cambiar al formato cubo'}</button>` : ''}</div>
-      <div class="diario">${E.map(e => `<article><p class="dia">${fechaLarga(e.fecha)}</p><h4>${esc(tx(e.titulo))}</h4><div class="cuerpo">${textoPost(tx(e.texto))}</div></article>`).join('') || '<p>El diario está vacío.</p>'}</div>`;
+      <div class="diario">${E.map(e => `<article id="dia-${e.id}"><p class="dia">${fechaLarga(e.fecha)}</p><h4>${esc(tx(e.titulo))}</h4><div class="cuerpo">${textoPost(tx(e.texto))}</div></article>`).join('') || '<p>El diario está vacío.</p>'}</div>`;
+  },
+  oculta() {
+    return `<h2>Sin señal</h2><p>Ninguna de estas pantallas muestra nada.</p>`;
   }
 };
 
 // ---------- Tira, viñeta y temas ----------
 const raiz = document.documentElement;
 const tira = $('#salas'), vineta = $('#vineta'), contenido = $('#contenido');
-tira.innerHTML = SECCIONES.map(s => `<button class="sala-btn" type="button" data-sala="${s.id}" style="--c:var(${s.v})"${s.id === 'diario' && !cuboHallado ? ' hidden' : ''}><span class="k" aria-hidden="true">${s.kanji}</span><span class="t"><b>${s.seccion}</b><span>${s.id === 'diario' ? 'Cubo' : s.nombre}</span></span></button>`).join('');
+tira.innerHTML = SALAS.map(s => `<button class="sala-btn" type="button" data-sala="${s.id}" style="--c:var(${s.v})"><span class="k" aria-hidden="true">${s.kanji}</span><span class="t"><b>${s.seccion}</b><span>${s.nombre}</span></span></button>`).join('');
 let actual = sala('inicio'), destino = actual;
 function marcarTira(id) { tira.querySelectorAll('.sala-btn').forEach(b => b.setAttribute('aria-current', b.dataset.sala === id ? 'page' : 'false')); }
 function mostrar(id, abrir) {
@@ -457,6 +509,8 @@ function pintarVineta(mantener) {
   contenido.innerHTML = VISTAS[seccionActual](a);
   vineta.scrollTop = mantener ? top : 0;
   if (a.post != null) { const el = document.getElementById('post-' + a.post); if (el) { el.classList.add('marcado'); el.scrollIntoView({ block: 'start' }); } }
+  if (a.entrada != null) { const el = document.getElementById('dia-' + a.entrada); if (el) el.scrollIntoView({ block: 'start' }); }
+  if (a.ancla) { const el = document.getElementById('ancla-' + a.ancla); if (el) el.scrollIntoView({ block: 'start' }); }
 }
 // Imagen que no carga (en esta vista previa, las de otros sitios): se deja el hueco con el nombre
 contenido.addEventListener('error', e => {
@@ -472,13 +526,12 @@ contenido.addEventListener('click', e => {
   if ((b = q('[data-cap]'))) { mostrar('escritos', { cap: +b.dataset.cap }); return; }
   if (q('[data-volver]')) { mostrar('escritos'); return; }
   if (q('#girar')) { girar(); return; }
-  if (q('[data-formato]')) { cambiarFormato(); return; }
-  if (q('[data-demo-gal]')) { galDemo = !galDemo; ronda = 0; galSel = null; if (hay3D) { paneles.forEach((p, i) => voltear(i, false)); pintarRonda(); } pintarVineta(true); return; }
+  if (q('[data-demo-gal]')) { galDemo = !galDemo; ronda = 0; galSel = null; if (hay3D) { paneles.forEach((p, i) => voltear(i, false)); pintarRonda(); repintarCara('galeria'); } pintarVineta(true); return; }
   if ((b = q('[data-ronda]'))) { cambiarRonda(ronda + +b.dataset.ronda); return; }
   if ((b = q('[data-g]'))) { const gi = +b.dataset.g; if (galSel === gi) { galSel = null; if (hay3D) voltear(gi % 6, false); pintarVineta(true); } else elegirImagen(gi); return; }
   if ((b = q('[data-v]'))) { const G = galLista(); if (b.dataset.v === 'cerrar') { if (hay3D && galSel != null) voltear(galSel % 6, false); galSel = null; pintarVineta(true); } else elegirImagen((galSel + (b.dataset.v === 'sig' ? 1 : -1) + G.length) % G.length); return; }
   if (q('[data-ver-todas]')) { ampliar(true); return; }
-  if (q('[data-demo-obras]')) { obrasDemo = !obrasDemo; obraMarcada = null; tableroPag = 0; if (hay3D) reconstruirNaval(); pintarVineta(true); return; }
+  if (q('[data-demo-obras]')) { obrasDemo = !obrasDemo; obraMarcada = null; tableroPag = 0; if (hay3D) { reconstruirNaval(); repintarCara('obras'); } pintarVineta(true); return; }
   if ((b = q('[data-tablero]'))) { const n = Math.ceil(obrasLista().length / 100); tableroPag = (tableroPag + +b.dataset.tablero + n) % n; obraMarcada = null; if (hay3D) reconstruirNaval(); pintarVineta(true); return; }
   if ((b = q('tr[data-obra]'))) { marcarObra(+b.dataset.obra); return; }
 });
@@ -536,44 +589,75 @@ function pintarTema() {
   b.setAttribute('aria-pressed', o); b.setAttribute('aria-label', o ? 'Modo claro' : 'Modo oscuro'); b.title = o ? 'Modo claro' : 'Modo oscuro';
   b.querySelector('svg').innerHTML = o ? ICONO_SOL : ICONO_LUNA;
   if (compuesto) compuesto.uniforms.uOscuro.value = o ? 1 : 0;
+  if (hay3D) repintarPantalla('inicio', 8);
 }
 $('#tema').addEventListener('click', () => { raiz.dataset.theme = esOscuro() ? 'light' : 'dark'; guardar('tema', raiz.dataset.theme); pintarTema(); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', pintarTema);
 new MutationObserver(pintarTema).observe(raiz, { attributes: true, attributeFilter: ['data-theme'] });
 pintarTema();
 
-function pintarFormato() {
-  const b = $('#formato'); b.hidden = !(cuboHallado && hay3D);
-  const c = modo === 'cubo'; b.setAttribute('aria-pressed', c); b.setAttribute('aria-label', c ? 'Volver a las salas' : 'Cambiar al formato cubo'); b.title = c ? 'Volver a las salas' : 'Formato cubo';
-  tira.querySelector('[data-sala="diario"]').hidden = !cuboHallado;
-  $('.ayuda').innerHTML = c ? 'Arrastra para girar el cubo<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de cara' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
+// Barra de acciones e inventario: cambian según dónde estás y dónde está el cubo
+const ICONO_CUBO = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 36 11v18L20 37 4 29V11Z" fill="var(--tinta)"/><path d="M20 5.5 33.5 12.2 20 19 6.5 12.2Z" fill="var(--magenta)"/><path d="M5.5 13.8 19 20.6V35 5.5 28.3Z" fill="var(--bermellon)"/><path d="M21 20.6 34.5 13.8v14.5L21 35Z" fill="var(--cobalto)"/><path d="M11 9.5l13.4 6.8M15.6 7.2 29 14M9.6 18.2v13.6M14.3 20.6v13.6M25.7 25.6l8.8-4.5M25.7 30.3l8.8-4.5" stroke="var(--tinta)" stroke-width="1.4"/></svg>';
+function pintarEstado() {
+  const nota = $('#acciones-nota'), bot = $('#acciones-botones'), botones = [];
+  let texto = '';
+  if (estado === 'cerca') { texto = 'Arrastra para girarlo. Haz clic en una pieza para mover su fila.'; botones.push(['agarrar', 'Agarrar', ''], ['soltar', 'Dejarlo', 'claro']); }
+  else if (estado === 'sentado') {
+    if (estadoCubo === 'mano') botones.push(['dejar', 'Dejar el cubo', '']);
+    if (estadoCubo === 'mesa' && asientoCubo === asiento) { texto = 'Doble clic en el cubo para abrirlo.'; botones.push(['recoger', 'Recoger el cubo', 'claro']); }
+    botones.push(['levantarse', 'Levantarse', 'claro']);
+  }
+  nota.textContent = texto;
+  bot.innerHTML = botones.map(([id, t, c]) => `<button class="boton ${c}" type="button" data-accion="${id}">${t}</button>`).join('');
+  $('#acciones').hidden = !hay3D || (!texto && !botones.length);
+  const bolsa = $('#bolsa'); bolsa.hidden = !(hay3D && estadoCubo === 'mano' && estado !== 'menu'); bolsa.setAttribute('aria-pressed', invAbierto);
+  if (estadoCubo !== 'mano' || estado === 'menu') invAbierto = false;
+  $('#inventario').hidden = !invAbierto;
+  $('#ranuras').innerHTML = Array.from({ length: 8 }, (_, i) => i === 0 && estadoCubo === 'mano' ? `<div class="ranura llena" title="Cubo de pantallas">${ICONO_CUBO}</div>` : '<div class="ranura"></div>').join('');
+  $('#inv-nota').innerHTML = estadoCubo === 'mano' ? `<b>Cubo de pantallas</b>${estado === 'sentado' && actual && actual.id === 'inicio' ? 'Usa Dejar el cubo para ponerlo sobre la ruleta.' : 'Llévalo a la Ruleta, siéntate en un taburete y déjalo en la mesa.'}` : '';
+  $('.tira').classList.toggle('menu', estado === 'menu');
+  $('.ayuda').innerHTML = estado === 'menu' ? 'Arrastra para girar el cubo<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
 }
-$('#formato').addEventListener('click', () => cambiarFormato());
+$('#acciones').addEventListener('click', e => {
+  const b = e.target.closest('[data-accion]'); if (!b) return;
+  ({ agarrar: agarrarCubo, soltar: () => devolverCubo(false), dejar: dejarCubo, recoger: recogerCubo, levantarse })[b.dataset.accion]();
+});
+$('#bolsa').addEventListener('click', () => { invAbierto = !invAbierto; pintarEstado(); });
+$('#cerrar-inv').addEventListener('click', () => { invAbierto = false; pintarEstado(); });
 
 function ir(id, abrir) {
   if (!seccion(id)) return;
   if (!hay3D) { mostrar(id, abrir); return; }
-  if (modo === 'cubo') irCara(id, abrir); else irA(id, abrir);
+  if (estado === 'menu') { if (SALAS.some(s => s.id === id) && caraFrente !== id) irCara(id, abrir); else mostrar(id, abrir); return; }
+  if (estado === 'cerca') devolverCubo(true);
+  if (estado === 'sentado') { const misma = sala(id) === actual; levantarse(); if (misma) { mostrar(id, abrir); return; } }
+  irA(id, abrir);
 }
 tira.addEventListener('click', e => { const b = e.target.closest('[data-sala]'); if (b) ir(b.dataset.sala); });
 addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-  if (e.key === 'Escape') { if (galSel != null && seccionActual === 'galeria') { if (hay3D) voltear(galSel % 6, false); galSel = null; pintarVineta(true); } else if (amplia) ampliar(false); return; }
+  if (e.key === 'Escape') {
+    if (galSel != null && seccionActual === 'galeria') { if (hay3D) voltear(galSel % 6, false); galSel = null; pintarVineta(true); }
+    else if (amplia) ampliar(false);
+    else if (invAbierto) { invAbierto = false; pintarEstado(); }
+    else if (hay3D && estado === 'menu') cerrarMenu();
+    else if (hay3D && estado === 'cerca') devolverCubo(false);
+    else if (hay3D && estado === 'sentado') levantarse();
+    return;
+  }
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-  const lista = modo === 'cubo' ? SECCIONES.filter(s => s.id !== 'diario' || cuboHallado) : SALAS;
-  const id = modo === 'cubo' ? seccionActual : (destino ? destino.id : seccionActual);
-  const i = Math.max(0, lista.findIndex(s => s.id === id)), n = lista[(i + (e.key === 'ArrowRight' ? 1 : -1) + lista.length) % lista.length];
+  const id = estado === 'menu' ? caraFrente : (destino ? destino.id : seccionActual);
+  const i = Math.max(0, SALAS.findIndex(s => s.id === id)), n = SALAS[(i + (e.key === 'ArrowRight' ? 1 : -1) + SALAS.length) % SALAS.length];
   e.preventDefault(); ir(n.id);
 });
+// La ruleta es solo un juego: gira, la bola cae en una casilla y se anota el número
 function girar() {
-  const j = jugadas(); if (!j.length) return;
-  const elegida = j[Math.floor(Math.random() * j.length)];
-  if (!hay3D || menos || modo === 'cubo') { ir(elegida.ir, elegida.abrir); return; }
-  const boton = $('#girar'); if (boton) boton.disabled = true;
-  if (actual.id !== 'inicio' || viaje) irA('inicio');
-  giro = { t0: performance.now(), elegida };
+  if (girando) return;
+  if (!hay3D || menos) { registrarTirada(Math.floor(Math.random() * RUEDA.length)); if (hay3D) bolaFija = { idx: tiradas.length ? RUEDA.indexOf(tiradas[0].n) : 0, t0: 0 }; return; }
+  girando = true; bolaFija = null; giro = { t0: performance.now() };
+  if (seccionActual === 'inicio') pintarVineta(true);
 }
-pintarFormato();
+pintarEstado();
 mostrar('inicio');
 
 // ---------- Escena ----------
@@ -712,8 +796,7 @@ function cartelPuerta(s) {
 }
 
 // ---------- Sala central: la ruleta del casino ilegal ----------
-const ROJOS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
-let rueda, bola, velRueda = 0.35, anguloBola = 0;
+let rueda, bola, velRueda = 0.35, anguloBola = 0, bolaFija = { idx: Math.floor(Math.random() * 38), t0: 0 };
 function construirRuleta() {
   const s = sala('inicio');
   salaCaja(s, ['N', 'S', 'E', 'W']);
@@ -747,13 +830,13 @@ function construirRuleta() {
   plano(4.9, 2.76, mat(PAPEL, { mapa: paño, trama: 0 }), 1.0, 1.27, 0, -Math.PI / 2, 0, { girar: true });
   // Rueda
   const aro = textura(1024, 1024, (c, w, h) => {
-    const cx = w / 2, cy = h / 2, R = 500, r2 = 330, n = 38;
+    const cx = w / 2, cy = h / 2, R = 500, r2 = 330, n = RUEDA.length;
     for (let i = 0; i < n; i++) {
       const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
       c.beginPath(); c.moveTo(cx + Math.cos(a0) * r2, cy + Math.sin(a0) * r2); c.arc(cx, cy, R, a0, a1); c.arc(cx, cy, r2, a1, a0, true); c.closePath();
-      c.fillStyle = (i === 0 || i === 19) ? PAPEL : (i % 2 ? s.color : TINTA); c.fill(); c.lineWidth = 5; c.strokeStyle = TINTA; c.stroke();
-      c.save(); c.translate(cx, cy); c.rotate((a0 + a1) / 2 + Math.PI / 2); c.fillStyle = (i === 0 || i === 19) ? TINTA : PAPEL; c.font = `46px ${ROT}`; c.textAlign = 'center';
-      c.fillText(i === 0 ? '0' : i === 19 ? '00' : String(((i * 7) % 36) + 1), 0, -R + 62); c.restore();
+      const num = RUEDA[i], cero = num === 0 || num === '00'; c.fillStyle = cero ? PAPEL : ROJOS.has(num) ? s.color : TINTA; c.fill(); c.lineWidth = 5; c.strokeStyle = TINTA; c.stroke();
+      c.save(); c.translate(cx, cy); c.rotate((a0 + a1) / 2 + Math.PI / 2); c.fillStyle = cero ? TINTA : PAPEL; c.font = `46px ${ROT}`; c.textAlign = 'center';
+      c.fillText(String(num), 0, -R + 62); c.restore();
     }
     c.beginPath(); c.arc(cx, cy, r2, 0, Math.PI * 2); c.fillStyle = PAPEL; c.fill(); c.lineWidth = 8; c.stroke();
     for (let k = 0; k < 4; k++) { c.save(); c.translate(cx, cy); c.rotate(k * Math.PI / 2); c.beginPath(); c.moveTo(0, -60); c.lineTo(-40, -r2 + 30); c.lineTo(40, -r2 + 30); c.closePath(); c.fillStyle = TINTA; c.fill(); c.restore(); }
@@ -766,9 +849,9 @@ function construirRuleta() {
   bola = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 10), M.papel); bola.position.set(-2.35, 1.56, 0); mundo.add(bola);
   // Fichas
   const fichas = [[s.color, 7], [TINTA, 5], [PAPEL, 9], [s.color, 4], [TINTA, 3]];
-  fichas.forEach(([col, n], i) => { for (let k = 0; k < n; k++) cil(0.19, 0.19, 0.055, mat(col), 0.2 + i * 0.62, 1.31 + k * 0.058, 1.05 + (i % 2) * 0.12, 28); });
+  fichas.forEach(([col, n], i) => { for (let k = 0; k < n; k++) cil(0.19, 0.19, 0.055, mat(col), 2.85 + (i % 2) * 0.42, 1.31 + k * 0.058, -0.9 + i * 0.42, 28); });
   // Taburetes alrededor
-  [[-3, 2.6], [-1, 2.8], [1.2, 2.8], [3.2, 2.6], [-1, -2.8], [1.4, -2.8]].forEach(([x, z]) => { cil(0.42, 0.42, 0.14, M.papel, x, 0.86, z, 32); cil(0.07, 0.1, 0.8, M.tinta, x, 0.4, z, 12); cil(0.34, 0.34, 0.05, M.tinta, x, 0.03, z, 24); });
+  TABURETES.forEach(([x, z], i) => { poner(new THREE.CylinderGeometry(0.42, 0.42, 0.14, 32), M.papel, x, 0.86, z, { sentarse: i }); cil(0.07, 0.1, 0.8, M.tinta, x, 0.4, z, 12); cil(0.34, 0.34, 0.05, M.tinta, x, 0.03, z, 24); });
   // Lamparas colgantes
   caja(L + GROSOR, 0.24, 0.32, M.tinta, 0, ALTO + 0.12, 0);
   for (const x of [-2.2, 1.8]) { poner(new THREE.ConeGeometry(0.85, 0.7, 32, 1, true), mat(TINTA, { doble: true }), x, 3.55, 0); cil(0.025, 0.025, 0.85, M.tinta, x, 4.3, 0, 8); poner(new THREE.SphereGeometry(0.16, 16, 10), mat(PAPEL, { trama: 0 }), x, 3.2, 0); }
@@ -835,9 +918,7 @@ function construirLibreria() {
   for (const x of [-6, -2, 2, 6]) { const g = estante(cx + x, fondoZ, 3.9, 0); if (x === -2) estanteCubo = g; }
   // El cubo escondido: en la tabla de abajo, entre los libros
   for (let i = lomos.length - 1; i >= 0; i--) { const b = lomos[i]; if (b.g === estanteCubo && Math.abs(b.x - 0.9) < 0.42 && b.y < 1.0) lomos.splice(i, 1); }
-  cubito = hacerCubo(0.48, false); cubito.grupo.position.set(cx - 2 + 0.9, 0.15 + 0.24, fondoZ + 0.04); cubito.grupo.rotation.y = 0.5; mundo.add(cubito.grupo);
-  cubito.piezas.forEach(p => { p.userData.accion = { cubo: true }; clicables.push(p); });
-  for (let k = 0; k < 4; k++) capaAlAzar(cubito, 0);
+  ESTANTE = { pos: new THREE.Vector3(cx - 2 + 0.9, 0.15 + 0.24, fondoZ + 0.04), rotY: 0.5 };
   for (const z of [-5.2, -1.3, 2.6]) { estante(cx - L / 2 + 0.6, cz + z, 3.7, Math.PI / 2); estante(cx + L / 2 - 0.6, cz + z, 3.7, -Math.PI / 2); }
   const libros = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 0.62), mat(PAPEL), lomos.length);
   const colores = [PAPEL, PAPEL, TINTA, s.color, GRIS, PAPEL, TINTA], m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), col = new THREE.Color();
@@ -998,35 +1079,159 @@ function construirPaneles() {
   pintarRonda();
 }
 
-// ---------- El cubo: escondido en la librería y, una vez hallado, formato del sitio ----------
+// ---------- El cubo de pantallas ----------
+// Cada pieza es una pantalla, como el cubo de Usogui. Con el cubo resuelto, cada cara es una sección y sus 9 pantallas son su menú.
 const CARAS = [
   { n: [0, 0, 1], id: 'inicio', r: [0, 0] }, { n: [1, 0, 0], id: 'blog', r: [0, Math.PI / 2] }, { n: [0, 0, -1], id: 'escritos', r: [0, Math.PI] },
-  { n: [-1, 0, 0], id: 'obras', r: [0, -Math.PI / 2] }, { n: [0, 1, 0], id: 'galeria', r: [-Math.PI / 2, 0] }, { n: [0, -1, 0], id: 'diario', r: [Math.PI / 2, 0] }
+  { n: [-1, 0, 0], id: 'obras', r: [0, -Math.PI / 2] }, { n: [0, 1, 0], id: 'galeria', r: [-Math.PI / 2, 0] }, { n: [0, -1, 0], id: 'oculta', r: [Math.PI / 2, 0] }
 ];
-function hacerCubo(lado, conKanji) {
-  const grupo = new THREE.Group(), piezas = [], paso = lado / 3, cuerpo = paso * 0.95, pegote = paso * 0.8;
+const ALREDEDOR = [0, 1, 2, 3, 5, 6, 7, 8];
+const colorCara = id => id === 'oculta' ? PAPEL : sala(id).color;
+const pegatinas = {};
+const fraseHoy = () => { const f = ((D.perfil || {}).frases || []).map(tx).filter(Boolean); return f.length ? f[new Date().getDate() % f.length] : ''; };
+const horaAhora = () => { const d = new Date(); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+
+function pantallasDe(id) {
+  const t = Array.from({ length: 9 }, () => ({ tipo: 'estatica' })), s = seccion(id), dos = n => String(n).padStart(2, '0');
+  if (id === 'oculta') {
+    if (!diarioVisto) return t;
+    t[4] = { tipo: 'titulo', kanji: '日', etiqueta: 'Diario', accion: { seccion: 'diario' } };
+    diarioOrdenado().slice(0, 8).forEach((e, k) => { t[ALREDEDOR[k]] = { tipo: 'texto', etiqueta: fechaCorta(e.fecha), lineas: [tx(e.titulo)], accion: { seccion: 'diario', abrir: { entrada: e.id } } }; });
+    return t;
+  }
+  t[4] = { tipo: 'titulo', kanji: s.kanji, etiqueta: s.seccion, accion: { seccion: id } };
+  if (id === 'inicio') {
+    t[0] = { tipo: 'texto', etiqueta: 'Sobre mí', lineas: [tx((D.perfil || {}).presentacion)], accion: { seccion: 'inicio' } };
+    t[1] = { tipo: 'digital', etiqueta: 'Hora', valor: horaAhora() };
+    t[2] = { tipo: 'texto', etiqueta: 'Frase del día', lineas: [fraseHoy() || 'Sin frase hoy'], accion: { seccion: 'inicio' } };
+    t[3] = { tipo: 'texto', etiqueta: 'Últimas jugadas', lineas: jugadas().slice(0, 3).map(x => x.titulo), accion: { seccion: 'inicio', abrir: { ancla: 'jugadas' } } };
+    t[5] = { tipo: 'digital', etiqueta: 'Ruleta', valor: tiradas[0] ? String(tiradas[0].n) : '--', accion: { girar: true } };
+    t[6] = { tipo: 'texto', etiqueta: 'Bitácora', lineas: [...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).slice(0, 1).map(c => tx(c.texto)), accion: { seccion: 'inicio', abrir: { ancla: 'bitacora' } } };
+    t[7] = { tipo: 'texto', etiqueta: 'Enlaces', lineas: (D.enlaces || []).slice(0, 4).map(e => e.nombre), accion: { seccion: 'inicio', abrir: { ancla: 'enlaces' } } };
+    t[8] = { tipo: 'interruptor', etiqueta: 'Modo oscuro', valor: esOscuro(), accion: { tema: true } };
+  } else if (id === 'blog') {
+    blog.slice(0, 6).forEach((p, k) => { t[[0, 1, 2, 3, 5, 6][k]] = { tipo: 'texto', etiqueta: numPost(p.id), lineas: [tx(p.titulo)], pie: fechaCorta(p.fecha), accion: { seccion: 'blog', abrir: { post: p.id } } }; });
+    if (blog.length) t[7] = { tipo: 'texto', etiqueta: 'Al azar', lineas: ['Una entrada cualquiera'], accion: { azar: true } };
+    t[8] = { tipo: 'digital', etiqueta: 'Entradas', valor: dos(blog.length), accion: { seccion: 'blog' } };
+  } else if (id === 'escritos') {
+    let k = 0;
+    (D.escritos || []).slice(0, 3).forEach(e => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: TIPO_ESCRITO[e.tipo] || 'Escrito', lineas: [tx(e.titulo)], pie: ESTADO_ESCRITO[e.estado] || '', accion: { seccion: 'escritos' } }; });
+    const caps = escrito ? escrito.capitulos || [] : [];
+    caps.map((c, i) => ({ c, i })).reverse().slice(0, 7 - k).forEach(({ c, i }) => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: `Capítulo ${i + 1}`, lineas: [c.titulo], pie: fechaCorta(c.fecha), accion: { seccion: 'escritos', abrir: { cap: i } } }; });
+    t[8] = { tipo: 'digital', etiqueta: 'Capítulos', valor: dos(caps.length), accion: { seccion: 'escritos' } };
+  } else if (id === 'obras') {
+    const L = obrasLista(), c = j => L.filter(x => x.jugada === j).length;
+    t[0] = { tipo: 'digital', etiqueta: 'Disparos', valor: dos(L.length - c('apuntada')), accion: { seccion: 'obras' } };
+    t[1] = { tipo: 'digital', etiqueta: 'Hundidas', valor: dos(c('hundida')), accion: { seccion: 'obras' } };
+    t[2] = { tipo: 'digital', etiqueta: 'Tocadas', valor: dos(c('tocada')), accion: { seccion: 'obras' } };
+    t[3] = { tipo: 'tablero', etiqueta: 'Tablero', lista: L.filter(x => x.tablero === 0), accion: { seccion: 'obras' } };
+    t[5] = { tipo: 'digital', etiqueta: 'Al agua', valor: dos(c('agua')), accion: { seccion: 'obras' } };
+    const ult = L[L.length - 1], mejor = [...L].sort((a, b) => (b.o.nota ?? 0) - (a.o.nota ?? 0))[0], tipos = new Map();
+    L.forEach(({ o }) => { const n = TIPO_OBRA[o.tipo] || 'Otro'; tipos.set(n, (tipos.get(n) || 0) + 1); });
+    if (ult) t[6] = { tipo: 'texto', etiqueta: 'La última', lineas: [ult.o.titulo], pie: ult.o.nota != null ? `Nota ${ult.o.nota}` : '', accion: { obra: ult.i } };
+    if (L.length) t[7] = { tipo: 'texto', etiqueta: 'Por tipo', lineas: [...tipos].slice(0, 4).map(([n, v]) => `${n}: ${v}`), accion: { seccion: 'obras' } };
+    if (mejor) t[8] = { tipo: 'texto', etiqueta: 'Mejor nota', lineas: [mejor.o.titulo], pie: mejor.o.nota != null ? `${mejor.o.nota} de 10` : '', accion: { obra: mejor.i } };
+  } else if (id === 'galeria') {
+    const G = galLista();
+    G.slice(0, 8).forEach((g, k) => { t[ALREDEDOR[k]] = { tipo: 'imagen', g, etiqueta: LETRAS[k % 6], accion: { imagen: k } }; });
+    if (!G.length) t[1] = { tipo: 'texto', etiqueta: 'Galería', lineas: ['Todavía no hay imágenes'], accion: { seccion: 'galeria' } };
+  }
+  return t;
+}
+
+// Dígitos de siete segmentos, como los marcadores del cubo del manga
+const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcfgd', '-': 'g' };
+function sieteSeg(c, texto, cx, y, alto, color, maxAncho) {
+  const medir = h => [...texto].reduce((w, ch) => w + (ch === ':' ? h * 0.24 : h * 0.656), 0) - h * 0.156;
+  if (maxAncho && medir(alto) > maxAncho) { const h = alto * maxAncho / medir(alto); y += (alto - h) / 2; alto = h; }
+  const an = alto * 0.5, g = alto * 0.12, paso = an + g * 1.3, dosP = g * 2;
+  const ancho = medir(alto);
+  let x = cx - ancho / 2;
+  for (const ch of texto) {
+    if (ch === ':') { c.fillStyle = color; c.fillRect(x + g * 0.4, y + alto * 0.28, g, g); c.fillRect(x + g * 0.4, y + alto * 0.64, g, g); x += dosP; continue; }
+    const on = SEG[ch] || '', m = alto / 2;
+    const seg = { a: [x + g, y, an - 2 * g, g], b: [x + an - g, y + g, g, m - 1.5 * g], c: [x + an - g, y + m + 0.5 * g, g, m - 1.5 * g], d: [x + g, y + alto - g, an - 2 * g, g], e: [x, y + m + 0.5 * g, g, m - 1.5 * g], f: [x, y + g, g, m - 1.5 * g], g: [x + g, y + m - g / 2, an - 2 * g, g] };
+    for (const k in seg) { c.fillStyle = on.includes(k) ? color : 'rgba(251, 250, 246, 0.035)'; c.fillRect(...seg[k]); }
+    x += paso;
+  }
+}
+function renglones(c, textos, ancho, max) {
+  const out = [];
+  for (const t of textos) {
+    let linea = '';
+    for (const p of String(t || '').split(/\s+/).filter(Boolean)) { const prueba = linea ? linea + ' ' + p : p; if (c.measureText(prueba).width > ancho && linea) { out.push(linea); linea = p; } else linea = prueba; }
+    if (linea) out.push(linea);
+  }
+  if (out.length > max) { out.length = max; out[max - 1] = out[max - 1].replace(/\s*\S*$/, '') + '…'; }
+  return out;
+}
+function dibujarPantalla(p, t, color) {
+  const c = p.cv.getContext('2d'), w = p.cv.width, m = 18, iw = w - 2 * m, tinta = color === PAPEL ? TINTA : color, turno = (p.turno = (p.turno || 0) + 1);
+  const marco = () => { c.beginPath(); c.roundRect(m, m, iw, iw, 22); };
+  const cabeza = (txt, fondo = tinta) => { c.fillStyle = fondo; c.fillRect(m, m, iw, 54); c.fillStyle = PAPEL; c.font = `700 25px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(txt, m + 16, m + 28); };
+  const cerrar = () => { c.restore(); marco(); c.lineWidth = 10; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
+  c.save(); c.fillStyle = color; c.fillRect(0, 0, w, w); marco(); c.clip();
+  if (t.tipo === 'titulo') {
+    c.fillStyle = color; c.fillRect(0, 0, w, w);
+    c.fillStyle = color === PAPEL ? TINTA : PAPEL; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = `140px ${ROT}`; c.fillText(t.kanji, w / 2, w / 2 - 16); c.font = `700 25px ${TXT}`; c.fillText(t.etiqueta, w / 2, w - m - 30);
+  } else if (t.tipo === 'digital') {
+    c.fillStyle = TINTA; c.fillRect(0, 0, w, w);
+    c.fillStyle = color === PAPEL ? PAPEL : color; c.font = `700 23px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 16, m + 30);
+    sieteSeg(c, t.valor, w / 2, 98, 92, color === PAPEL ? PAPEL : color, iw - 40);
+  } else if (t.tipo === 'interruptor') {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
+    const x = w / 2 - 62, y = 112; c.lineWidth = 8; c.strokeStyle = TINTA; c.beginPath(); c.roundRect(x, y, 124, 60, 30); c.fillStyle = t.valor ? TINTA : PAPEL; c.fill(); c.stroke();
+    c.fillStyle = t.valor ? PAPEL : TINTA; c.beginPath(); c.arc(t.valor ? x + 94 : x + 30, y + 30, 20, 0, Math.PI * 2); c.fill();
+    c.fillStyle = TINTA; c.font = `700 26px ${TXT}`; c.textAlign = 'center'; c.fillText(t.valor ? 'Activado' : 'Apagado', w / 2, 210);
+  } else if (t.tipo === 'tablero') {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
+    const x0 = m + 34, y0 = m + 64, k = (iw - 68) / 10;
+    (t.lista || []).forEach(({ celda, jugada }) => { const x = x0 + (celda % 10) * k, y = y0 + Math.floor(celda / 10) * k; c.fillStyle = tinta; if (jugada === 'hundida') c.fillRect(x, y, k, k); else if (jugada === 'tocada') { c.lineWidth = 3; c.strokeStyle = tinta; c.strokeRect(x + 3, y + 3, k - 6, k - 6); } else if (jugada === 'agua') { c.fillStyle = TINTA; c.fillRect(x + k / 2 - 2, y + k / 2 - 2, 4, 4); } });
+    c.strokeStyle = TINTA; c.lineWidth = 1.5; for (let i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(x0 + i * k, y0); c.lineTo(x0 + i * k, y0 + 10 * k); c.stroke(); c.beginPath(); c.moveTo(x0, y0 + i * k); c.lineTo(x0 + 10 * k, y0 + i * k); c.stroke(); }
+  } else if (t.tipo === 'imagen') {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, w);
+    const poner = im => { if (turno !== p.turno) return; const iw2 = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, e = Math.max(iw / iw2, iw / ih); c.save(); marco(); c.clip(); c.drawImage(im, w / 2 - iw2 * e / 2, w / 2 - ih * e / 2, iw2 * e, ih * e); c.fillStyle = TINTA; c.fillRect(m, m, 46, 46); c.fillStyle = PAPEL; c.font = `30px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 23, m + 25); c.restore(); marco(); c.lineWidth = 10; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
+    if (t.g.ejemplo != null) { cerrar(); poner(dibujoEjemplo(t.g.ejemplo)); return; }
+    const im = new Image(); im.onload = () => poner(im); im.src = t.g.archivo;
+  } else if (t.tipo === 'texto') {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
+    c.fillStyle = TINTA; c.font = `500 25px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    renglones(c, t.lineas || [], iw - 30, t.pie ? 4 : 5).forEach((l, i) => c.fillText(l, m + 15, m + 92 + i * 31));
+    if (t.pie) { c.fillStyle = '#5b5751'; c.font = `500 20px ${TXT}`; c.fillText(t.pie, m + 15, w - m - 16); }
+  } else {
+    // Sin señal: ruido gris con bandas, distinto cada vez que se pinta
+    const r = azarSemilla((p.semilla = (p.semilla || 7) + 13)); c.fillStyle = '#cfcac0'; c.fillRect(0, 0, w, w);
+    for (let i = 0; i < 1500; i++) { const v = Math.floor(r() * 4); c.fillStyle = ['#141312', '#5b5751', '#fbfaf6', '#9b968c'][v]; c.fillRect(Math.floor(r() * w / 4) * 4, Math.floor(r() * w / 4) * 4, 4, 4); }
+    for (let i = 0; i < 4; i++) { c.fillStyle = 'rgba(20, 19, 18, 0.22)'; c.fillRect(0, r() * w, w, 6 + r() * 12); }
+  }
+  cerrar();
+}
+function repintarPantalla(cara, i) { const p = (pegatinas[cara] || [])[i]; if (!p) return; p.spec = pantallasDe(cara)[i]; dibujarPantalla(p, p.spec, colorCara(cara)); }
+function repintarCara(cara) { if (!pegatinas[cara]) return; const specs = pantallasDe(cara); pegatinas[cara].forEach((p, i) => { if (p) { p.spec = specs[i]; dibujarPantalla(p, specs[i], colorCara(cara)); } }); }
+
+function hacerCubo(lado) {
+  const grupo = new THREE.Group(), piezas = [], paso = lado / 3, cuerpo = paso * 0.95, pegote = paso * 0.86;
   const geoC = new THREE.BoxGeometry(cuerpo, cuerpo, cuerpo), geoP = new THREE.PlaneGeometry(pegote, pegote);
-  const colorCara = id => id === 'diario' ? PAPEL : seccion(id).color, mats = {}, centros = {};
-  CARAS.forEach(c => {
-    mats[c.id] = mat(colorCara(c.id));
-    if (conKanji) centros[c.id] = mat(PAPEL, { mapa: textura(256, 256, (x, w, h) => { x.fillStyle = colorCara(c.id); x.fillRect(0, 0, w, h); x.fillStyle = c.id === 'diario' ? TINTA : PAPEL; x.font = `168px ${ROT}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(seccion(c.id).kanji, w / 2, h / 2 + 8); }) });
-  });
+  CARAS.forEach(c => { pegatinas[c.id] = []; const e = new THREE.Euler(c.r[0], c.r[1], 0); c.der = new THREE.Vector3(1, 0, 0).applyEuler(e); c.arr = new THREE.Vector3(0, 1, 0).applyEuler(e); });
   for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
-    const pieza = new THREE.Mesh(geoC, M.tinta); pieza.position.set(x * paso, y * paso, z * paso);
+    const pieza = new THREE.Mesh(geoC, M.tinta), pos = new THREE.Vector3(x, y, z); pieza.position.copy(pos).multiplyScalar(paso);
     CARAS.forEach(c => {
       if (x * c.n[0] + y * c.n[1] + z * c.n[2] !== 1) return;
-      const centro = Math.abs(x) + Math.abs(y) + Math.abs(z) === 1;
-      const st = new THREE.Mesh(geoP, conKanji && centro ? centros[c.id] : mats[c.id]);
-      st.position.set(c.n[0], c.n[1], c.n[2]).multiplyScalar(cuerpo / 2 + paso * 0.004); st.rotation.set(c.r[0], c.r[1], 0); st.userData.cara = c.id;
-      pieza.add(st);
+      const indice = (1 - Math.round(pos.dot(c.arr))) * 3 + (Math.round(pos.dot(c.der)) + 1), [cv, tex] = lienzoTex(256, 256);
+      const st = new THREE.Mesh(geoP, mat(PAPEL, { mapa: tex, trama: 0 }));
+      st.position.set(c.n[0], c.n[1], c.n[2]).multiplyScalar(cuerpo / 2 + paso * 0.004); st.rotation.set(c.r[0], c.r[1], 0); st.userData = { cara: c.id, indice };
+      pieza.add(st); pegatinas[c.id][indice] = { cv, tex };
     });
     grupo.add(pieza); piezas.push(pieza);
   }
-  return { grupo, piezas, paso, giro: null };
+  CARAS.forEach(c => repintarCara(c.id));
+  return { grupo, piezas, paso, giro: null, cola: [], historia: [], alResolver: null };
 }
-// Girar una capa: las piezas de esa capa pasan a un pivote, giran 90 grados y vuelven al cubo
-function girarCapa(cubo, eje, capa, sentido, dur) {
+// Girar una capa: sus piezas pasan a un pivote, giran 90 grados y vuelven al cubo. Se anota para poder deshacerlo.
+function girarCapa(cubo, eje, capa, sentido, dur, deshacer) {
   if (cubo.giro) return;
+  if (!deshacer) cubo.historia.push({ eje, capa, sentido });
   const pivote = new THREE.Group(); cubo.grupo.add(pivote);
   const sel = cubo.piezas.filter(p => Math.round(p.position[eje] / cubo.paso) === capa); sel.forEach(p => pivote.attach(p));
   cubo.giro = { pivote, sel, eje, ang: sentido * Math.PI / 2, t0: performance.now(), dur };
@@ -1041,52 +1246,135 @@ function avanzarCubo(cubo, ahora) {
   g.pivote.updateMatrixWorld(true);
   g.sel.forEach(p => { cubo.grupo.attach(p); p.position.divideScalar(cubo.paso).round().multiplyScalar(cubo.paso); p.rotation.set(unCuarto(p.rotation.x), unCuarto(p.rotation.y), unCuarto(p.rotation.z)); });
   cubo.grupo.remove(g.pivote); cubo.giro = null;
+  siguienteGiro(cubo);
+}
+function siguienteGiro(cubo) {
+  while (!cubo.giro && cubo.cola.length) { const m = cubo.cola.shift(); girarCapa(cubo, m.eje, m.capa, m.sentido, m.dur, true); }
+  if (!cubo.giro && !cubo.cola.length && cubo.alResolver) { const f = cubo.alResolver; cubo.alResolver = null; f(); }
+}
+// Deshace los giros en orden inverso: el cubo se arma solo
+function resolverCubo(cubo, fin) {
+  const n = cubo.historia.length, dur = menos ? 0 : THREE.MathUtils.clamp(1100 / Math.max(1, n), 70, 170);
+  cubo.cola = cubo.historia.reverse().map(m => ({ ...m, sentido: -m.sentido, dur })); cubo.historia = []; cubo.alResolver = fin || null;
+  siguienteGiro(cubo);
 }
 const capaAlAzar = (cubo, dur) => girarCapa(cubo, 'xyz'[Math.floor(Math.random() * 3)], Math.floor(Math.random() * 3) - 1, Math.random() < 0.5 ? 1 : -1, dur);
-let cubito = null;
-function hallarCubo() {
-  capaAlAzar(cubito, menos ? 0 : 320);
-  if (!cuboHallado) { cuboHallado = true; guardar('cubo', '1'); pintarFormato(); }
-  if (actual.id === 'escritos' && !viaje) mostrar('diario'); else irA('diario');
-}
 
-// Formato cubo: el sitio entero como un cubo de Rubik, una cara por sección
-let escenaCubo = null, camCubo = null, granCubo = null, soporte = null;
+// ---------- Dónde está el cubo y qué haces con él ----------
+let cubito = null, soporteCubo = null, movCubo = null, ESTANTE = null, caraFrente = 'inicio', clicsOcultos = [];
+const TABURETES = [[-3, 2.6], [-1, 2.8], [1.2, 2.8], [3.2, 2.6], [-1, -2.8], [1.4, -2.8]];
 const cuboGiro = { desde: new THREE.Quaternion(), hacia: new THREE.Quaternion(), t0: 0, dur: 0 };
-const INCLINA = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.36, -0.6, 0));
-const Q_CARA = { inicio: [0, 0, 0], blog: [0, -Math.PI / 2, 0], escritos: [0, Math.PI, 0], obras: [0, Math.PI / 2, 0], galeria: [Math.PI / 2, 0, 0], diario: [-Math.PI / 2, 0, 0] };
+function crearCubo() {
+  cubito = hacerCubo(0.48); soporteCubo = new THREE.Group(); soporteCubo.add(cubito.grupo); mundo.add(soporteCubo);
+  cubito.piezas.forEach(p => { p.userData.accion = { cubo: true }; clicables.push(p); });
+  if (estadoCubo === 'mesa') { const d = puntoMesa(asientoCubo); soporteCubo.position.copy(d.pos); soporteCubo.rotation.y = d.rotY; return; }
+  soporteCubo.position.copy(ESTANTE.pos); soporteCubo.rotation.y = ESTANTE.rotY; soporteCubo.visible = estadoCubo === 'estante';
+  if (estadoCubo === 'estante') for (let k = 0; k < 5; k++) capaAlAzar(cubito, 0);
+}
+function puntoMesa(i) { const [sx, sz] = TABURETES[i], x = THREE.MathUtils.clamp(sx, -0.7, 2.2), z = Math.sign(sz) * 0.55; return { pos: new THREE.Vector3(x, 1.27 + 0.24, z), rotY: Math.atan2(sx - x, sz - z) }; }
+function frenteCamara(adelante, lado, alto) {
+  const f = new THREE.Vector3(), d = new THREE.Vector3(1, 0, 0).applyQuaternion(camara.quaternion), u = new THREE.Vector3(0, 1, 0).applyQuaternion(camara.quaternion);
+  camara.getWorldDirection(f); return camara.position.clone().addScaledVector(f, adelante).addScaledVector(d, lado).addScaledVector(u, alto);
+}
+function moverCubo(dest, dur, alza, fin) {
+  let r1 = dest.rotY; while (r1 - soporteCubo.rotation.y > Math.PI) r1 -= Math.PI * 2; while (r1 - soporteCubo.rotation.y < -Math.PI) r1 += Math.PI * 2;
+  movCubo = { p0: soporteCubo.position.clone(), p1: dest.pos.clone(), r0: soporteCubo.rotation.y, r1, s0: soporteCubo.scale.x, s1: dest.escala ?? 1, t0: performance.now(), dur: menos ? 1 : dur, alza: alza || 0, fin };
+}
+function girarCuboA(q, dur) { cuboGiro.desde.copy(cubito.grupo.quaternion); cuboGiro.hacia.copy(q); cuboGiro.t0 = performance.now(); cuboGiro.dur = menos ? 1 : dur; }
+const vistaCerca = () => ({ pos: new THREE.Vector3(ESTANTE.pos.x, 1.55, ESTANTE.pos.z + 2.95), mira: new THREE.Vector3(ESTANTE.pos.x, 1.2, ESTANTE.pos.z + 0.6) });
+function vistaAsiento(i) { const [sx, sz] = TABURETES[i]; return { pos: new THREE.Vector3(sx, 2.45, sz * 1.08), mira: new THREE.Vector3(THREE.MathUtils.clamp(sx, -1.5, 2.2) * 0.75, 1.25, -Math.sign(sz) * 0.2) }; }
+function vistaMenu() { const loc = (x, y, z) => soporteCubo.localToWorld(new THREE.Vector3(x, y, z)); return { pos: loc(-0.2, 0.16, 1.2), mira: loc(-0.2, 0.06, 0) }; }
+
+// En la librería: clic al cubo, la cámara se acerca y el cubo se levanta del estante
+function acercarCubo() {
+  if (estadoCubo !== 'estante' || viaje || vuelo || actual.id !== 'escritos' || estado !== 'sala') return;
+  estado = 'cerca'; volar(vistaCerca(), 1000, LIM_FIJO);
+  moverCubo({ pos: new THREE.Vector3(ESTANTE.pos.x, 1.32, ESTANTE.pos.z + 1.45), rotY: 0 }, 1000, 0.25);
+  pintarEstado();
+}
+function agarrarCubo() {
+  if (estado !== 'cerca' || vuelo) return;
+  estadoCubo = 'mano'; guardar('cubo', 'mano'); estado = 'sala'; invAbierto = true;
+  moverCubo({ pos: frenteCamara(0.7, -0.45, 0.3), rotY: soporteCubo.rotation.y, escala: 0.15 }, 420, 0, () => { soporteCubo.visible = false; soporteCubo.scale.setScalar(1); cubito.grupo.quaternion.identity(); });
+  volar(vista(actual), 900, LIM_SALA); pintarEstado();
+}
+function devolverCubo(inmediato) {
+  if (estado !== 'cerca') return;
+  estado = 'sala'; girarCuboA(new THREE.Quaternion(), 600);
+  if (inmediato) { movCubo = null; soporteCubo.position.copy(ESTANTE.pos); soporteCubo.rotation.y = ESTANTE.rotY; cubito.grupo.quaternion.identity(); cuboGiro.dur = 0; }
+  else { moverCubo(ESTANTE, 800, 0.15); volar(vista(actual), 900, LIM_SALA); }
+  pintarEstado();
+}
+// En la ruleta: sentarse en un taburete, dejar el cubo sobre la mesa
+function sentarse(i) {
+  if (viaje || vuelo || estado === 'menu' || estado === 'cerca') return;
+  if (actual.id !== 'inicio') { irA('inicio'); return; }
+  asiento = i; estado = 'sentado'; volar(vistaAsiento(i), 1000, LIM_SENTADO); pintarEstado();
+}
+function levantarse() {
+  if (estado !== 'sentado') return;
+  asiento = null; estado = 'sala'; volar(vista(actual), 900, LIM_SALA); pintarEstado();
+}
+function dejarCubo() {
+  if (estado !== 'sentado' || estadoCubo !== 'mano' || vuelo) return;
+  estadoCubo = 'mesa'; asientoCubo = asiento; guardar('cubo', 'mesa'); guardar('asiento', String(asiento)); invAbierto = false;
+  const d = puntoMesa(asiento);
+  cubito.grupo.quaternion.identity(); soporteCubo.position.copy(frenteCamara(0.7, 0, -0.25)); soporteCubo.rotation.y = d.rotY; soporteCubo.scale.setScalar(0.3); soporteCubo.visible = true;
+  moverCubo(d, 650, 0.12); pintarEstado();
+}
+function recogerCubo() {
+  if (estadoCubo !== 'mesa' || estado === 'menu') return;
+  estadoCubo = 'mano'; guardar('cubo', 'mano'); invAbierto = true;
+  moverCubo({ pos: frenteCamara(0.7, -0.45, 0.3), rotY: soporteCubo.rotation.y, escala: 0.15 }, 420, 0.1, () => { soporteCubo.visible = false; soporteCubo.scale.setScalar(1); });
+  pintarEstado();
+}
+// Menú cubo: doble clic al cubo sobre la mesa. Se arma solo y la cámara entra hasta una cara; en la esquina queda la mesa.
+const INCLINA = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.12, -0.2, 0));
+const Q_CARA = { inicio: [0, 0, 0], blog: [0, -Math.PI / 2, 0], escritos: [0, Math.PI, 0], obras: [0, Math.PI / 2, 0], galeria: [Math.PI / 2, 0, 0], oculta: [-Math.PI / 2, 0, 0] };
 const qCara = id => INCLINA.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...Q_CARA[id])));
-function construirFormatoCubo() {
-  escenaCubo = new THREE.Scene(); escenaCubo.background = new THREE.Color(PAPEL);
-  camCubo = new THREE.PerspectiveCamera(30, 1, 0.1, 200); camCubo.position.set(0, 1.5, 13); camCubo.lookAt(0, -0.1, 0);
-  soporte = new THREE.Group(); escenaCubo.add(soporte);
-  granCubo = hacerCubo(2.95, true); soporte.add(granCubo.grupo); granCubo.grupo.quaternion.copy(qCara('inicio'));
-  // Sombra de trama bajo el cubo; va en la capa 1 para que no le salga contorno
-  const sombra = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 3.2), mat(PAPEL, { trama: 0, mapa: textura(512, 222, (c, w, h) => tramaCanvas(c, w, h, 9, TINTA, (x, y) => Math.max(0, 2.8 * (1 - Math.hypot((x - w / 2) / (w / 2), (y - h / 2) / (h / 2)))))) }));
-  sombra.rotation.x = -Math.PI / 2; sombra.position.y = -2.7; sombra.layers.set(1); escenaCubo.add(sombra);
+function abrirMenu() {
+  if (estadoCubo !== 'mesa' || estado === 'menu' || estado === 'cerca' || viaje || vuelo || movCubo) return;
+  const id = SALAS.some(s => s.id === seccionActual) ? seccionActual : 'inicio';
+  estado = 'menu'; invAbierto = false; caraFrente = id;
+  CARAS.forEach(c => repintarCara(c.id));
+  resolverCubo(cubito); girarCuboA(qCara(id), 1000);
+  volar(vistaMenu(), 1300, LIM_FIJO);
+  mostrar(id); pintarEstado();
+}
+function cerrarMenu() {
+  if (estado !== 'menu') return;
+  estado = asiento != null ? 'sentado' : 'sala'; girarCuboA(new THREE.Quaternion(), 700);
+  volar(asiento != null ? vistaAsiento(asiento) : vista(actual), 1100, asiento != null ? LIM_SENTADO : LIM_SALA);
+  if (seccionActual === 'diario' || seccionActual === 'oculta') mostrar('inicio');
+  pintarEstado();
 }
 function irCara(id, abrir) {
-  if (id === 'diario' && !cuboHallado) return;
-  cuboGiro.desde.copy(granCubo.grupo.quaternion); cuboGiro.hacia.copy(qCara(id)); cuboGiro.t0 = performance.now(); cuboGiro.dur = menos ? 0 : 720;
-  if (menos) granCubo.grupo.quaternion.copy(cuboGiro.hacia);
-  marcarTira(id); vineta.classList.add('sale');
+  caraFrente = id; girarCuboA(qCara(id), 650);
+  vineta.classList.add('sale');
   setTimeout(() => { mostrar(id, abrir); vineta.classList.remove('sale'); }, menos ? 0 : 160);
 }
 function caraAlFrente() {
-  const meta = new THREE.Vector3(0, 0, 1).applyQuaternion(INCLINA); let mejor = seccionActual, max = -2;
-  CARAS.forEach(c => { const d = new THREE.Vector3(...c.n).applyQuaternion(granCubo.grupo.quaternion).dot(meta); if (d > max) { max = d; mejor = c.id; } });
+  const meta = new THREE.Vector3(0, 0, 1).applyQuaternion(INCLINA); let mejor = caraFrente, max = -2;
+  CARAS.forEach(c => { const d = new THREE.Vector3(...c.n).applyQuaternion(cubito.grupo.quaternion).dot(meta); if (d > max) { max = d; mejor = c.id; } });
   return mejor;
 }
-function cambiarFormato() {
-  if (!cuboHallado || !hay3D) return;
-  lienzo.classList.add('fundido');
-  setTimeout(() => {
-    modo = modo === 'salas' ? 'cubo' : 'salas';
-    if (modo === 'cubo') { cuboGiro.dur = 0; granCubo.grupo.quaternion.copy(qCara(seccionActual)); }
-    else { const s = sala(seccionActual === 'diario' ? 'escritos' : seccionActual); viaje = null; actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); }
-    pintarFormato(); mostrar(seccionActual, ultima);
-    requestAnimationFrame(() => lienzo.classList.remove('fundido'));
-  }, menos ? 0 : 280);
+function tocarPantalla(cara, i) {
+  if (cara !== caraFrente) { irCara(cara); return; }
+  if (cara === 'oculta' && !diarioVisto) {
+    // La cara sin señal: cinco clics seguidos a la pantalla del centro
+    repintarPantalla('oculta', i);
+    if (i !== 4) return;
+    const ahora = performance.now(); clicsOcultos = [...clicsOcultos.filter(t => ahora - t < 2500), ahora];
+    if (clicsOcultos.length >= 5) { diarioVisto = true; clicsOcultos = []; repintarCara('oculta'); mostrar('diario'); }
+    return;
+  }
+  const a = ((pegatinas[cara] || [])[i] || {}).spec?.accion; if (!a) return;
+  if (a.girar) girar();
+  else if (a.tema) $('#tema').click();
+  else if (a.azar) mostrar('blog', { post: blog[Math.floor(Math.random() * blog.length)].id });
+  else if (a.imagen != null) { if (seccionActual !== 'galeria') mostrar('galeria'); elegirImagen(a.imagen); }
+  else if (a.obra != null) { obraMarcada = null; marcarObra(a.obra); }
+  else if (a.seccion) mostrar(a.seccion, a.abrir);
 }
 
 // ---------- Recorridos ----------
@@ -1134,21 +1422,29 @@ function ruta(desde, b) {
   return pts;
 }
 
-// ---------- Camara: mirar arrastrando, viajar entre salas ----------
+// ---------- Camara: mirar arrastrando, viajar entre salas, volar a un punto ----------
+const LIM_SALA = { th: 0.95, ph0: -0.45, ph1: 0.25, sway: 0.03, zoom: true }, LIM_SENTADO = { th: 0.45, ph0: -0.2, ph1: 0.18, sway: 0, zoom: false }, LIM_FIJO = { th: 0, ph0: 0, ph1: 0, sway: 0, zoom: false };
 const mirar = { th: 0, ph: 0, dTh: 0, dPh: 0, r: 1, dR: 0 };
-let objetivo = vista(actual).mira.clone(), base = null, viaje = null, pendiente = null;
-function fijarBase(s) {
-  const v = vista(s), off = v.pos.clone().sub(v.mira);
-  base = { mira: v.mira, r: off.length(), th: Math.atan2(off.x, off.z), ph: Math.asin(off.y / off.length()) };
+let objetivo = vista(actual).mira.clone(), base = null, viaje = null, vuelo = null;
+function fijarVista(v, lim) {
+  const off = v.pos.clone().sub(v.mira);
+  base = { mira: v.mira.clone(), r: off.length(), th: Math.atan2(off.x, off.z), ph: Math.asin(off.y / off.length()), lim: lim || LIM_SALA };
   mirar.dTh = mirar.dPh = mirar.dR = 0; objetivo.copy(v.mira);
 }
+const fijarBase = s => fijarVista(vista(s), LIM_SALA);
 fijarBase(actual); camara.position.copy(vista(actual).pos); camara.lookAt(objetivo);
 const suave = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function volar(v, dur, lim, fin) {
+  const dir = new THREE.Vector3(); camara.getWorldDirection(dir);
+  const d = base ? camara.position.distanceTo(base.mira) : 6;
+  viaje = null;
+  vuelo = { p0: camara.position.clone(), p1: v.pos.clone(), m0: camara.position.clone().addScaledVector(dir, d), m1: v.mira.clone(), t0: performance.now(), dur: menos ? 1 : dur, v, lim, fin };
+}
 
 function irA(id, abrir) {
   const b = sala(id === 'diario' ? 'escritos' : id); if (!b) return;
-  destino = b; marcarTira(id);
-  if (b === actual && !viaje) { mostrar(id, abrir); return; }
+  vuelo = null; destino = b; marcarTira(id);
+  if (b === actual && !viaje) { fijarBase(b); mostrar(id, abrir); return; }
   const curva = new THREE.CatmullRomCurve3(ruta(camara.position, b), false, 'centripetal', 0.5);
   const largo = curva.getLength();
   vineta.classList.add('sale');
@@ -1165,47 +1461,65 @@ function llegar(b, id, abrir) {
   $('#velocidad').style.opacity = 0;
 }
 
-// Arrastrar para mirar; clic sin arrastre para usar los objetos
+// Arrastrar: mira alrededor, o gira el cubo cuando lo tienes enfrente. Clic sin arrastre: usa lo que tocas.
 let arrastre = null;
 const ray = new THREE.Raycaster(), puntero = new THREE.Vector2();
-function tocado(e) {
-  const r = lienzo.getBoundingClientRect(); puntero.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-  if (modo === 'cubo') { ray.setFromCamera(puntero, camCubo); const h = ray.intersectObject(granCubo.grupo, true).find(x => x.object.userData.cara); return h ? { cara: h.object.userData.cara } : null; }
-  ray.setFromCamera(puntero, camara); const h = ray.intersectObjects(clicables, false)[0]; return h ? h.object.userData.accion : null;
+function apuntar(e) { const r = lienzo.getBoundingClientRect(); puntero.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(puntero, camara); }
+function tocaCubo() {
+  if (!soporteCubo || !soporteCubo.visible) return null;
+  const h = ray.intersectObject(soporteCubo, true)[0]; if (!h) return null;
+  return h.object.userData.cara ? { cara: h.object.userData.cara, indice: h.object.userData.indice, pieza: h.object.parent } : { pieza: h.object };
 }
+function tocado(e) {
+  apuntar(e);
+  if (estado === 'menu' || estado === 'cerca') return tocaCubo();
+  const h = ray.intersectObjects(clicables, false).find(x => !(x.object.userData.accion && x.object.userData.accion.cubo) || soporteCubo.visible);
+  return h ? h.object.userData.accion : null;
+}
+const enCubo = () => estado === 'menu' || estado === 'cerca';
 lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
 lienzo.addEventListener('pointermove', e => {
-  if (!arrastre) { lienzo.classList.toggle('sobre', !!tocado(e)); return; }
+  if (!arrastre) { const t = tocado(e); lienzo.classList.toggle('sobre', !!t); lienzo.classList.toggle('salir', estado === 'menu' && !t); return; }
   const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
   if (!arrastre.movio && Math.hypot(dx, dy) > 5) { arrastre.movio = true; lienzo.classList.add('arrastra'); }
-  if (arrastre.movio && modo === 'cubo') {
-    const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(dy, dx, 0).normalize(), Math.hypot(dx, dy) * 0.009);
-    granCubo.grupo.quaternion.premultiply(q); cuboGiro.dur = 0; arrastre.x = e.clientX; arrastre.y = e.clientY;
-  } else if (arrastre.movio && !viaje) {
-    mirar.dTh = THREE.MathUtils.clamp(mirar.dTh - dx * 0.0055, -0.95, 0.95); mirar.dPh = THREE.MathUtils.clamp(mirar.dPh + dy * 0.004, -0.45, 0.25);
-    arrastre.x = e.clientX; arrastre.y = e.clientY;
+  if (!arrastre.movio) return;
+  if (enCubo()) {
+    if (!vuelo) {
+      const eje = new THREE.Vector3(dy, dx, 0).normalize().applyQuaternion(camara.quaternion), qm = new THREE.Quaternion().setFromAxisAngle(eje, Math.hypot(dx, dy) * 0.009);
+      const qs = soporteCubo.getWorldQuaternion(new THREE.Quaternion()); cubito.grupo.quaternion.premultiply(qs.clone().invert().multiply(qm).multiply(qs)); cuboGiro.dur = 0;
+    }
+  } else if (!viaje && !vuelo) {
+    const l = base.lim; mirar.dTh = THREE.MathUtils.clamp(mirar.dTh - dx * 0.0055, -l.th, l.th); mirar.dPh = THREE.MathUtils.clamp(mirar.dPh + dy * 0.004, l.ph0, l.ph1);
   }
+  arrastre.x = e.clientX; arrastre.y = e.clientY;
 });
 lienzo.addEventListener('pointerup', e => {
   const a = arrastre; arrastre = null; lienzo.classList.remove('arrastra');
   if (!a) return;
-  if (modo === 'cubo') {
-    if (a.movio) { const id = caraAlFrente(); if (id !== seccionActual) irCara(id); else { cuboGiro.desde.copy(granCubo.grupo.quaternion); cuboGiro.hacia.copy(qCara(id)); cuboGiro.t0 = performance.now(); cuboGiro.dur = menos ? 1 : 420; } }
-    else { const acc = tocado(e); if (acc) irCara(acc.cara); }
+  if (estado === 'menu') {
+    if (vuelo) return;
+    if (a.movio) { const id = caraAlFrente(); if (id !== caraFrente) irCara(id); else girarCuboA(qCara(id), 380); return; }
+    const t = tocado(e); if (!t) { cerrarMenu(); return; }
+    if (t.cara) tocarPantalla(t.cara, t.indice);
+    return;
+  }
+  if (estado === 'cerca') {
+    if (!a.movio && !vuelo && !cubito.giro) { const t = tocado(e); if (t && t.pieza) girarCapa(cubito, 'y', Math.round(t.pieza.position.y / cubito.paso), Math.random() < 0.5 ? 1 : -1, 260); }
     return;
   }
   if (a.movio) return;
   const acc = tocado(e); if (!acc) return;
   if (acc.girar) girar();
-  else if (acc.cubo) hallarCubo();
+  else if (acc.cubo) { if (estadoCubo === 'estante') acercarCubo(); }
+  else if (acc.sentarse != null) sentarse(acc.sentarse);
   else if (acc.panel != null) tocarPanel(acc.panel);
-  else if (acc.rondaSig) { if (actual.id === 'galeria' && !viaje) cambiarRonda(ronda + 1); else irA('galeria'); }
+  else if (acc.rondaSig) { if (actual.id === 'galeria' && !viaje) cambiarRonda(ronda + 1); else ir('galeria'); }
   else if (acc.obra != null) marcarObra(acc.obra);
-  else if (acc.ir) irA(acc.ir, acc.abrir);
+  else if (acc.ir) ir(acc.ir, acc.abrir);
 });
-lienzo.addEventListener('wheel', e => { e.preventDefault(); if (modo === 'cubo') return; mirar.dR = THREE.MathUtils.clamp(mirar.dR + e.deltaY * 0.0008, -0.35, 0.3); }, { passive: false });
+lienzo.addEventListener('dblclick', e => { if (enCubo() || estadoCubo !== 'mesa') return; apuntar(e); if (tocaCubo()) abrirMenu(); });
+lienzo.addEventListener('wheel', e => { e.preventDefault(); if (estado !== 'sala' || !base.lim.zoom) return; mirar.dR = THREE.MathUtils.clamp(mirar.dR + e.deltaY * 0.0008, -0.35, 0.3); }, { passive: false });
 
-// La ruleta gira rapido, se detiene y te lleva a algo al azar
 let giro = null;
 
 // ---------- Tinta: pasada de normales y profundidad para el contorno ----------
@@ -1241,7 +1555,7 @@ compuesto = new THREE.ShaderMaterial({
 const escenaQuad = new THREE.Scene(), camQuad = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 escenaQuad.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), compuesto));
 let offX = 0, offXMeta = 0, offY = 0, anchoNormal = 0;
-function aplicarOffset() { const w = innerWidth, h = innerHeight; for (const c of [camara, camCubo]) if (c) c.setViewOffset(w, h, Math.round(offX), offY, w, h); }
+function aplicarOffset() { camara.setViewOffset(innerWidth, innerHeight, Math.round(offX), offY, innerWidth, innerHeight); }
 function encuadrar(inmediato) {
   const w = innerWidth;
   if (w > 760) { offXMeta = amplia ? 0 : Math.round(((anchoNormal || Math.min(410, w * 0.34) + 46) + 16) / 2); offY = Math.round($('.tira').offsetHeight / 2); }
@@ -1251,7 +1565,7 @@ function encuadrar(inmediato) {
 }
 function medir() {
   const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
-  for (const c of [camara, camCubo]) if (c) { c.aspect = w / h; c.updateProjectionMatrix(); }
+  camara.aspect = w / h; camara.updateProjectionMatrix();
   const W = Math.floor(w * DPR), H = Math.floor(h * DPR);
   if (rtN) { rtN.dispose(); rtC.dispose(); }
   rtN = new THREE.WebGLRenderTarget(W, H, { depthTexture: new THREE.DepthTexture(W, H), depthBuffer: true });
@@ -1263,14 +1577,13 @@ function medir() {
 addEventListener('resize', medir);
 
 function dibujar() {
-  const esc = modo === 'cubo' ? escenaCubo : escena, cam = modo === 'cubo' ? camCubo : camara;
-  cam.layers.set(0); esc.overrideMaterial = matN; renderer.setRenderTarget(rtN); renderer.render(esc, cam);
-  cam.layers.enable(1); esc.overrideMaterial = null; renderer.setRenderTarget(rtC); renderer.render(esc, cam);
+  escena.overrideMaterial = matN; renderer.setRenderTarget(rtN); renderer.render(escena, camara);
+  escena.overrideMaterial = null; renderer.setRenderTarget(rtC); renderer.render(escena, camara);
   renderer.setRenderTarget(null); renderer.render(escenaQuad, camQuad);
 }
 
 let antes = performance.now();
-const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), DOS_PI = Math.PI * 2;
 function cuadro(ahora) {
   requestAnimationFrame(cuadro);
   if (document.hidden) { antes = ahora; return; }
@@ -1282,44 +1595,59 @@ function cuadro(ahora) {
     const fin = vista(viaje.b).mira, w0 = 1 - THREE.MathUtils.smoothstep(t, 0, 0.18), w1 = THREE.MathUtils.smoothstep(t, 0.62, 1);
     tmp2.copy(tmp).lerp(viaje.miraIni, w0).lerp(fin, w1);
     camara.lookAt(tmp2);
-    const vel = Math.sin(Math.PI * t);
-    $('#velocidad').style.opacity = (vel * 0.22).toFixed(3);
+    $('#velocidad').style.opacity = (Math.sin(Math.PI * t) * 0.22).toFixed(3);
     if (t >= 1) llegar(viaje.b, viaje.id, viaje.abrir);
+  } else if (vuelo) {
+    const t = THREE.MathUtils.clamp((ahora - vuelo.t0) / vuelo.dur, 0, 1), e = suave(t);
+    camara.position.lerpVectors(vuelo.p0, vuelo.p1, e); tmp.lerpVectors(vuelo.m0, vuelo.m1, e); camara.lookAt(tmp);
+    if (t >= 1) { const v = vuelo; vuelo = null; fijarVista(v.v, v.lim); if (v.fin) v.fin(); }
   } else {
-    const deriva = menos ? 0 : Math.sin(ahora / 4200) * 0.03;
-    const th = base.th + mirar.dTh + deriva, ph = THREE.MathUtils.clamp(base.ph + mirar.dPh, 0.12, 1.25), r = base.r * (1 + mirar.dR);
+    const l = base.lim, deriva = menos ? 0 : Math.sin(ahora / 4200) * l.sway;
+    const th = base.th + mirar.dTh + deriva, ph = base.ph + mirar.dPh, r = base.r * (1 + mirar.dR);
     tmp.set(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(r).add(base.mira);
     camara.position.lerp(tmp, 1 - Math.exp(-dt * 7)); camara.lookAt(base.mira);
   }
-  // Rueda y bola
+  // Ruleta: la rueda gira, la bola corre en contra, frena y cae en una casilla
   if (giro) {
     const g = (ahora - giro.t0) / 1000;
     velRueda = g < 0.3 ? 0.35 + g * 30 : Math.max(0.35, 9.35 * Math.exp(-(g - 0.3) * 1.6));
-    if (g > 2.1 && !viaje) { const el = giro.elegida; giro = null; const b = $('#girar'); if (b) b.disabled = false; irA(el.ir, el.abrir); }
+    if (!bolaFija) {
+      anguloBola -= dt * (1.2 + 8 * Math.exp(-g * 0.75));
+      if (g > 2.8) { const th = (((anguloBola + rueda.rotation.y) % DOS_PI) + DOS_PI) % DOS_PI; bolaFija = { idx: Math.floor(th / DOS_PI * RUEDA.length) % RUEDA.length, t0: ahora }; registrarTirada(bolaFija.idx); }
+    }
+    if (g > 5) giro = null;
   }
-  rueda.rotation.y += dt * velRueda; anguloBola -= dt * velRueda * 1.7;
+  rueda.rotation.y += dt * velRueda;
+  let rb = 1.05;
+  if (bolaFija) { anguloBola = (bolaFija.idx + 0.5) / RUEDA.length * DOS_PI - rueda.rotation.y; rb = bolaFija.t0 ? 1.05 - 0.13 * suave(THREE.MathUtils.clamp((ahora - bolaFija.t0) / 450, 0, 1)) : 0.92; }
+  bola.position.set(-2.35 + Math.cos(anguloBola) * rb, 1.56, Math.sin(anguloBola) * rb);
+  // Paneles de la galería que se dan vuelta
   for (const p of paneles) {
     if (p.giro !== p.hacia) { const k = THREE.MathUtils.clamp((ahora - p.t0) / 520, 0, 1); p.giro = k >= 1 ? p.hacia : p.desde + (p.hacia - p.desde) * suave(k); }
     p.m.scale.x = Math.max(0.02, Math.abs(Math.cos(p.giro * Math.PI))); p.m.material = p.giro > 0.5 ? p.dorso : p.frente;
   }
+  // El cubo: capas que giran, traslados (estante, mano, mesa) y giros del cubo entero
   avanzarCubo(cubito, ahora);
-  if (modo === 'cubo') {
-    if (cuboGiro.dur && !(arrastre && arrastre.movio)) { const k = THREE.MathUtils.clamp((ahora - cuboGiro.t0) / cuboGiro.dur, 0, 1); granCubo.grupo.quaternion.slerpQuaternions(cuboGiro.desde, cuboGiro.hacia, suave(k)); if (k >= 1) cuboGiro.dur = 0; }
-    soporte.rotation.y = menos ? 0 : Math.sin(ahora / 2600) * 0.06; soporte.position.y = menos ? 0 : Math.sin(ahora / 1900) * 0.07;
+  if (movCubo) {
+    const k = THREE.MathUtils.clamp((ahora - movCubo.t0) / movCubo.dur, 0, 1), e = suave(k);
+    soporteCubo.position.lerpVectors(movCubo.p0, movCubo.p1, e); soporteCubo.position.y += Math.sin(Math.PI * e) * movCubo.alza;
+    soporteCubo.rotation.y = movCubo.r0 + (movCubo.r1 - movCubo.r0) * e; soporteCubo.scale.setScalar(movCubo.s0 + (movCubo.s1 - movCubo.s0) * e);
+    if (k >= 1) { const f = movCubo.fin; movCubo = null; if (f) f(); }
   }
+  if (cuboGiro.dur && !(arrastre && arrastre.movio && enCubo())) { const k = THREE.MathUtils.clamp((ahora - cuboGiro.t0) / cuboGiro.dur, 0, 1); cubito.grupo.quaternion.slerpQuaternions(cuboGiro.desde, cuboGiro.hacia, suave(k)); if (k >= 1) cuboGiro.dur = 0; }
   if (Math.abs(offX - offXMeta) > 0.5) { offX += (offXMeta - offX) * (1 - Math.exp(-dt * 10)); if (Math.abs(offX - offXMeta) <= 0.5) offX = offXMeta; aplicarOffset(); }
-  const rb = giro ? 1.05 : 0.86; bola.position.set(-2.35 + Math.cos(anguloBola) * rb, 1.56, Math.sin(anguloBola) * rb);
   dibujar();
 }
 
 async function empezar() {
   try { await Promise.race([Promise.all([document.fonts.load(`40px "Dela Gothic One"`), document.fonts.load(`700 40px "Zen Kaku Gothic New"`)]), new Promise(r => setTimeout(r, 2500))]); } catch (err) {}
-  construirRuleta(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); construirFormatoCubo();
-  hay3D = true; pintarFormato(); medir();
-  const h = location.hash.slice(1), ini = sala(h) ? h : seccionActual, s = sala(ini === 'diario' ? 'escritos' : ini);
+  construirRuleta(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles(); crearCubo();
+  hay3D = true; medir();
+  const h = location.hash.slice(1), ini = sala(h) ? h : (sala(seccionActual) ? seccionActual : 'inicio'), s = sala(ini);
   if (s !== actual) { actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); }
-  mostrar(ini, ini === seccionActual ? ultima : {});
-  window.prueba = { ir, ampliar, cambiarFormato, hallarCubo, cambiarRonda, elegirImagen, marcarObra, get modo() { return modo; } };
+  mostrar(ini, ini === seccionActual ? ultima : {}); pintarEstado();
+  setInterval(() => repintarPantalla('inicio', 1), 20000);
+  window.prueba = { ir, ampliar, girar, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
   requestAnimationFrame(cuadro);
 }
 empezar();
