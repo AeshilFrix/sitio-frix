@@ -27,33 +27,6 @@ window.DATOS = {
         "es": "Cada cara del cubo tiene su orden.",
         "en": "Every face of the cube has its order."
       }
-    ],
-    "reglas": [
-      {
-        "es": "Todo lo que hay aquí lo hice yo, salvo que diga lo contrario.",
-        "en": "Everything here is my own work unless I say otherwise.",
-        "auto": true
-      },
-      {
-        "es": "Mis escritos son míos: no los copies sin preguntar.",
-        "en": "My writing is mine: don't copy it without asking.",
-        "auto": true
-      },
-      {
-        "es": "Lo que se apuesta en esta mesa, se paga.",
-        "en": "Whatever is bet at this table gets paid.",
-        "auto": true
-      },
-      {
-        "es": "Si encuentras algo escondido, guárdalo.",
-        "en": "If you find something hidden, keep it.",
-        "auto": true
-      },
-      {
-        "es": "El sitio cambia seguido: vuelve de vez en cuando.",
-        "en": "The site changes often: come back now and then.",
-        "auto": true
-      }
     ]
   },
   "blog": [
@@ -230,8 +203,8 @@ window.DATOS = {
       "id": 6,
       "fecha": "2026-11-16",
       "texto": {
-        "es": "La mesa se movió: menú de cartas, brújula, reglas de la casa y siete cosas escondidas.",
-        "en": "The table moved: card menu, compass, house rules and seven hidden things."
+        "es": "Las flechas ← → del teclado pasan de una página a otra.",
+        "en": "The ← → arrow keys move from one page to the next."
       }
     }
   ]
