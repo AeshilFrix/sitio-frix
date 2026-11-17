@@ -19,6 +19,16 @@
 - Cinco salas en cruz alrededor de la Ruleta (Inicio): Siete cartas (Blog), Librería (Escritos), Batalla naval (Obras), Paneles (Galería). La cámara viaja por las puertas y rodea la mesa central.
 - Detector de impeccable: sin hallazgos.
 
+### Versión 2 (pedidos de Frix, 17/11/2026)
+- Sin cartel arriba (ni nombre de la sala ni capítulos de Usogui).
+- Blog: imágenes en la viñeta con formato de tablón (Archivo:, miniatura a la izquierda, clic para agrandar). En el artifact no cargan las de tenor/Google (el artifact bloquea imágenes de otros sitios); en el sitio real sí.
+- Viñeta ampliable: doble clic, botón arriba a la derecha o Esc. Deja ver el 3D a los lados.
+- Modo oscuro: botón de luna en la tira; las salas pasan a tinta en negativo.
+- Galería: rondas de 6 paneles A–F que se dan vuelta; botones de ronda; en la viñeta ampliada se ven todas. Ejemplo con 24 imágenes dibujadas.
+- Obras: cada obra es un disparo (hundida = completada, tocada = en curso/pausa, agua = abandonada, apuntada = planeada). Flota al fondo de la mesa: un barco por tipo, una pieza por obra hasta 5. Ejemplo con 34 obras.
+- Cubo escondido en la Librería (estante del fondo, tabla de abajo): abre el Diario y desbloquea el formato cubo (el sitio como cubo de Rubik, una cara por sección; el Diario es la sexta cara). Se recuerda en localStorage.
+- Ideas para después: sala propia de Usogui como otro easter egg.
+
 ## Siguiente paso
 1. Que Frix lo recorra y diga qué cambiar.
 2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.
