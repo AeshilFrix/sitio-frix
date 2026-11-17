@@ -1,0 +1,803 @@
+<title>Casa de juego de Frix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root {
+    /* Lienzo 3D a pantalla completa; cartel de la sala arriba a la izquierda, viñeta de contenido a la derecha, tira de salas abajo */
+    --papel: #fbfaf6;
+    --tinta: #141312;
+    --tenue: #5b5751;
+    --linea: #d8d3c8;
+    --bermellon: #e0362c;
+    --cobalto: #2747c8;
+    --ocre: #d4921a;
+    --turquesa: #108f84;
+    --magenta: #c4236c;
+    --sala: var(--bermellon);
+    --f-rotulo: "Dela Gothic One", "Noto Sans CJK JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+    --f-texto: "Zen Kaku Gothic New", "Noto Sans CJK JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+    --borde: 3px;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--papel); color: var(--tinta); font: 15px/1.65 var(--f-texto); overflow: hidden; }
+  ::selection { background: var(--sala); color: var(--papel); }
+  :focus-visible { outline: 3px solid var(--sala); outline-offset: 3px; }
+  a { color: var(--tinta); text-decoration-color: var(--sala); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--sala); }
+
+  #mundo { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  #mundo.arrastra { cursor: grabbing; }
+  #mundo.sobre { cursor: pointer; }
+
+  .cartel { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px));
+    max-width: min(440px, calc(100vw - 32px)); background: var(--papel); border: var(--borde) solid var(--tinta); padding: 10px 18px 12px; }
+  .cartel h1 { margin: 0; font: 400 clamp(30px, 3.4vw, 46px)/1.05 var(--f-rotulo); letter-spacing: -0.01em; text-wrap: balance; }
+  .cartel h1 .k { color: var(--sala); margin-right: 0.22em; }
+  .cartel p { margin: 6px 0 0; font-size: 13px; line-height: 1.4; color: var(--tenue); }
+
+  .vineta { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(104px + env(safe-area-inset-bottom, 0px)); width: min(410px, 34vw); background: var(--papel); border: var(--borde) solid var(--tinta);
+    overflow-y: auto; padding: 18px 20px 24px; scrollbar-width: thin; scrollbar-color: var(--tinta) transparent;
+    transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+  .vineta.sale { opacity: 0; transform: translateY(8px); }
+  .vineta::-webkit-scrollbar { width: 8px; }
+  .vineta::-webkit-scrollbar-thumb { background: var(--tinta); }
+  .vineta h2 { margin: 0 0 10px; font: 400 24px/1.15 var(--f-rotulo); text-wrap: balance; }
+  .vineta h3 { margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 2px solid var(--tinta); font: 700 15px/1.3 var(--f-texto); }
+  .vineta p { margin: 0 0 10px; }
+  .tenue { color: var(--tenue); font-size: 13px; }
+  .frase { margin: 12px 0; padding: 10px 12px; background: var(--tinta); color: var(--papel); font-weight: 500; }
+
+  .lista { list-style: none; margin: 0; padding: 0; }
+  .lista li + li { border-top: 1px solid var(--linea); }
+  .lista button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; width: 100%; padding: 8px 2px; cursor: pointer; }
+  .lista button:focus-visible { outline: 3px solid var(--sala); outline-offset: 1px; }
+  .lista .f { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; padding-top: 2px; }
+  .lista b { display: block; font-weight: 700; line-height: 1.35; }
+  .lista small { font-size: 12px; color: var(--tenue); }
+  .lista button:hover b { text-decoration: underline 2px var(--sala); text-underline-offset: 3px; }
+  .bitacora { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .bitacora li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding: 5px 0; }
+  .bitacora .f { color: var(--tenue); font-variant-numeric: tabular-nums; }
+
+  .boton { all: unset; box-sizing: border-box; display: inline-block; cursor: pointer; padding: 9px 16px; background: var(--tinta); color: var(--papel); font: 700 14px/1.2 var(--f-texto);
+    transition: background-color 0.15s ease-out, transform 0.1s ease-out; }
+  .boton:hover { background: var(--sala); }
+  .boton:active { transform: translateY(1px); }
+  .boton:disabled { opacity: 0.5; cursor: default; }
+  .fila { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 6px; }
+
+  .post { border: 2px solid var(--tinta); padding: 10px 12px 12px; margin-bottom: 12px; scroll-margin: 12px; }
+  .post.marcado { outline: 3px solid var(--sala); outline-offset: 3px; }
+  .post header { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; margin-bottom: 6px; }
+  .post .asunto { font-weight: 700; font-size: 16px; }
+  .post .meta { font-size: 12px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+  .post .cuerpo { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .post .cita { color: var(--sala); }
+  .post .img { font-size: 12px; color: var(--tenue); margin: 8px 0 0; }
+
+  .capitulo p { margin: 0 0 12px; font-size: 15.5px; line-height: 1.8; }
+  .volver { all: unset; cursor: pointer; font-size: 13px; font-weight: 700; margin-bottom: 10px; display: inline-block; }
+  .volver:hover { color: var(--sala); }
+
+  table.obras { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.obras th { text-align: left; font-size: 12px; color: var(--tenue); font-weight: 500; border-bottom: 2px solid var(--tinta); padding: 4px 6px; }
+  table.obras td { border-bottom: 1px solid var(--linea); padding: 7px 6px; }
+  table.obras td.n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  table.obras tr.marcado td { background: color-mix(in srgb, var(--sala) 16%, var(--papel)); }
+
+  .tira { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 10px; align-items: stretch;
+    padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+  .tira > * { pointer-events: auto; }
+  .marca { display: grid; place-items: center; padding: 0 16px; background: var(--tinta); color: var(--papel); font: 400 26px/1 var(--f-rotulo); }
+  .salas { display: flex; gap: 8px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .sala-btn { all: unset; box-sizing: border-box; flex: none; cursor: pointer; display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: stretch; width: 172px; height: 66px;
+    background: var(--papel); border: var(--borde) solid var(--tinta); transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1); }
+  .sala-btn .k { display: grid; place-items: center; background: var(--c); color: var(--papel); border-right: var(--borde) solid var(--tinta); font: 400 27px/1 var(--f-rotulo); }
+  .sala-btn .t { padding: 9px 12px; line-height: 1.2; min-width: 0; }
+  .sala-btn .t b { display: block; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sala-btn .t span { font-size: 12px; color: var(--tenue); white-space: nowrap; }
+  .sala-btn:hover { transform: translateY(-2px); }
+  .sala-btn[aria-current="page"] { background: var(--c); }
+  .sala-btn[aria-current="page"] .t b, .sala-btn[aria-current="page"] .t span { color: var(--papel); }
+  .sala-btn:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+  .ayuda { align-self: center; margin: 0; padding: 6px 10px; background: var(--papel); border: 2px solid var(--tinta); font-size: 12px; line-height: 1.35; color: var(--tenue); white-space: nowrap; }
+  .ayuda kbd { font: 700 12px var(--f-texto); color: var(--tinta); }
+
+  .velocidad { position: fixed; inset: 0; pointer-events: none; opacity: 0;
+    background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 3deg, rgba(20, 19, 18, 0.5) 3deg 3.35deg);
+    -webkit-mask: radial-gradient(closest-side, transparent 62%, #000 100%); mask: radial-gradient(closest-side, transparent 62%, #000 100%); }
+  .aviso3d { position: fixed; left: 16px; top: 140px; max-width: 360px; margin: 0; padding: 10px 14px; background: var(--papel); border: var(--borde) solid var(--tinta); }
+
+  @media (max-width: 760px) {
+    .vineta { left: 12px; right: 12px; width: auto; top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); max-height: 42vh; }
+    .cartel { top: 12px; left: 12px; padding: 8px 12px; }
+    .cartel h1 { font-size: 26px; }
+    .marca, .ayuda { display: none; }
+    .sala-btn { width: 132px; height: 60px; grid-template-columns: 42px minmax(0, 1fr); }
+    .sala-btn .t { padding: 8px 9px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vineta, .sala-btn, .boton { transition: none; }
+  }
+</style>
+<script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+
+<canvas id="mundo" aria-label="Las salas en 3D. Arrastra para mirar alrededor; haz clic en las mesas y los objetos."></canvas>
+<div class="velocidad" id="velocidad" aria-hidden="true"></div>
+<header class="cartel"><h1 id="sala-nombre"></h1><p id="sala-juego"></p></header>
+<section class="vineta" id="vineta" aria-live="polite"></section>
+<nav class="tira" aria-label="Salas">
+  <span class="marca">Frix</span>
+  <div class="salas" id="salas"></div>
+  <p class="ayuda">Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala</p>
+</nav>
+<p class="aviso3d" id="aviso3d" hidden>Tu navegador no pudo abrir las salas en 3D. El contenido sigue en la viñeta de la derecha.</p>
+
+<script type="application/json" id="datos">{"perfil": {"nombre": "Frix", "lema": {"es": "Todo lo que escribo, sin mentiras.", "en": "Everything I write, without lies."}, "presentacion": {"es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\n", "en": "Hi, I'm Frix. This is where I keep my diary, what I think about what I see and read, and everything I write.\n\n"}, "desde": "2026-11", "frases": [{"es": "Cuando veas una buena jugada, busca una mejor. (Emanuel Lasker)", "en": "When you see a good move, look for a better one. (Emanuel Lasker)"}, {"es": "En esta mesa no se miente.", "en": "No lies at this table."}, {"es": "Cada cara del cubo tiene su orden.", "en": "Every face of the cube has its order."}], "gustos": []}, "blog": [{"id": 1, "fecha": "2026-11-15T14:00", "titulo": {"es": "Prueba rápida y ejemplo  ", "en": "I opened this site"}, "texto": {"es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n", "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"}, "imagen": true}, {"id": 2, "fecha": "2026-11-16T01:16", "titulo": {"es": "Creo que he roto algo", "en": "I think I broke something."}, "texto": {"es": "Si esto funciona god, si no, ptmr", "en": "If this works, thank God. If not, damn it."}, "imagen": true}, {"id": 3, "fecha": "2026-11-16T01:26", "titulo": {"es": "VOLVI", "en": "VOLVI", "manual": true}, "texto": {"es": "# sepa a quien le importaría, pero logre recuperar todo, tampoco es que fuera tan difícil, pero me re complique todo. #FF0000", "en": "# I don't know who would care, but I managed to get everything back. It wasn't that difficult, but I made everything really complicated for myself. #FF0000"}, "imagen": true}], "escritos": [{"id": 1, "titulo": {"es": "El hombre al que todo olvidan. "}, "tipo": "novela", "estado": 1, "actualizado": "2026-11-16", "idioma": "es", "resumen": {"es": ""}, "notas": {"es": ""}, "capitulos": [{"titulo": "La ciudad de cristal", "fecha": "2026-11-16", "html": "<p>Me preguntaba por qué cantaban los pájaros.<\/p><p>Bajé del tren junto a un viejo carpintero que, entre anécdotas de su oficio, me habló de lo difícil que era alejarse de la familia. Tras la partida de su hijo, escuchó lo que sus oídos habían ignorado por años: el canto de los pájaros. Sus historias fueron lo único que hizo soportable aquel viaje de un día. Él, por fin, iba a ver a su hijo después de tanto tiempo. En el centro de la terminal me despedí de él. Su familia lo esperaba; yo acababa de separarme de la mía.<\/p><p>Sobre mi cabeza escuché un chirrido rítmico que subía y bajaba de tono, como un engranaje oxidado girando sin control en lo alto de los postes. Al voltear vi lo que parecía una pequeña esfera viviente montada sobre dos alambres rígidos. Estaba cubierta por capas de hojas blancas, superpuestas como escamas, y de su frente brotaba una aguja de hueso amarillento que se abría en dos cada vez que emitía ese chirrido.<\/p><p>—<i>Qué raros animales tiene la capital.<\/i><\/p><p>Me quedé inmóvil un momento; la gente pasaba a mi lado sin mirarme. Busqué algún paradero que me llevara al centro. Aunque entre tantas personas me era imposible avanzar. Sentado en lo que parecía una cafetín espere que todo se calmara, y ya sea por el cansancio o por la música caí dormido.<\/p>"}]}], "obras": [{"id": 1, "tipo": "manga", "titulo": "Usogui", "anio": 2006, "portada": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/small/bx39982-68LS2Z9075Kw.jpg", "estado": 2, "nota": 10, "fecha": "2026-11-16"}], "cambios": [{"id": 1, "fecha": "2026-11-15", "texto": {"es": "Abrí el sitio: blog, escritos, obras y galería.", "en": "Opened the site: blog, writing, titles and gallery."}}, {"id": 2, "fecha": "2026-11-15", "texto": {"es": "Mis escritos ahora tienen capítulos, subidos desde Tintero.", "en": "My writing now has chapters, uploaded from Tintero."}}, {"id": 3, "fecha": "2026-11-15", "texto": {"es": "Todo se traduce solo al inglés, menos mis historias.", "en": "Everything is translated into English automatically, except my stories."}}, {"id": 4, "fecha": "2026-11-16", "texto": {"es": "Colores en el texto e imágenes que se agrandan con un clic.", "en": "Colored text and images that grow with a click."}}, {"id": 5, "fecha": "2026-11-16", "texto": {"es": "Paneles nuevos: ahora mismo, frase del día, bitácora y fichas.", "en": "New panels: right now, quote of the day, table log and chips."}}, {"id": 6, "fecha": "2026-11-16", "texto": {"es": "Las flechas ← → del teclado pasan de una página a otra.", "en": "The ← → arrow keys move from one page to the next."}}]}</script>
+<script type="module">
+import * as THREE from 'three';
+
+THREE.ColorManagement.enabled = false; // todo se trabaja en sRGB directo, como tinta sobre papel
+
+const D = JSON.parse(document.getElementById('datos').textContent);
+const menos = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = s => document.querySelector(s);
+const tx = o => (o && (o.es || o.en) || '').trim();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fechaCorta = f => { const m = String(f || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}/${m[2]}/${m[1].slice(2)}` : ''; };
+
+const PAPEL = '#fbfaf6', TINTA = '#141312', GRIS = '#c9c4b8';
+const SALAS = [
+  { id: 'inicio', nombre: 'Ruleta', seccion: 'Inicio', kanji: '賭', color: '#e0362c', juego: 'Ruleta del casino ilegal', caps: 'caps. 1–3', dir: null },
+  { id: 'blog', nombre: 'Siete cartas', seccion: 'Blog', kanji: '札', color: '#2747c8', juego: 'Póker de siete cartas', caps: 'caps. 26–31', dir: [-1, 0] },
+  { id: 'escritos', nombre: 'Librería', seccion: 'Escritos', kanji: '書', color: '#d4921a', juego: 'Apuesta de la librería', caps: 'caps. 310–323', dir: [0, -1] },
+  { id: 'obras', nombre: 'Batalla naval', seccion: 'Obras', kanji: '艦', color: '#108f84', juego: 'Batalla Naval', caps: 'caps. 280–309', dir: [1, 0] },
+  { id: 'galeria', nombre: 'Paneles', seccion: 'Galería', kanji: '画', color: '#c4236c', juego: 'Juego maquiavélico', caps: 'caps. 178–204', dir: [0, 1] }
+];
+const sala = id => SALAS.find(s => s.id === id);
+const L = 18, ALTO = 4.6, GROSOR = 0.36, PUERTA = 4.6, DINTEL = 3.9, DIST = 26;
+for (const s of SALAS) s.c = s.dir ? new THREE.Vector3(s.dir[0] * DIST, 0, s.dir[1] * DIST) : new THREE.Vector3();
+
+// ---------- Contenido (viñeta) ----------
+const blog = [...(D.blog || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+const escrito = (D.escritos || [])[0];
+const ESTADO_ESCRITO = { 1: 'Escribiendo', 2: 'Terminado', 3: 'En pausa', 4: 'Abandonado', 5: 'Planeado' };
+const TIPO_ESCRITO = { novela: 'Novela', relato: 'Relato', mundo: 'Mundo', poema: 'Poema', otro: 'Otro' };
+const ESTADO_OBRA = { 1: 'En curso', 2: 'Completado', 3: 'En pausa', 4: 'Abandonado', 5: 'Planeado' };
+const TIPO_OBRA = { anime: 'Anime', manga: 'Manga', pelicula: 'Película', serie: 'Serie', libro: 'Libro', comic: 'Cómic', juego: 'Juego' };
+const numPost = id => 'No.' + String(id).padStart(6, '0');
+
+function jugadas() {
+  const j = blog.map(p => ({ f: p.fecha, tipo: 'Blog', titulo: tx(p.titulo), ir: 'blog', abrir: { post: p.id } }));
+  if (escrito) (escrito.capitulos || []).forEach((c, i) => j.push({ f: c.fecha || escrito.actualizado, tipo: `Capítulo ${i + 1}`, titulo: c.titulo, ir: 'escritos', abrir: { cap: i } }));
+  (D.obras || []).forEach(o => j.push({ f: o.fecha || '', tipo: 'Obra', titulo: o.titulo, ir: 'obras', abrir: { obra: o.titulo } }));
+  return j.sort((a, b) => String(b.f).localeCompare(String(a.f)));
+}
+
+function limpiarHTML(html) {
+  const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+  const ok = new Set(['P', 'EM', 'STRONG', 'B', 'I', 'U', 'BR', 'HR', 'BLOCKQUOTE']);
+  const pasar = n => [...n.childNodes].map(c => c.nodeType === 3 ? esc(c.textContent) : (c.nodeType === 1 ? (ok.has(c.tagName) ? `<${c.tagName.toLowerCase()}>${pasar(c)}</${c.tagName.toLowerCase()}>`.replace(/<(br|hr)><\/(br|hr)>/, '<$1>') : pasar(c)) : '')).join('');
+  return pasar(doc.body);
+}
+const textoPost = t => esc(t).split('\n').map(l => /^&gt;/.test(l) ? `<span class="cita">${l}</span>` : l).join('\n').trim();
+
+const VISTAS = {
+  inicio() {
+    const p = D.perfil || {}, frases = (p.frases || []).map(tx).filter(Boolean);
+    const frase = frases.length ? frases[new Date().getDate() % frases.length] : '';
+    return `<h2>Sobre mí</h2>
+      <p>${esc(tx(p.presentacion))}</p>
+      ${frase ? `<p class="frase">${esc(frase)}</p>` : ''}
+      <div class="fila"><button class="boton" id="girar" type="button">Girar la ruleta</button><span class="tenue">Te lleva a algo al azar.</span></div>
+      <h3>Últimas jugadas</h3>
+      <ol class="lista">${jugadas().slice(0, 6).map((j, i) => `<li><button type="button" data-jugada="${i}"><span class="f">${fechaCorta(j.f)}</span><span><b>${esc(j.titulo)}</b><small>${esc(j.tipo)}</small></span></button></li>`).join('')}</ol>
+      <h3>Bitácora</h3>
+      <ul class="bitacora">${[...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)) || (b.id - a.id)).slice(0, 4).map(c => `<li><span class="f">${fechaCorta(c.fecha)}</span><span>${esc(tx(c.texto))}</span></li>`).join('')}</ul>
+      ${(D.enlaces || []).length ? `<h3>Enlaces</h3><p>${D.enlaces.map(e => `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.nombre)}</a>`).join(' · ')}</p>` : ''}`;
+  },
+  blog() {
+    if (!blog.length) return `<h2>Blog</h2><p>Todavía no hay entradas. Cada una aparece como una carta sobre la mesa.</p>`;
+    return `<h2>Blog</h2><p class="tenue">Cada entrada es una carta boca arriba sobre la mesa. Haz clic en una para ir a ella.</p>
+      ${blog.map(p => `<article class="post" id="post-${p.id}"><header><span class="asunto">${esc(tx(p.titulo))}</span><span class="meta">Frix · ${fechaCorta(p.fecha)} · ${numPost(p.id)}</span></header>
+        <div class="cuerpo">${textoPost(tx(p.texto))}</div>${p.imagen ? '<p class="img">Esta entrada tiene una imagen; se ve en el sitio.</p>' : ''}</article>`).join('')}`;
+  },
+  escritos(cap) {
+    if (!escrito) return `<h2>Escritos</h2><p>Todavía no hay escritos en el estante.</p>`;
+    const caps = escrito.capitulos || [];
+    if (cap != null && caps[cap]) {
+      const c = caps[cap];
+      return `<button class="volver" type="button" data-volver>&larr; Capítulos</button><h2>${esc(c.titulo)}</h2>
+        <p class="tenue">Capítulo ${cap + 1} · ${fechaCorta(c.fecha)}</p><div class="capitulo">${limpiarHTML(c.html)}</div>`;
+    }
+    const meta = [TIPO_ESCRITO[escrito.tipo] || 'Escrito', ESTADO_ESCRITO[escrito.estado] || '', `${caps.length} ${caps.length === 1 ? 'capítulo' : 'capítulos'}`, `actualizado ${fechaCorta(escrito.actualizado)}`].filter(Boolean).join(' · ');
+    return `<h2>${esc(tx(escrito.titulo))}</h2><p class="tenue">${meta}</p>
+      ${tx(escrito.resumen) ? `<p>${esc(tx(escrito.resumen))}</p>` : ''}${tx(escrito.notas) ? `<p>${esc(tx(escrito.notas))}</p>` : ''}
+      <h3>Capítulos</h3><ol class="lista">${caps.map((c, i) => `<li><button type="button" data-cap="${i}"><span class="f">${i + 1}</span><span><b>${esc(c.titulo)}</b><small>${fechaCorta(c.fecha)}</small></span></button></li>`).join('')}</ol>`;
+  },
+  obras(marca) {
+    const o = D.obras || [];
+    if (!o.length) return `<h2>Obras</h2><p>Todavía no hay obras en la cuadrícula.</p>`;
+    return `<h2>Obras</h2><p class="tenue">Cada obra es una casilla de la cuadrícula. Hundida: completada. Tocada: en curso. Agua: abandonada.</p>
+      <table class="obras"><thead><tr><th>Obra</th><th>Tipo</th><th>Estado</th><th>Nota</th></tr></thead><tbody>
+      ${o.map(x => `<tr${marca && marca === x.titulo ? ' class="marcado"' : ''}><td>${esc(x.titulo)}</td><td>${esc(TIPO_OBRA[x.tipo] || x.tipo || '')}</td><td>${esc(ESTADO_OBRA[x.estado] || '')}</td><td class="n">${x.nota ?? '–'}</td></tr>`).join('')}</tbody></table>`;
+  },
+  galeria() {
+    return `<h2>Galería</h2><p>Todavía no subiste imágenes. Cuando subas una desde el panel, queda escondida detrás de un panel con su letra, como en el programa del Juego maquiavélico, y se da vuelta al hacer clic.</p>`;
+  }
+};
+
+// ---------- Tira de salas, cartel y viñeta ----------
+const tira = $('#salas');
+tira.innerHTML = SALAS.map(s => `<button class="sala-btn" type="button" data-sala="${s.id}" style="--c:${s.color}"><span class="k" aria-hidden="true">${s.kanji}</span><span class="t"><b>${s.seccion}</b><span>${s.nombre}</span></span></button>`).join('');
+let actual = sala('inicio'), destino = actual;
+function marcarTira(s) { tira.querySelectorAll('.sala-btn').forEach(b => b.setAttribute('aria-current', b.dataset.sala === s.id ? 'page' : 'false')); }
+function pintarCartel(s) {
+  document.documentElement.style.setProperty('--sala', s.color);
+  $('#sala-nombre').innerHTML = `<span class="k" aria-hidden="true">${s.kanji}</span>${esc(s.nombre)}`;
+  $('#sala-juego').textContent = `${s.seccion} · ${s.juego}, ${s.caps}`;
+  document.title = `${s.seccion} · Casa de juego de Frix`;
+}
+const vineta = $('#vineta');
+function pintarVineta(s, abrir) {
+  const a = abrir || {};
+  vineta.innerHTML = s.id === 'escritos' ? VISTAS.escritos(a.cap) : s.id === 'obras' ? VISTAS.obras(a.obra) : VISTAS[s.id]();
+  vineta.scrollTop = 0;
+  if (a.post != null) { const el = document.getElementById('post-' + a.post); if (el) { el.classList.add('marcado'); el.scrollIntoView({ block: 'start' }); } }
+}
+vineta.addEventListener('click', e => {
+  const j = e.target.closest('[data-jugada]'); if (j) { const x = jugadas()[+j.dataset.jugada]; irA(x.ir, x.abrir); return; }
+  const c = e.target.closest('[data-cap]'); if (c) { pintarVineta(sala('escritos'), { cap: +c.dataset.cap }); return; }
+  if (e.target.closest('[data-volver]')) { pintarVineta(sala('escritos')); return; }
+  if (e.target.closest('#girar')) girar();
+});
+tira.addEventListener('click', e => { const b = e.target.closest('[data-sala]'); if (b) irA(b.dataset.sala); });
+addEventListener('keydown', e => {
+  if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  const i = SALAS.indexOf(destino), n = SALAS[(i + (e.key === 'ArrowRight' ? 1 : -1) + SALAS.length) % SALAS.length];
+  e.preventDefault(); irA(n.id);
+});
+
+// ---------- Escena ----------
+const lienzo = $('#mundo');
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: false, powerPreference: 'high-performance' }); } catch (err) { renderer = null; }
+if (!renderer || !renderer.capabilities.isWebGL2) {
+  $('#aviso3d').hidden = false; lienzo.hidden = true;
+  marcarTira(actual); pintarCartel(actual); pintarVineta(actual);
+  window.irA = id => { const s = sala(id); if (!s) return; actual = destino = s; marcarTira(s); pintarCartel(s); pintarVineta(s); };
+  throw new Error('sin WebGL2');
+}
+const DPR = Math.min(window.devicePixelRatio || 1, 1.75);
+renderer.setPixelRatio(DPR);
+renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(PAPEL);
+const camara = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
+
+// Material de tinta: color plano, sombras en trama de puntos a 45 grados segun la luz
+const U = { tinta: { value: new THREE.Color(TINTA) }, luz: { value: new THREE.Vector3(-0.45, 1, 0.6).normalize() }, celda: { value: 5.2 * DPR } };
+const VS = `
+  varying vec3 vN; varying vec3 vC; varying vec2 vUv;
+  void main() {
+    vec4 p = vec4(position, 1.0); vec3 n = normal;
+    #ifdef USE_INSTANCING
+      p = instanceMatrix * p; n = mat3(instanceMatrix) * n;
+    #endif
+    #ifdef USE_INSTANCING_COLOR
+      vC = instanceColor;
+    #else
+      vC = vec3(1.0);
+    #endif
+    vN = normalize(mat3(modelMatrix) * n); vUv = uv;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * p;
+  }`;
+const FS = `
+  uniform vec3 uColor; uniform vec3 uTinta; uniform vec3 uLuz; uniform float uCelda; uniform float uTrama;
+  uniform sampler2D uMapa; uniform float uUsaMapa; uniform vec2 uRep;
+  varying vec3 vN; varying vec3 vC; varying vec2 vUv;
+  float puntos(vec2 p, float r) {
+    const float k = 0.70710678; vec2 q = mat2(k, -k, k, k) * p / uCelda; vec2 f = fract(q) - 0.5;
+    return 1.0 - smoothstep(r - 0.05, r + 0.05, length(f));
+  }
+  void main() {
+    vec3 base = uColor * vC;
+    if (uUsaMapa > 0.5) { vec4 t = texture2D(uMapa, vUv * uRep); base = mix(base, t.rgb, t.a); }
+    float l = dot(normalize(vN), uLuz) * 0.5 + 0.5;
+    float r = l < 0.24 ? 0.4 : (l < 0.48 ? 0.24 : 0.0);
+    float m = puntos(gl_FragCoord.xy, r) * uTrama;
+    gl_FragColor = vec4(mix(base, uTinta, m * 0.88), 1.0);
+  }`;
+function mat(color = PAPEL, op = {}) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(color) }, uTinta: U.tinta, uLuz: U.luz, uCelda: U.celda, uTrama: { value: op.trama ?? 1 },
+      uMapa: { value: op.mapa || null }, uUsaMapa: { value: op.mapa ? 1 : 0 }, uRep: { value: new THREE.Vector2(op.rep || 1, op.rep || 1) } },
+    vertexShader: VS, fragmentShader: FS, side: op.doble ? THREE.DoubleSide : THREE.FrontSide
+  });
+}
+const M = { papel: mat(PAPEL), tinta: mat(TINTA), gris: mat(GRIS) };
+
+// Texturas dibujadas en canvas (letras de la viñeta: Dela Gothic One y Zen Kaku Gothic New)
+function textura(w, h, dibujar, repetir) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d'); dibujar(ctx, w, h);
+  const t = new THREE.CanvasTexture(cv); t.anisotropy = 8;
+  if (repetir) t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+const ROT = '"Dela Gothic One", "Noto Sans CJK JP", sans-serif', TXT = '"Zen Kaku Gothic New", "Noto Sans CJK JP", sans-serif';
+function envolver(ctx, texto, x, y, ancho, alto, max) {
+  const pal = String(texto).split(/\s+/); let linea = '', n = 0;
+  for (const p of pal) {
+    const prueba = linea ? linea + ' ' + p : p;
+    if (ctx.measureText(prueba).width > ancho && linea) { ctx.fillText(linea, x, y + n * alto); linea = p; n++; if (n >= max - 1) break; }
+    else linea = prueba;
+  }
+  if (linea) ctx.fillText(linea, x, y + n * alto);
+}
+
+const mundo = new THREE.Group(); escena.add(mundo);
+const clicables = [];
+function poner(geo, material, x, y, z, accion) { const m = new THREE.Mesh(geo, material); m.position.set(x, y, z); mundo.add(m); if (accion) { m.userData.accion = accion; clicables.push(m); } return m; }
+const caja = (w, h, d, material, x, y, z, accion) => poner(new THREE.BoxGeometry(w, h, d), material, x, y, z, accion);
+const cil = (rt, rb, h, material, x, y, z, seg = 40) => poner(new THREE.CylinderGeometry(rt, rb, h, seg), material, x, y, z);
+function plano(w, h, material, x, y, z, rx = -Math.PI / 2, ry = 0, accion) { const m = poner(new THREE.PlaneGeometry(w, h), material, x, y, z, accion); m.rotation.set(rx, ry, 0, 'YXZ'); return m; }
+
+const texPiso = () => textura(512, 512, (c, w, h) => {
+  c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.strokeStyle = TINTA; c.lineWidth = 2.5;
+  for (let i = 0; i <= 8; i++) { c.beginPath(); c.moveTo(0, i * 64); c.lineTo(w, i * 64); c.stroke(); }
+  for (let i = 0; i < 8; i++) for (let k = 0; k < 2; k++) { const x = ((i % 2) * 128 + k * 256 + 40) % w; c.beginPath(); c.moveTo(x, i * 64); c.lineTo(x, i * 64 + 64); c.stroke(); }
+}, true);
+const texAlfombra = color => textura(512, 512, (c, w, h) => {
+  c.fillStyle = color; c.fillRect(0, 0, w, h); c.strokeStyle = PAPEL; c.lineWidth = 10; c.strokeRect(26, 26, w - 52, h - 52); c.lineWidth = 4; c.strokeRect(48, 48, w - 96, h - 96);
+});
+
+// Paredes de una sala con puertas en los lados indicados
+function salaCaja(s, puertas) {
+  const { x: cx, z: cz } = s.c, h = L / 2;
+  const piso = plano(L, L, mat(PAPEL, { mapa: texPiso(), rep: 3 }), cx, 0, cz);
+  piso.userData.piso = true;
+  const lado = (eje, fijo, desde, hasta) => {
+    const largo = hasta - desde, medio = (desde + hasta) / 2;
+    if (eje === 'x') caja(largo, ALTO, GROSOR, M.papel, medio, ALTO / 2, fijo); else caja(GROSOR, ALTO, largo, M.papel, fijo, ALTO / 2, medio);
+  };
+  const muro = (eje, fijo, centro, conPuerta) => {
+    if (!conPuerta) { lado(eje, fijo, centro - h - GROSOR / 2, centro + h + GROSOR / 2); return; }
+    lado(eje, fijo, centro - h - GROSOR / 2, centro - PUERTA / 2); lado(eje, fijo, centro + PUERTA / 2, centro + h + GROSOR / 2);
+    if (eje === 'x') caja(PUERTA, ALTO - DINTEL, GROSOR, M.papel, centro, (ALTO + DINTEL) / 2, fijo); else caja(GROSOR, ALTO - DINTEL, PUERTA, M.papel, fijo, (ALTO + DINTEL) / 2, centro);
+  };
+  muro('x', cz - h, cx, puertas.includes('N')); muro('x', cz + h, cx, puertas.includes('S'));
+  muro('z', cx + h, cz, puertas.includes('E')); muro('z', cx - h, cz, puertas.includes('W'));
+}
+function pasillo(s) {
+  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), medio = d.clone().multiplyScalar((L / 2 + DIST - L / 2) / 2), largo = DIST - L, ancho = PUERTA + 0.8;
+  const horizontal = Math.abs(d.x) > 0;
+  plano(horizontal ? largo : ancho, horizontal ? ancho : largo, mat(PAPEL, { mapa: texPiso(), rep: 1.4 }), medio.x, 0.002, medio.z);
+  for (const lado of [-1, 1]) {
+    if (horizontal) caja(largo, ALTO, GROSOR, M.papel, medio.x, ALTO / 2, lado * ancho / 2); else caja(GROSOR, ALTO, largo, M.papel, lado * ancho / 2, ALTO / 2, medio.z);
+  }
+}
+
+// Cartel colgado sobre cada puerta de la sala central
+function cartelPuerta(s) {
+  const t = textura(1024, 256, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.fillStyle = s.color; c.fillRect(0, 0, 256, h);
+    c.fillStyle = PAPEL; c.font = `170px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(s.kanji, 128, h / 2 + 8);
+    c.fillStyle = TINTA; c.textAlign = 'left'; c.font = `84px ${ROT}`; c.fillText(s.nombre, 296, 112);
+    c.font = `500 46px ${TXT}`; c.fillStyle = '#5b5751'; c.fillText(s.seccion, 300, 196);
+    c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16); c.beginPath(); c.moveTo(256, 0); c.lineTo(256, h); c.stroke();
+  });
+  const d = new THREE.Vector3(s.dir[0], 0, s.dir[1]), p = d.clone().multiplyScalar(L / 2 - 0.45);
+  const m = plano(3.8, 0.95, mat(PAPEL, { mapa: t, trama: 0 }), p.x, 4.25, p.z, 0, Math.atan2(-d.x, -d.z), { ir: s.id });
+  caja(4.0, 1.07, 0.12, M.tinta, p.x + d.x * 0.08, 4.25, p.z + d.z * 0.08);
+  return m;
+}
+
+// ---------- Sala central: la ruleta del casino ilegal ----------
+const ROJOS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+let rueda, bola, velRueda = 0.35, anguloBola = 0;
+function construirRuleta() {
+  const s = sala('inicio');
+  salaCaja(s, ['N', 'S', 'E', 'W']);
+  plano(10, 6.4, mat(s.color, { mapa: texAlfombra(s.color), trama: 0 }), 0, 0.01, 0);
+  // Mesa: cuerpo de papel con borde de tinta y paño con el tablero de apuestas
+  const forma = new THREE.Shape(); const W = 7.4, P = 3.4, r = 1.2;
+  forma.moveTo(-W / 2 + r, -P / 2); forma.lineTo(W / 2 - r, -P / 2); forma.quadraticCurveTo(W / 2, -P / 2, W / 2, -P / 2 + r); forma.lineTo(W / 2, P / 2 - r); forma.quadraticCurveTo(W / 2, P / 2, W / 2 - r, P / 2);
+  forma.lineTo(-W / 2 + r, P / 2); forma.quadraticCurveTo(-W / 2, P / 2, -W / 2, P / 2 - r); forma.lineTo(-W / 2, -P / 2 + r); forma.quadraticCurveTo(-W / 2, -P / 2, -W / 2 + r, -P / 2);
+  const cuerpo = poner(new THREE.ExtrudeGeometry(forma, { depth: 0.22, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 2, curveSegments: 18 }), M.papel, 0, 0.98, 0);
+  cuerpo.rotation.x = -Math.PI / 2;
+  caja(1.0, 0.92, 2.0, M.tinta, -2.2, 0.46, 0); caja(1.0, 0.92, 2.0, M.tinta, 2.2, 0.46, 0);
+  const paño = textura(1600, 900, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h);
+    const x0 = 150, y0 = 70, cw = (w - x0 - 60) / 12, ch = 165;
+    c.lineWidth = 6; c.strokeStyle = TINTA; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = s.color; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x0, y0 + ch * 3); c.lineTo(40, y0 + ch * 1.5); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = PAPEL; c.font = `86px ${ROT}`; c.fillText('0', 110, y0 + ch * 1.5);
+    for (let col = 0; col < 12; col++) for (let fila = 0; fila < 3; fila++) {
+      const n = col * 3 + (3 - fila), x = x0 + col * cw, y = y0 + fila * ch;
+      c.strokeRect(x, y, cw, ch); c.fillStyle = ROJOS.has(n) ? s.color : TINTA; c.font = `76px ${ROT}`; c.fillText(String(n), x + cw / 2, y + ch / 2 + 4);
+    }
+    const yd = y0 + ch * 3, docenas = ['1ª 12', '2ª 12', '3ª 12'];
+    docenas.forEach((d, i) => { c.strokeRect(x0 + i * cw * 4, yd, cw * 4, 120); c.fillStyle = TINTA; c.font = `60px ${ROT}`; c.fillText(d, x0 + i * cw * 4 + cw * 2, yd + 62); });
+    const abajo = ['1–18', 'Par', '', '', 'Impar', '19–36'];
+    abajo.forEach((t, i) => {
+      const x = x0 + i * cw * 2, y = yd + 120; c.strokeRect(x, y, cw * 2, 120);
+      if (i === 2 || i === 3) { c.fillStyle = i === 2 ? s.color : TINTA; c.beginPath(); c.moveTo(x + cw, y + 22); c.lineTo(x + cw * 1.6, y + 60); c.lineTo(x + cw, y + 98); c.lineTo(x + cw * 0.4, y + 60); c.closePath(); c.fill(); }
+      else { c.fillStyle = TINTA; c.font = `54px ${ROT}`; c.fillText(t, x + cw, y + 64); }
+    });
+  });
+  plano(4.9, 2.76, mat(PAPEL, { mapa: paño, trama: 0 }), 1.0, 1.27, 0, -Math.PI / 2, 0, { girar: true });
+  // Rueda
+  const aro = textura(1024, 1024, (c, w, h) => {
+    const cx = w / 2, cy = h / 2, R = 500, r2 = 330, n = 38;
+    for (let i = 0; i < n; i++) {
+      const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
+      c.beginPath(); c.moveTo(cx + Math.cos(a0) * r2, cy + Math.sin(a0) * r2); c.arc(cx, cy, R, a0, a1); c.arc(cx, cy, r2, a1, a0, true); c.closePath();
+      c.fillStyle = (i === 0 || i === 19) ? PAPEL : (i % 2 ? s.color : TINTA); c.fill(); c.lineWidth = 5; c.strokeStyle = TINTA; c.stroke();
+      c.save(); c.translate(cx, cy); c.rotate((a0 + a1) / 2 + Math.PI / 2); c.fillStyle = (i === 0 || i === 19) ? TINTA : PAPEL; c.font = `46px ${ROT}`; c.textAlign = 'center';
+      c.fillText(i === 0 ? '0' : i === 19 ? '00' : String(((i * 7) % 36) + 1), 0, -R + 62); c.restore();
+    }
+    c.beginPath(); c.arc(cx, cy, r2, 0, Math.PI * 2); c.fillStyle = PAPEL; c.fill(); c.lineWidth = 8; c.stroke();
+    for (let k = 0; k < 4; k++) { c.save(); c.translate(cx, cy); c.rotate(k * Math.PI / 2); c.beginPath(); c.moveTo(0, -60); c.lineTo(-40, -r2 + 30); c.lineTo(40, -r2 + 30); c.closePath(); c.fillStyle = TINTA; c.fill(); c.restore(); }
+  });
+  cil(1.32, 1.42, 0.36, M.papel, -2.35, 1.31, 0, 56);
+  rueda = new THREE.Group(); rueda.position.set(-2.35, 1.5, 0); mundo.add(rueda);
+  const disco = new THREE.Mesh(new THREE.CircleGeometry(1.2, 64), mat(PAPEL, { mapa: aro, trama: 0 })); disco.rotation.x = -Math.PI / 2; disco.userData.accion = { girar: true }; clicables.push(disco); rueda.add(disco);
+  const torre = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, 0.34, 20), M.tinta); torre.position.y = 0.17; rueda.add(torre);
+  const tapa = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 12), M.tinta); tapa.position.y = 0.36; rueda.add(tapa);
+  bola = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 10), M.papel); bola.position.set(-2.35, 1.56, 0); mundo.add(bola);
+  // Fichas
+  const fichas = [[s.color, 7], [TINTA, 5], [PAPEL, 9], [s.color, 4], [TINTA, 3]];
+  fichas.forEach(([col, n], i) => { for (let k = 0; k < n; k++) cil(0.19, 0.19, 0.055, mat(col), 0.2 + i * 0.62, 1.31 + k * 0.058, 1.05 + (i % 2) * 0.12, 28); });
+  // Taburetes alrededor
+  [[-3, 2.6], [-1, 2.8], [1.2, 2.8], [3.2, 2.6], [-1, -2.8], [1.4, -2.8]].forEach(([x, z]) => { cil(0.42, 0.42, 0.14, M.papel, x, 0.86, z, 32); cil(0.07, 0.1, 0.8, M.tinta, x, 0.4, z, 12); cil(0.34, 0.34, 0.05, M.tinta, x, 0.03, z, 24); });
+  // Lamparas colgantes
+  caja(L + GROSOR, 0.24, 0.32, M.tinta, 0, ALTO + 0.12, 0);
+  for (const x of [-2.2, 1.8]) { poner(new THREE.ConeGeometry(0.85, 0.7, 32, 1, true), mat(TINTA, { doble: true }), x, 3.55, 0); cil(0.025, 0.025, 0.85, M.tinta, x, 4.3, 0, 8); poner(new THREE.SphereGeometry(0.16, 16, 10), mat(PAPEL, { trama: 0 }), x, 3.2, 0); }
+  for (const otra of SALAS) if (otra.dir) cartelPuerta(otra);
+}
+
+// ---------- Blog: la mesa de siete cartas ----------
+function construirCartas() {
+  const s = sala('blog'), { x: cx, z: cz } = s.c;
+  salaCaja(s, ['E']); pasillo(s);
+  plano(9, 9, mat(s.color, { mapa: texAlfombra(s.color), trama: 0 }), cx, 0.01, cz);
+  poner(new THREE.CylinderGeometry(2.55, 2.55, 0.2, 64), [mat(PAPEL), mat(s.color, { trama: 0.6 }), mat(PAPEL)], cx, 1.0, cz);
+  poner(new THREE.TorusGeometry(2.55, 0.13, 14, 80), M.tinta, cx, 1.08, cz).rotation.x = Math.PI / 2;
+  cil(0.35, 0.45, 0.9, M.tinta, cx, 0.45, cz, 24); cil(1.1, 1.1, 0.08, M.tinta, cx, 0.04, cz, 40);
+  const visibles = blog.slice(0, 7), cartas = Array(7).fill(null), desde = Math.floor((7 - visibles.length) / 2);
+  visibles.forEach((p, i) => { cartas[desde + i] = p; });
+  const vc = vista(s).pos.clone().sub(s.c).setY(0).normalize(), lado = V3(-vc.z, 0, vc.x), giroCarta = Math.atan2(vc.x, vc.z);
+  cartas.forEach((p, i) => {
+    const t = textura(512, 712, (c, w, h) => {
+      if (p) {
+        c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.fillStyle = s.color; c.fillRect(0, 0, w, 120);
+        c.fillStyle = PAPEL; c.font = `54px ${ROT}`; c.textAlign = 'left'; c.fillText(numPost(p.id), 36, 82);
+        c.fillStyle = TINTA; c.font = `700 58px ${TXT}`; envolver(c, tx(p.titulo), 36, 220, w - 72, 70, 5);
+        c.font = `500 38px ${TXT}`; c.fillStyle = '#5b5751'; c.fillText(fechaCorta(p.fecha), 36, h - 50);
+      } else {
+        c.fillStyle = s.color; c.fillRect(0, 0, w, h); c.strokeStyle = PAPEL; c.lineWidth = 4;
+        for (let k = -h; k < w + h; k += 34) { c.beginPath(); c.moveTo(k, 0); c.lineTo(k + h, h); c.stroke(); }
+        c.lineWidth = 12; c.strokeRect(34, 34, w - 68, h - 68);
+        c.fillStyle = PAPEL; c.beginPath(); c.arc(w / 2, h / 2, 110, 0, Math.PI * 2); c.fill();
+        c.fillStyle = s.color; c.font = `140px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(s.kanji, w / 2, h / 2 + 6);
+      }
+      c.lineWidth = 14; c.strokeStyle = TINTA; c.strokeRect(7, 7, w - 14, h - 14);
+    });
+    const k = i - 3, pos = s.c.clone().addScaledVector(vc, 0.85 - Math.abs(k) * 0.1).addScaledVector(lado, k * 0.6);
+    plano(0.82, 1.14, mat(PAPEL, { mapa: t, trama: 0 }), pos.x, 1.115 + i * 0.002, pos.z, -Math.PI / 2, giroCarta + k * 0.09, p ? { ir: 'blog', abrir: { post: p.id } } : { ir: 'blog' });
+  });
+  [[-1, 0], [1, 0], [0, -1], [-0.7, -0.7], [0.7, -0.7]].forEach(([dx, dz]) => {
+    const x = cx + dx * 3.4, z = cz + dz * 3.4, ang = Math.atan2(dx, dz);
+    const silla = new THREE.Group(); silla.position.set(x, 0, z); silla.rotation.y = ang; mundo.add(silla);
+    const asiento = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.1, 0.75), M.papel); asiento.position.y = 0.72; silla.add(asiento);
+    const respaldo = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.9, 0.1), M.papel); respaldo.position.set(0, 1.2, 0.33); silla.add(respaldo);
+    for (const [px, pz] of [[-0.3, -0.3], [0.3, -0.3], [-0.3, 0.3], [0.3, 0.3]]) { const pata = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.7, 0.07), M.tinta); pata.position.set(px, 0.35, pz); silla.add(pata); }
+  });
+}
+
+// ---------- Escritos: la librería ----------
+function construirLibreria() {
+  const s = sala('escritos'), { x: cx, z: cz } = s.c;
+  salaCaja(s, ['S']); pasillo(s);
+  plano(7, 5.5, mat(s.color, { mapa: texAlfombra(s.color), trama: 0 }), cx, 0.01, cz + 0.5);
+  // Estantes contra las tres paredes cerradas, llenos de libros
+  const lomos = [];
+  const estante = (x, z, ancho, rotY) => {
+    const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; mundo.add(g);
+    const fondo = new THREE.Mesh(new THREE.BoxGeometry(ancho, 4.0, 0.12), M.papel); fondo.position.set(0, 2.0, -0.42); g.add(fondo);
+    for (const lx of [-ancho / 2, ancho / 2]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.14, 4.0, 0.9), M.papel); l.position.set(lx, 2.0, 0); g.add(l); }
+    for (let k = 0; k < 5; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.1, 0.9), M.papel); b.position.set(0, 0.1 + k * 0.95, 0); g.add(b); }
+    g.updateMatrixWorld();
+    for (let k = 0; k < 4; k++) { let px = -ancho / 2 + 0.12; while (px < ancho / 2 - 0.3) { const ancho1 = 0.11 + Math.random() * 0.12, alto = 0.55 + Math.random() * 0.28; lomos.push({ g, x: px + ancho1 / 2, y: 0.15 + k * 0.95 + alto / 2, w: ancho1, h: alto }); px += ancho1 + (Math.random() < 0.06 ? 0.22 : 0.012); } }
+  };
+  const fondoZ = cz - L / 2 + 0.6;
+  for (const x of [-6, -2, 2, 6]) estante(cx + x, fondoZ, 3.9, 0);
+  for (const z of [-5.2, -1.3, 2.6]) { estante(cx - L / 2 + 0.6, cz + z, 3.7, Math.PI / 2); estante(cx + L / 2 - 0.6, cz + z, 3.7, -Math.PI / 2); }
+  const libros = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 0.62), mat(PAPEL), lomos.length);
+  const colores = [PAPEL, PAPEL, TINTA, s.color, GRIS, PAPEL, TINTA], m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), col = new THREE.Color();
+  lomos.forEach((b, i) => {
+    pos.set(b.x, b.y, 0.05).applyMatrix4(b.g.matrixWorld); b.g.getWorldQuaternion(q); sc.set(b.w, b.h, 1);
+    m4.compose(pos, q, sc); libros.setMatrixAt(i, m4); libros.setColorAt(i, col.set(colores[(i * 7 + Math.floor(i / 3)) % colores.length]));
+  });
+  mundo.add(libros);
+  // Atril con el libro de Frix
+  caja(1.3, 1.05, 0.95, M.papel, cx, 0.52, cz + 1.2);
+  const tapa = escrito ? textura(600, 800, (c, w, h) => {
+    c.fillStyle = s.color; c.fillRect(0, 0, w, h); c.fillStyle = TINTA; c.fillRect(0, h - 150, w, 150);
+    c.fillStyle = TINTA; c.font = `68px ${ROT}`; c.textAlign = 'left'; envolver(c, tx(escrito.titulo), 50, 150, w - 100, 86, 5);
+    c.fillStyle = PAPEL; c.font = `52px ${ROT}`; c.fillText('Frix', 50, h - 58);
+    c.font = `500 36px ${TXT}`; c.textAlign = 'right'; c.fillText(`${(escrito.capitulos || []).length} cap.`, w - 50, h - 62);
+    c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16);
+  }) : null;
+  const libro = poner(new THREE.BoxGeometry(0.9, 0.12, 1.2), [M.papel, M.papel, mat(PAPEL, { mapa: tapa, trama: 0 }), M.papel, M.papel, M.papel], cx, 1.12, cz + 1.2, { ir: 'escritos', abrir: {} });
+  libro.rotation.set(0.32, 0, 0);
+  // Mostrador del librero
+  caja(3.6, 1.05, 1.0, M.papel, cx - 5.2, 0.52, cz + 4.4); caja(3.7, 0.08, 1.1, M.tinta, cx - 5.2, 1.08, cz + 4.4);
+  poner(new THREE.SphereGeometry(0.16, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.tinta, cx - 4.4, 1.12, cz + 4.4);
+  for (let k = 0; k < 5; k++) caja(0.85 - k * 0.05, 0.12, 0.62, mat(k % 2 ? PAPEL : s.color), cx - 6.1, 1.18 + k * 0.125, cz + 4.4);
+}
+
+// ---------- Obras: batalla naval ----------
+let casillaObra = null;
+function construirNaval() {
+  const s = sala('obras'), { x: cx, z: cz } = s.c;
+  salaCaja(s, ['W']); pasillo(s);
+  const obras = D.obras || [];
+  const celdas = obras.map((o, i) => ({ o, col: (2 + i * 3) % 10, fila: (3 + i * 4) % 10 }));
+  const tablero = textura(1100, 1100, (c, w, h) => {
+    c.fillStyle = PAPEL; c.fillRect(0, 0, w, h);
+    const m = 110, t = (w - m - 30) / 10;
+    c.strokeStyle = s.color; c.lineWidth = 3; c.globalAlpha = 0.35;
+    for (let y = m; y < m + t * 10; y += 14) { c.beginPath(); c.moveTo(m, y); c.lineTo(m + t * 10, y); c.stroke(); }
+    c.globalAlpha = 1;
+    celdas.forEach(({ o, col, fila }) => {
+      const x = m + col * t, y = m + fila * t; c.fillStyle = s.color; c.fillRect(x, y, t, t);
+      c.strokeStyle = TINTA; c.lineWidth = 12; const est = Number(o.estado);
+      if (est === 2) { c.beginPath(); c.moveTo(x + 18, y + 18); c.lineTo(x + t - 18, y + t - 18); c.moveTo(x + t - 18, y + 18); c.lineTo(x + 18, y + t - 18); c.stroke(); }
+      else if (est === 1) { c.beginPath(); c.arc(x + t / 2, y + t / 2, t * 0.3, 0, Math.PI * 2); c.stroke(); }
+    });
+    c.strokeStyle = TINTA; c.lineWidth = 4;
+    for (let i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(m + i * t, m); c.lineTo(m + i * t, m + t * 10); c.stroke(); c.beginPath(); c.moveTo(m, m + i * t); c.lineTo(m + t * 10, m + i * t); c.stroke(); }
+    c.lineWidth = 10; c.strokeRect(m, m, t * 10, t * 10);
+    c.fillStyle = TINTA; c.font = `54px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    'ABCDEFGHIJ'.split('').forEach((l, i) => c.fillText(l, m + i * t + t / 2, m / 2));
+    for (let i = 0; i < 10; i++) c.fillText(String(i + 1), m / 2, m + i * t + t / 2);
+  });
+  // Mesa de mando con la cuadricula encima
+  caja(6.6, 0.24, 6.6, M.papel, cx, 1.0, cz); plano(6.2, 6.2, mat(PAPEL, { mapa: tablero, trama: 0 }), cx, 1.125, cz, -Math.PI / 2, 0, { ir: 'obras', abrir: { obra: obras[0] && obras[0].titulo } });
+  for (const [dx, dz] of [[-2.9, -2.9], [2.9, -2.9], [-2.9, 2.9], [2.9, 2.9]]) caja(0.3, 0.9, 0.3, M.tinta, cx + dx, 0.45, cz + dz);
+  // Clavija sobre la casilla de cada obra
+  const t = 6.2 / 11, m = 6.2 * 110 / 1100;
+  celdas.forEach(({ col, fila }) => {
+    const x = cx - 3.1 + m + (col + 0.5) * (6.2 - m - 6.2 * 30 / 1100) / 10, z = cz - 3.1 + m + (fila + 0.5) * (6.2 - m - 6.2 * 30 / 1100) / 10;
+    const p = cil(0.13, 0.13, 0.55, mat(s.color), x, 1.4, z, 20); cil(0.17, 0.17, 0.08, M.tinta, x, 1.7, z, 20); casillaObra = p;
+  });
+  // Barcos de juguete sobre el mar
+  const barco = (x, z, largo, rot) => { const b = caja(largo, 0.22, 0.32, M.tinta, x, 1.25, z); b.rotation.y = rot; const c2 = caja(largo * 0.35, 0.18, 0.22, M.papel, x, 1.44, z); c2.rotation.y = rot; };
+  barco(cx + 1.6, cz - 1.8, 1.6, 0); barco(cx - 1.4, cz + 1.9, 1.1, Math.PI / 2); barco(cx + 2.0, cz + 1.4, 0.9, 0);
+  for (const dz of [-3.7, 3.7]) { const g = new THREE.Group(); mundo.add(g); caja(0.8, 0.1, 0.8, M.papel, cx - 0.5, 0.72, cz + dz); caja(0.8, 0.9, 0.1, M.papel, cx - 0.5, 1.2, cz + dz + Math.sign(dz) * 0.35); }
+}
+
+// ---------- Galería: los paneles del programa ----------
+function construirPaneles() {
+  const s = sala('galeria'), { x: cx, z: cz } = s.c;
+  salaCaja(s, ['N']); pasillo(s);
+  plano(16, 6, mat(s.color, { mapa: texAlfombra(s.color), trama: 0 }), cx, 0.01, cz + 4.6);
+  const fondoZ = cz + L / 2 - 0.5;
+  caja(10.2, 4.3, 0.3, M.tinta, cx, 2.45, fondoZ);
+  'ABCDEF'.split('').forEach((letra, i) => {
+    const t = textura(512, 340, (c, w, h) => {
+      c.fillStyle = s.color; c.fillRect(0, 0, w, h); c.fillStyle = PAPEL; c.font = `230px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(letra, w / 2, h / 2 + 10);
+      c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16);
+    });
+    const col = i % 3, fila = Math.floor(i / 3);
+    plano(3.0, 1.98, mat(PAPEL, { mapa: t, trama: 0 }), cx + 3.25 - col * 3.25, 3.48 - fila * 2.1, fondoZ - 0.2, 0, Math.PI, { ir: 'galeria' });
+  });
+  // Atriles de los concursantes
+  [-3.2, 0, 3.2].forEach((dx, i) => {
+    caja(1.6, 1.15, 0.9, M.papel, cx - dx, 0.58, cz + 1.2);
+    const n = textura(256, 128, (c, w, h) => { c.fillStyle = s.color; c.fillRect(0, 0, w, h); c.fillStyle = PAPEL; c.font = `86px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(i + 1), w / 2, h / 2 + 6); });
+    plano(1.2, 0.6, mat(PAPEL, { mapa: n, trama: 0 }), cx - dx, 0.66, cz + 1.2 - 0.46, 0, Math.PI);
+  });
+}
+
+// ---------- Recorridos ----------
+const ALT_PASO = 2.9;
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+// atras: hacia la puerta; lado: a un costado; miraD: hacia el fondo de la sala
+const ENCUADRE = {
+  blog: { atras: 4.8, lado: 3.6, alto: 8.0, miraD: 0.5, miraY: 0.9 },
+  escritos: { atras: 5.6, lado: 2.4, alto: 5.2, miraD: -0.2, miraY: 1.0 },
+  obras: { atras: 7.4, lado: 2.8, alto: 9.0, miraD: 0.4, miraY: 1.0 },
+  galeria: { atras: 7.0, lado: 0.4, alto: 5.0, miraD: 5.0, miraY: 1.9 }
+};
+function vista(s) {
+  if (!s.dir) return { pos: V3(7.4, 9.8, 8.4), mira: V3(-0.6, 0.8, -0.6) };
+  const e = ENCUADRE[s.id], d = V3(s.dir[0], 0, s.dir[1]), perp = V3(-d.z, 0, d.x);
+  const pos = s.c.clone().addScaledVector(d, -e.atras).addScaledVector(perp, e.lado); pos.y = e.alto;
+  const mira = s.c.clone().addScaledVector(d, e.miraD); mira.y = e.miraY;
+  return { pos, mira };
+}
+const enPasillo = (s, p) => { if (!s.dir) return false; const d = V3(s.dir[0], 0, s.dir[1]), a = p.x * d.x + p.z * d.z; return a > L / 2 - 0.2 && a < DIST - L / 2 + 0.2; };
+function zonaDe(p) {
+  for (const s of SALAS) if (Math.abs(p.x - s.c.x) <= L / 2 && Math.abs(p.z - s.c.z) <= L / 2) return { s, pasillo: false };
+  for (const s of SALAS) if (enPasillo(s, p)) return { s, pasillo: true };
+  return { s: actual, pasillo: false };
+}
+const puertaDentro = s => { const d = V3(s.dir[0], 0, s.dir[1]); return d.multiplyScalar(DIST - L / 2 + 2.2).setY(ALT_PASO); };
+const puertaFuera = s => { const d = V3(s.dir[0], 0, s.dir[1]); return d.multiplyScalar(DIST - L / 2 - 1.4).setY(ALT_PASO); };
+const angulo = s => Math.atan2(s.dir[1], s.dir[0]);
+const enArco = a => V3(Math.cos(a) * 5.6, ALT_PASO + 0.3, Math.sin(a) * 5.6);
+function arco(a0, a1) {
+  let da = a1 - a0; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
+  const pasos = Math.max(1, Math.ceil(Math.abs(da) / (Math.PI / 3.2))), r = [];
+  for (let i = 1; i <= pasos; i++) r.push(enArco(a0 + (da * i) / pasos));
+  return r;
+}
+function ruta(desde, b) {
+  const { s: a, pasillo: enP } = zonaDe(desde), pts = [desde.clone()];
+  if (a === b) { if (enP) pts.push(puertaDentro(a)); pts.push(vista(b).pos); return pts; }
+  let ang;
+  if (a.dir) { if (!enP) pts.push(puertaDentro(a)); pts.push(puertaFuera(a)); pts.push(enArco(angulo(a))); ang = angulo(a); }
+  else { ang = Math.atan2(desde.z, desde.x); pts.push(enArco(ang)); }
+  if (b.dir) { pts.push(...arco(ang, angulo(b))); pts.push(puertaFuera(b), puertaDentro(b)); }
+  else pts.push(V3(Math.cos(ang) * 7.6, 5.2, Math.sin(ang) * 7.6));
+  pts.push(vista(b).pos);
+  return pts;
+}
+
+// ---------- Camara: mirar arrastrando, viajar entre salas ----------
+const mirar = { th: 0, ph: 0, dTh: 0, dPh: 0, r: 1, dR: 0 };
+let objetivo = vista(actual).mira.clone(), base = null, viaje = null, pendiente = null;
+function fijarBase(s) {
+  const v = vista(s), off = v.pos.clone().sub(v.mira);
+  base = { mira: v.mira, r: off.length(), th: Math.atan2(off.x, off.z), ph: Math.asin(off.y / off.length()) };
+  mirar.dTh = mirar.dPh = mirar.dR = 0; objetivo.copy(v.mira);
+}
+fijarBase(actual); camara.position.copy(vista(actual).pos); camara.lookAt(objetivo);
+const suave = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+function irA(id, abrir) {
+  const b = sala(id); if (!b) return;
+  destino = b; marcarTira(b);
+  if (b === actual && !viaje) { pintarVineta(b, abrir); return; }
+  const curva = new THREE.CatmullRomCurve3(ruta(camara.position, b), false, 'centripetal', 0.5);
+  const largo = curva.getLength();
+  vineta.classList.add('sale');
+  if (menos) { // sin recorrido: corte directo
+    camara.position.copy(vista(b).pos); llegar(b, abrir); return;
+  }
+  const dir = new THREE.Vector3(); camara.getWorldDirection(dir);
+  viaje = { curva, b, abrir, t0: performance.now(), dur: Math.min(3.6, Math.max(1.7, largo / 10.5)) * 1000, miraIni: camara.position.clone().addScaledVector(dir, 6) };
+}
+window.irA = irA;
+function llegar(b, abrir) {
+  viaje = null; actual = b; fijarBase(b); pintarCartel(b); pintarVineta(b, abrir);
+  requestAnimationFrame(() => vineta.classList.remove('sale'));
+  $('#velocidad').style.opacity = 0;
+}
+
+// Arrastrar para mirar; clic sin arrastre para usar los objetos
+let arrastre = null;
+const ray = new THREE.Raycaster(), puntero = new THREE.Vector2();
+function tocado(e) {
+  const r = lienzo.getBoundingClientRect(); puntero.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(puntero, camara); const h = ray.intersectObjects(clicables, false)[0]; return h ? h.object.userData.accion : null;
+}
+lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
+lienzo.addEventListener('pointermove', e => {
+  if (!arrastre) { lienzo.classList.toggle('sobre', !!tocado(e)); return; }
+  const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
+  if (!arrastre.movio && Math.hypot(dx, dy) > 5) { arrastre.movio = true; lienzo.classList.add('arrastra'); }
+  if (arrastre.movio && !viaje) {
+    mirar.dTh = THREE.MathUtils.clamp(mirar.dTh - dx * 0.0055, -0.95, 0.95); mirar.dPh = THREE.MathUtils.clamp(mirar.dPh + dy * 0.004, -0.45, 0.25);
+    arrastre.x = e.clientX; arrastre.y = e.clientY;
+  }
+});
+lienzo.addEventListener('pointerup', e => {
+  const a = arrastre; arrastre = null; lienzo.classList.remove('arrastra');
+  if (a && !a.movio) { const acc = tocado(e); if (acc) { if (acc.girar) girar(); else if (acc.ir) irA(acc.ir, acc.abrir); } }
+});
+lienzo.addEventListener('wheel', e => { e.preventDefault(); mirar.dR = THREE.MathUtils.clamp(mirar.dR + e.deltaY * 0.0008, -0.35, 0.3); }, { passive: false });
+
+// La ruleta gira rapido, se detiene y te lleva a algo al azar
+let giro = null;
+function girar() {
+  const j = jugadas(); if (!j.length) return;
+  const elegida = j[Math.floor(Math.random() * j.length)];
+  const boton = $('#girar'); if (boton) boton.disabled = true;
+  if (menos) { irA(elegida.ir, elegida.abrir); return; }
+  if (actual.id !== 'inicio' || viaje) { irA('inicio'); }
+  giro = { t0: performance.now(), elegida };
+}
+
+// ---------- Tinta: pasada de normales y profundidad para el contorno ----------
+let rtN, rtC;
+const matN = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
+const compuesto = new THREE.ShaderMaterial({
+  uniforms: { tC: { value: null }, tN: { value: null }, tD: { value: null }, uRes: { value: new THREE.Vector2() }, uCerca: { value: camara.near }, uLejos: { value: camara.far }, uGrosor: { value: 1.2 * DPR }, uTinta: U.tinta },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: `
+    uniform sampler2D tC, tN, tD; uniform vec2 uRes; uniform float uCerca, uLejos, uGrosor; uniform vec3 uTinta; varying vec2 vUv;
+    float lin(float z) { return (2.0 * uCerca * uLejos) / (uLejos + uCerca - (z * 2.0 - 1.0) * (uLejos - uCerca)); }
+    float azar(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main() {
+      vec2 px = uGrosor / uRes;
+      vec3 c = texture2D(tC, vUv).rgb, n0 = texture2D(tN, vUv).rgb; float d0 = lin(texture2D(tD, vUv).x);
+      float en = 0.0, ed = 0.0;
+      for (int i = 0; i < 4; i++) {
+        vec2 o = i == 0 ? vec2(px.x, 0.0) : i == 1 ? vec2(-px.x, 0.0) : i == 2 ? vec2(0.0, px.y) : vec2(0.0, -px.y);
+        en += length(texture2D(tN, vUv + o).rgb - n0); ed += abs(lin(texture2D(tD, vUv + o).x) - d0);
+      }
+      float tinta = max(smoothstep(0.5, 0.85, en), smoothstep(0.045, 0.11, ed / d0));
+      float grano = (azar(floor(gl_FragCoord.xy / 1.5)) - 0.5) * 0.03;
+      gl_FragColor = vec4(mix(c, uTinta, tinta) + grano, 1.0);
+    }`
+});
+const escenaQuad = new THREE.Scene(), camQuad = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+escenaQuad.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), compuesto));
+function medir() {
+  const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camara.aspect = w / h; camara.updateProjectionMatrix();
+  const W = Math.floor(w * DPR), H = Math.floor(h * DPR);
+  if (rtN) { rtN.dispose(); rtC.dispose(); }
+  rtN = new THREE.WebGLRenderTarget(W, H, { depthTexture: new THREE.DepthTexture(W, H), depthBuffer: true });
+  rtC = new THREE.WebGLRenderTarget(W, H, { samples: 4 });
+  const vr = vineta.getBoundingClientRect();
+  if (w > 760) camara.setViewOffset(w, h, Math.round((vr.width + 16) / 2), Math.round($('.tira').offsetHeight / 2), w, h); else camara.setViewOffset(w, h, 0, Math.round(vr.height / 2), w, h);
+  compuesto.uniforms.tC.value = rtC.texture; compuesto.uniforms.tN.value = rtN.texture; compuesto.uniforms.tD.value = rtN.depthTexture; compuesto.uniforms.uRes.value.set(W, H);
+}
+addEventListener('resize', medir);
+
+function dibujar() {
+  escena.overrideMaterial = matN; renderer.setRenderTarget(rtN); renderer.render(escena, camara);
+  escena.overrideMaterial = null; renderer.setRenderTarget(rtC); renderer.render(escena, camara);
+  renderer.setRenderTarget(null); renderer.render(escenaQuad, camQuad);
+}
+
+let antes = performance.now();
+const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+function cuadro(ahora) {
+  requestAnimationFrame(cuadro);
+  if (document.hidden) { antes = ahora; return; }
+  const dt = Math.min(0.05, (ahora - antes) / 1000); antes = ahora;
+  if (viaje) {
+    const t = THREE.MathUtils.clamp((ahora - viaje.t0) / viaje.dur, 0, 1), e = suave(t);
+    viaje.curva.getPointAt(e, camara.position);
+    viaje.curva.getPointAt(Math.min(1, e + 0.14), tmp);
+    const fin = vista(viaje.b).mira, w0 = 1 - THREE.MathUtils.smoothstep(t, 0, 0.18), w1 = THREE.MathUtils.smoothstep(t, 0.62, 1);
+    tmp2.copy(tmp).lerp(viaje.miraIni, w0).lerp(fin, w1);
+    camara.lookAt(tmp2);
+    const vel = Math.sin(Math.PI * t);
+    $('#velocidad').style.opacity = (vel * 0.22).toFixed(3);
+    if (t >= 1) llegar(viaje.b, viaje.abrir);
+  } else {
+    const deriva = menos ? 0 : Math.sin(ahora / 4200) * 0.03;
+    const th = base.th + mirar.dTh + deriva, ph = THREE.MathUtils.clamp(base.ph + mirar.dPh, 0.12, 1.25), r = base.r * (1 + mirar.dR);
+    tmp.set(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(r).add(base.mira);
+    camara.position.lerp(tmp, 1 - Math.exp(-dt * 7)); camara.lookAt(base.mira);
+  }
+  // Rueda y bola
+  if (giro) {
+    const g = (ahora - giro.t0) / 1000;
+    velRueda = g < 0.3 ? 0.35 + g * 30 : Math.max(0.35, 9.35 * Math.exp(-(g - 0.3) * 1.6));
+    if (g > 2.1 && !viaje) { const el = giro.elegida; giro = null; const b = $('#girar'); if (b) b.disabled = false; irA(el.ir, el.abrir); }
+  }
+  rueda.rotation.y += dt * velRueda; anguloBola -= dt * velRueda * 1.7;
+  const rb = giro ? 1.05 : 0.86; bola.position.set(-2.35 + Math.cos(anguloBola) * rb, 1.56, Math.sin(anguloBola) * rb);
+  dibujar();
+}
+
+async function empezar() {
+  try { await Promise.race([Promise.all([document.fonts.load(`40px "Dela Gothic One"`), document.fonts.load(`700 40px "Zen Kaku Gothic New"`)]), new Promise(r => setTimeout(r, 2500))]); } catch (err) {}
+  construirRuleta(); construirCartas(); construirLibreria(); construirNaval(); construirPaneles();
+  medir(); marcarTira(actual); pintarCartel(actual); pintarVineta(actual);
+  const h = location.hash.slice(1); if (sala(h) && h !== 'inicio') { const s = sala(h); actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); marcarTira(s); pintarCartel(s); pintarVineta(s); }
+  requestAnimationFrame(cuadro);
+}
+empezar();
+</script>

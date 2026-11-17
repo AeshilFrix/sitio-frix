@@ -1,4 +1,4 @@
-# Dónde quedó el trabajo (16/11/2026, 21:25)
+# Dónde quedó el trabajo (17/11/2026)
 
 ## Hecho y publicado
 - Se quitaron: cursor propio, menú de cartas, brújula, página de Reglas, pañuelos, tema verde.
@@ -12,14 +12,16 @@
 - La transición NO debe ser solo líneas de velocidad: tiene que verse el recorrido de una sala a la otra (la cámara viaja de un lado al otro).
 - Tirada de impeccable: degradada (sin conexión a impeccable.style). Referencia de semilla: seed:af9713ceb703f119.
 
+## Prototipo 3D (17/11/2026)
+- Hecho como artifact privado, sin tocar el sitio en vivo: https://claude.ai/artifact/3xxf5As3aQEVoQ3iBFHupK
+- Código: `prototipo-3d/index.html` (fuera de `public/`, así que no se despliega). Se genera desde una plantilla con los datos de `datos.js` metidos dentro como copia fija.
+- Contrato de dirección: `.impeccable/surfaces/prototipo-3d-index-html.md`.
+- Cinco salas en cruz alrededor de la Ruleta (Inicio): Siete cartas (Blog), Librería (Escritos), Batalla naval (Obras), Paneles (Galería). La cámara viaja por las puertas y rodea la mesa central.
+- Detector de impeccable: sin hallazgos.
+
 ## Siguiente paso
-1. Escribir el contrato de dirección (impeccable new-work, paso 5) y leer reference/craft-floor.md.
-2. Prototipo 3D aparte (sin tocar el sitio en vivo), como artifact privado:
-   - three.js 0.160 (import map desde cdn.jsdelivr.net), sombreado toon + contorno + trama.
-   - Salas: Ruleta (Inicio), Siete cartas (Blog), Librería (Escritos), Batalla naval (Obras), Juego maquiavélico (Galería, puede quedar como "próximamente").
-   - Las salas conectadas en un mismo espacio para que la cámara recorra el camino entre ellas.
-   - Arrastrar para mirar; panel con el contenido real de datos.js.
-3. Mostrarle capturas y el enlace, y que elija antes de publicar.
+1. Que Frix lo recorra y diga qué cambiar.
+2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.
 
 ## Skills usadas (reinstalar en una sesión nueva)
 - npx skills@latest add emilkowalski/skills -g -a claude-code -s '*' -y --copy
