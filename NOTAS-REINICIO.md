@@ -49,9 +49,15 @@
 - Inspiración de Persona 5: títulos de sección como recortes (letras sueltas, tipos y giros mezclados), sala actual inclinada con mancha de tinta dentada, botones de acción en paralelogramo, fila elegida con barra de tinta inclinada, entrada del contenido con barrido en diagonal.
 - Frix dijo que ya lo subiría; falta su visto bueno final para integrarlo al sitio en vivo.
 
+### Versión 6 (17/11/2026) — publicada en el sitio
+- Librería: el atril se cambió por una pantalla con las historias publicadas. Al elegir una, la cámara mira al estante (fondo, derecha, a la altura de los ojos), el libro sale flotando por encima de la pantalla y se posa en la mesa de lectura. Clic al libro: se abre con índice (capítulos, palabras, minutos) y cada capítulo se lee paginado, con hojas que se dan vuelta (← → o los números de página).
+- En la Librería la viñeta lateral se esconde (la pantalla es el menú); queda una pestaña "Escritos en texto" para abrirla.
+- El cubo se puede devolver a su hueco del estante (clic en el hueco o desde el inventario).
+- Sitio real: `public/casa.html` (se genera desde la misma plantilla y lee `datos.js` en vivo). La portada falsa ahora lleva a casa.html; las páginas viejas siguen como versión clásica (enlace en el Inicio 3D y "Salas en 3D" en el menú del avatar).
+- Plantilla y script de armado: scratchpad (`tres/plantilla.html`, `construir.py`). Si se pierde el scratchpad, `prototipo-3d/index.html` es la plantilla con los datos ya metidos.
+
 ## Siguiente paso
-1. Que Frix lo recorra y diga qué cambiar.
-2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.
+- Lo que Frix pida después de probarlo en Neocities: sala propia de Usogui (easter egg), juego de la ruleta, versión en inglés del 3D, música en el 3D.
 
 ## Skills usadas (reinstalar en una sesión nueva)
 - npx skills@latest add emilkowalski/skills -g -a claude-code -s '*' -y --copy

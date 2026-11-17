@@ -108,7 +108,7 @@
       </div>
       <nav class="menu-perfil" id="menu-perfil" hidden>
         <div class="quien">${esc(P.nombre)}</div>
-        <ul>${PAGINAS.map(([href, id, palo, es, en, c]) => `<li><a href="${href}"${id === PAGINA ? ' aria-current="page"' : ''}><span class="palo ${c}">${palo}</span>${t(es, en)}</a></li>`).join('')}</ul>
+        <ul>${PAGINAS.map(([href, id, palo, es, en, c]) => `<li><a href="${href}"${id === PAGINA ? ' aria-current="page"' : ''}><span class="palo ${c}">${palo}</span>${t(es, en)}</a></li>`).join('')}<li><a href="casa.html"><span class="palo">&#9632;</span>${t('Salas en 3D', 'Rooms in 3D')}</a></li></ul>
       </nav>
     </header>`;
   const pie = $('#pie');

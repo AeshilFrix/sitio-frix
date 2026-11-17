@@ -247,6 +247,57 @@
   .ficha.negro { background: var(--tinta); color: var(--papel); }
   .ficha.cero { background: var(--papel); }
   .tira.menu .salas, .tira.menu .marca { visibility: hidden; }
+  body.sin-vineta .acciones { right: 16px; }
+  .pestana { all: unset; box-sizing: border-box; position: fixed; right: 0; top: 40%; padding: 16px 9px; background: var(--papel); color: var(--tinta); border: var(--borde) solid var(--tinta); border-right: 0;
+    writing-mode: vertical-rl; font: 700 13px/1 var(--f-texto); cursor: pointer; }
+  .pestana:hover { background: var(--tinta); color: var(--papel); }
+  .pestana:focus-visible { outline: 3px solid var(--sala); outline-offset: 2px; }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+  .libro { position: fixed; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; perspective: 2400px; --fs: 15px; animation: aparece 0.28s ease-out; }
+  .libro .pag { position: relative; overflow: hidden; background: var(--papel); color: var(--tinta); border: 2px solid var(--tinta); }
+  .libro .pag.izq { border-right-width: 1px; box-shadow: inset -30px 0 26px -26px color-mix(in srgb, var(--tinta) 45%, transparent); }
+  .libro .pag.der { border-left-width: 1px; box-shadow: inset 30px 0 26px -26px color-mix(in srgb, var(--tinta) 45%, transparent); }
+  .hoja { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 1; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.25, 1); }
+  .hoja.adelante { left: 50%; transform-origin: left center; }
+  .hoja.atras { left: 0; transform-origin: right center; }
+  .hoja.adelante.va { transform: rotateY(-180deg); }
+  .hoja.atras.va { transform: rotateY(180deg); }
+  .hoja .cara { position: absolute; inset: 0; backface-visibility: hidden; }
+  .hoja .dorso { transform: rotateY(180deg); }
+  .vista { position: absolute; overflow: hidden; }
+  .flujo { column-fill: auto; font: 400 var(--fs)/1.72 var(--f-texto); color: var(--tinta); }
+  .flujo p { margin: 0 0 0.7em; }
+  .flujo .texto-cap p { margin: 0 0 0.45em; text-indent: 1.3em; }
+  .flujo .texto-cap p:first-child { text-indent: 0; }
+  .flujo .portadilla { text-align: center; padding-top: 10%; }
+  .flujo .portadilla .kanji { font: 400 calc(var(--fs) * 3.4)/1 var(--f-rotulo); color: var(--sala); margin: 0 0 0.3em; }
+  .flujo .portadilla h2 { font: 400 calc(var(--fs) * 1.9)/1.15 var(--f-rotulo); margin: 0 0 0.45em; text-wrap: balance; }
+  .flujo .autor { font-weight: 700; margin-bottom: 1.4em; }
+  .flujo .meta { font-size: 0.82em; color: var(--tenue); margin: 0 0 0.3em; font-variant-numeric: tabular-nums; }
+  .flujo .resumen { text-align: left; margin-top: 1.2em; }
+  .flujo .indice { break-before: column; }
+  .flujo .indice h3 { font: 400 calc(var(--fs) * 1.5)/1.2 var(--f-rotulo); margin: 0 0 0.5em; padding-bottom: 0.3em; border-bottom: 2px solid var(--tinta); }
+  .flujo .indice ol { list-style: none; margin: 0; padding: 0; }
+  .flujo .indice li { break-inside: avoid; border-bottom: 1px solid var(--linea); }
+  .flujo .indice button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 2em minmax(0, 1fr); gap: 0.5em; width: 100%; padding: 0.55em 0.2em; position: relative; isolation: isolate; }
+  .flujo .indice .n { font: 400 1.2em/1.25 var(--f-rotulo); color: var(--sala); }
+  .flujo .indice b { display: block; line-height: 1.35; }
+  .flujo .indice small { color: var(--tenue); font-size: 0.8em; font-variant-numeric: tabular-nums; }
+  .flujo .indice button:hover::before, .flujo .indice button:focus-visible::before { content: ""; position: absolute; inset: 2px -4px; z-index: -1; background: var(--tinta); clip-path: polygon(1.5% 0, 100% 0, 98.5% 100%, 0 100%); }
+  .flujo .indice button:hover b, .flujo .indice button:hover small, .flujo .indice button:hover .n, .flujo .indice button:focus-visible b, .flujo .indice button:focus-visible small { color: var(--papel); }
+  .flujo .cab-cap { break-inside: avoid; margin-bottom: 1.1em; padding-bottom: 0.55em; border-bottom: 2px solid var(--tinta); }
+  .flujo .cab-cap .num { font: 700 0.8em var(--f-texto); color: var(--sala); margin: 0; letter-spacing: 0.04em; }
+  .flujo .cab-cap h2 { font: 400 calc(var(--fs) * 1.75)/1.15 var(--f-rotulo); margin: 0.15em 0 0.3em; text-wrap: balance; }
+  .flujo .fin { text-align: center; color: var(--sala); margin: 1.2em 0; }
+  .flujo .nav-cap { display: flex; flex-direction: column; gap: 0.6em; align-items: flex-start; break-inside: avoid; }
+  .flujo .nav-cap button { all: unset; cursor: pointer; font-weight: 700; text-decoration: underline 2px var(--sala); text-underline-offset: 3px; }
+  .flujo .nav-cap button:hover { color: var(--sala); }
+  .flujo button:focus-visible { outline: 3px solid var(--sala); outline-offset: 2px; }
+  .folio { all: unset; position: absolute; bottom: 7px; z-index: 2; padding: 2px 8px; font: 700 12px/1.4 var(--f-texto); color: var(--tenue); font-variant-numeric: tabular-nums; }
+  .folio.izq { left: 3%; } .folio.der { right: 3%; }
+  .folio:not(:disabled) { cursor: pointer; color: var(--tinta); }
+  .folio:not(:disabled):hover { background: var(--tinta); color: var(--papel); }
+  .folio:focus-visible { outline: 3px solid var(--sala); }
   .aviso3d { position: fixed; left: 16px; top: 140px; max-width: 360px; margin: 0; padding: 10px 14px; background: var(--papel); border: var(--borde) solid var(--tinta); }
 
   @media (max-width: 760px) {
@@ -263,7 +314,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .vineta, .sala-btn, .boton, .icono, #mundo { transition: none; }
-    .contenido.entra { animation: none; }
+    .contenido.entra, .libro { animation: none; }
+    .hoja { transition: none; }
   }
 </style>
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
@@ -284,6 +336,9 @@
   <div class="ranuras" id="ranuras"></div>
   <p id="inv-nota"></p>
 </aside>
+<button class="pestana" id="pestana" type="button" hidden>Escritos en texto</button>
+<div class="libro" id="libro" hidden><div class="pag izq" id="pag-izq"></div><div class="pag der" id="pag-der"></div>
+  <button class="folio izq" id="folio-izq" type="button" data-pasar="-1"></button><button class="folio der" id="folio-der" type="button" data-pasar="1"></button></div>
 <p class="aviso3d" id="aviso3d" hidden>Tu navegador no pudo abrir las salas en 3D. El contenido sigue en la viñeta de la derecha.</p>
 
 <script type="application/json" id="datos">{"perfil": {"nombre": "Frix", "avatar": "", "desde": "2026-11", "lema": {"es": "Todo lo que escribo, sin mentiras.", "en": "Everything I write, without lies."}, "presentacion": {"es": "Hola, soy Frix. Aquí guardo mi diario, lo que pienso sobre lo que veo y leo, y todo lo que escribo.\n\n", "en": "Hi, I'm Frix. This is where I keep my diary, what I think about what I see and read, and everything I write.\n\n"}, "gustos": [], "discord": "1074051356349976727", "frases": [{"es": "Cuando veas una buena jugada, busca una mejor. (Emanuel Lasker)", "en": "When you see a good move, look for a better one. (Emanuel Lasker)"}, {"es": "En esta mesa no se miente.", "en": "No lies at this table."}, {"es": "Cada cara del cubo tiene su orden.", "en": "Every face of the cube has its order."}]}, "blog": [{"id": 1, "fecha": "2026-11-15T14:00", "imagen": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl48i2nW1soWZLD7sflHB74io-t42ChuLxEkArfVX2kQ&s=10", "titulo": {"es": "Prueba rápida y ejemplo  ", "en": "I opened this site"}, "texto": {"es": ">querer una página propia\n>hacerla a mano (A medias)\n\nEsto es una prueba medio x, para esto, en vez de hacer mis trabajos hago esto... Increíble. \n\n", "en": ">Wanting your own page\n>Do it by hand (Halfway)\n\nThis is a half-x test. For this, instead of doing my homework, I'm doing this... Unbelievable. \n\n"}}, {"fecha": "2026-11-16T01:16", "titulo": {"es": "Creo que he roto algo", "en": "I think I broke something."}, "imagen": "https://media.tenor.com/RmHRq5dDMDoAAAAM/misaka-railgun.gif", "texto": {"es": "Si esto funciona god, si no, ptmr", "en": "If this works, thank God. If not, damn it."}, "id": 2}, {"fecha": "2026-11-16T01:26", "titulo": {"es": "VOLVI", "en": "VOLVI", "manual": true}, "imagen": "https://media.tenor.com/0EgQgZWi8WoAAAAM/sigh-yamadakun-and-the-seven-witches.gif", "texto": {"es": "# sepa a quien le importaría, pero logre recuperar todo, tampoco es que fuera tan difícil, pero me re complique todo. #FF0000", "en": "# I don't know who would care, but I managed to get everything back. It wasn't that difficult, but I made everything really complicated for myself. #FF0000"}, "id": 3}], "diario": [{"fecha": "2026-11-15T23:09", "titulo": {"es": "Casi un descuido, o no.", "en": "Almost an oversight, or not."}, "texto": {"es": "Ya casi a final de día sigo sin haberle felicitado a mi amiga [Maricielo] por su cumpleaños. \nLa verdad supe que no me diría nada y tampoco tenía nada preparado, el año pasado falle en mi palabra y no quería volver a mentirle de esas forma, aunque ignorarla todo el día sabiendo que es su cumpleaños sigue siendo horrible. \nNo sabría decir o que me inventaría para \"justificarlo\"\nBueno, al menos me acorde de cuando era.", "en": "It's almost the end of the day, and I still haven't wished my friend [Maricielo] a happy birthday. \nThe truth is, I knew she wouldn't tell me anything, and I hadn't prepared anything either. Last year, I broke my word, and I didn't want to lie to her like that again, even though ignoring her all day knowing it's her birthday is still horrible. \nI wouldn't know what to say or what I would make up to \"justify it.\"\nWell, at least I remembered when it was."}, "id": 1}, {"fecha": "2026-11-16T14:19", "titulo": {"es": "Cero practica", "en": "No practical experience"}, "texto": {"es": "Mañana tengo uno de mi exámenes finales y tuve todo el fin de semana para prepararme, cosa que hice a medias. No me tengo fe para mañana, la única forma que veo ahora para aprobar es no dormir, claro que si, otra vez, crj voy a dañar mi horario de sueño si sigo durmiendo así de mal. \n", "en": "Tomorrow I have one of my final exams, and I had the whole weekend to prepare, which I did half-heartedly. I don't have confidence for tomorrow. The only way I see now to pass is to not sleep. Of course, yes, again. Damn it, I'm going to mess up my sleep schedule if I keep sleeping this badly. \n"}, "id": 2}], "escritos": [{"actualizado": "2026-11-16", "estado": 1, "tipo": "novela", "idioma": "es", "titulo": {"es": "El hombre al que todo olvidan. "}, "version": "", "resumen": {"es": ""}, "notas": {"es": ""}, "texto": {"es": ""}, "id": 1, "capitulos": [{"id": 1, "titulo": "La ciudad de cristal", "fecha": "2026-11-16", "html": "<p>Me preguntaba por qué cantaban los pájaros.<\/p><p>Bajé del tren junto a un viejo carpintero que, entre anécdotas de su oficio, me habló de lo difícil que era alejarse de la familia. Tras la partida de su hijo, escuchó lo que sus oídos habían ignorado por años: el canto de los pájaros. Sus historias fueron lo único que hizo soportable aquel viaje de un día. Él, por fin, iba a ver a su hijo después de tanto tiempo. En el centro de la terminal me despedí de él. Su familia lo esperaba; yo acababa de separarme de la mía.<\/p><p>Sobre mi cabeza escuché un chirrido rítmico que subía y bajaba de tono, como un engranaje oxidado girando sin control en lo alto de los postes. Al voltear vi lo que parecía una pequeña esfera viviente montada sobre dos alambres rígidos. Estaba cubierta por capas de hojas blancas, superpuestas como escamas, y de su frente brotaba una aguja de hueso amarillento que se abría en dos cada vez que emitía ese chirrido.<\/p><p>—<i>Qué raros animales tiene la capital.<\/i><\/p><p>Me quedé inmóvil un momento; la gente pasaba a mi lado sin mirarme. Busqué algún paradero que me llevara al centro. Aunque entre tantas personas me era imposible avanzar. Sentado en lo que parecía una cafetín espere que todo se calmara, y ya sea por el cansancio o por la música caí dormido.<\/p>"}]}], "obras": [{"id": 1, "tipo": "manga", "titulo": "Usogui", "anio": 2006, "portada": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/small/bx39982-68LS2Z9075Kw.jpg", "estado": 2, "nota": 10, "fecha": "2026-11-16"}], "galeria": [], "enlaces": [{"nombre": "MyAnimeList", "url": "https://myanimelist.net/profile/AeshilFrix", "detalle": "AeshilFrix"}, {"nombre": "Anime list", "url": "https://myanimelist.net/animelist/AeshilFrix", "detalle": "MAL"}, {"nombre": "Manga list", "url": "https://myanimelist.net/mangalist/AeshilFrix", "detalle": "MAL"}], "cambios": [{"id": 1, "fecha": "2026-11-15", "texto": {"es": "Abrí el sitio: blog, escritos, obras y galería.", "en": "Opened the site: blog, writing, titles and gallery."}}, {"id": 2, "fecha": "2026-11-15", "texto": {"es": "Mis escritos ahora tienen capítulos, subidos desde Tintero.", "en": "My writing now has chapters, uploaded from Tintero."}}, {"id": 3, "fecha": "2026-11-15", "texto": {"es": "Todo se traduce solo al inglés, menos mis historias.", "en": "Everything is translated into English automatically, except my stories."}}, {"id": 4, "fecha": "2026-11-16", "texto": {"es": "Colores en el texto e imágenes que se agrandan con un clic.", "en": "Colored text and images that grow with a click."}}, {"id": 5, "fecha": "2026-11-16", "texto": {"es": "Paneles nuevos: ahora mismo, frase del día, bitácora y fichas.", "en": "New panels: right now, quote of the day, table log and chips."}}, {"id": 6, "fecha": "2026-11-16", "texto": {"es": "Las flechas ← → del teclado pasan de una página a otra.", "en": "The ← → arrow keys move from one page to the next."}}]}</script>
@@ -292,7 +347,8 @@ import * as THREE from 'three';
 
 THREE.ColorManagement.enabled = false; // todo se trabaja en sRGB directo, como tinta sobre papel
 
-const D = JSON.parse(document.getElementById('datos').textContent);
+const datosEl = document.getElementById('datos');
+const D = Object.assign({ perfil: {}, blog: [], diario: [], escritos: [], obras: [], galeria: [], enlaces: [], cambios: [] }, window.DATOS || (datosEl ? JSON.parse(datosEl.textContent) : {}));
 const menos = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = s => document.querySelector(s);
 const tx = o => (o && (o.es || o.en) || '').trim();
@@ -328,6 +384,7 @@ let estado = 'sala', asiento = null, invAbierto = false, diarioVisto = false;
 // dónde está el cubo: estante (librería), mano (inventario) o mesa (sobre la ruleta)
 let estadoCubo = ['estante', 'mano', 'mesa'].includes(leer('cubo')) ? leer('cubo') : 'estante', asientoCubo = Math.min(5, Math.max(0, +leer('asiento') || 1));
 let girando = false, tiradas = [];
+let libroFuera = null, lectura = null, textoAbierto = false, vinetaOculta = false;
 // El reloj y el calendario cuelgan en una esquina de la sala de la Ruleta; objeto = el que estás mirando de cerca
 let objeto = null, calMes = (() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; })(), calDia = null;
 const dosD = n => String(n).padStart(2, '0');
@@ -347,7 +404,16 @@ let paneles = [], compuesto = null;
 
 // ---------- Contenido (viñeta) ----------
 const blog = [...(D.blog || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
-const escrito = (D.escritos || [])[0];
+const historias = [...(D.escritos || [])].sort((a, b) => String(b.actualizado || '').localeCompare(String(a.actualizado || '')));
+const escrito = historias[0];
+// Una historia sin capítulos pero con texto se lee como un solo capítulo
+const parrafos = t => String(t || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map(x => `<p>${esc(x).replace(/\n/g, '<br>')}</p>`).join('');
+const capsDe = h => h && (h.capitulos || []).length ? h.capitulos : (h && tx(h.texto) ? [{ titulo: tx(h.titulo), fecha: h.actualizado, html: parrafos(tx(h.texto)) }] : []);
+const contarPalabras = html => (new DOMParser().parseFromString(String(html || ''), 'text/html').body.textContent || '').split(/\s+/).filter(Boolean).length;
+const palabrasDe = h => capsDe(h).reduce((n, c) => n + contarPalabras(c.html), 0);
+const minutos = n => Math.max(1, Math.round(n / 200));
+const miles = n => Number(n).toLocaleString('es');
+const metaHistoria = h => { const n = capsDe(h).length; return [TIPO_ESCRITO[h.tipo] || 'Escrito', ESTADO_ESCRITO[h.estado] || '', `${n} ${n === 1 ? 'capítulo' : 'capítulos'}`, `${miles(palabrasDe(h))} palabras`].filter(Boolean).join(' · '); };
 const ESTADO_ESCRITO = { 1: 'Escribiendo', 2: 'Terminado', 3: 'En pausa', 4: 'Abandonado', 5: 'Planeado' };
 const TIPO_ESCRITO = { novela: 'Novela', relato: 'Relato', mundo: 'Mundo', poema: 'Poema', otro: 'Otro' };
 const ESTADO_OBRA = { 1: 'En curso', 2: 'Completado', 3: 'En pausa', 4: 'Abandonado', 5: 'Planeado' };
@@ -379,7 +445,7 @@ function registrarTirada(idx) {
 }
 function jugadas() {
   const j = blog.map(p => ({ f: p.fecha, tipo: 'Blog', titulo: tx(p.titulo), ir: 'blog', abrir: { post: p.id } }));
-  if (escrito) (escrito.capitulos || []).forEach((c, i) => j.push({ f: c.fecha || escrito.actualizado, tipo: `Capítulo ${i + 1}`, titulo: c.titulo, ir: 'escritos', abrir: { cap: i } }));
+  historias.forEach((h, hi) => capsDe(h).forEach((c, i) => j.push({ f: c.fecha || h.actualizado, tipo: `Capítulo ${i + 1}`, titulo: c.titulo, ir: 'escritos', abrir: { hist: hi, cap: i } })));
   (D.obras || []).forEach(o => j.push({ f: o.fecha || '', tipo: 'Obra', titulo: o.titulo, ir: 'obras', abrir: {} }));
   return j.sort((a, b) => String(b.f).localeCompare(String(a.f)));
 }
@@ -475,6 +541,7 @@ const VISTAS = {
       <div><h3 id="ancla-bitacora">Bitácora</h3>
       <ul class="bitacora">${[...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)) || (b.id - a.id)).slice(0, amplia ? 10 : 4).map(c => `<li><span class="f">${fechaCorta(c.fecha)}</span><span>${esc(tx(c.texto))}</span></li>`).join('')}</ul>
       <p><button class="enlace" type="button" data-calendario>Ver la bitácora en el calendario</button></p>
+      ${window.DATOS ? '<p class="tenue"><a href="inicio.html">Ver la versión clásica del sitio</a>, con la música, el contador y en inglés.</p>' : ''}
       ${(D.enlaces || []).length ? `<h3 id="ancla-enlaces">Enlaces</h3><ul class="bitacora">${D.enlaces.map(e => `<li><span class="f">${esc(e.nombre || '')}</span><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(String(e.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))}</a></li>`).join('')}</ul>` : ''}</div></div>`;
   },
   blog() {
@@ -485,17 +552,18 @@ const VISTAS = {
         <div class="cuerpo">${textoPost(tx(p.texto))}</div></article>`).join('')}`;
   },
   escritos(a) {
-    if (!escrito) return `<h2>Escritos</h2><p>Todavía no hay escritos en el estante.</p>`;
-    const caps = escrito.capitulos || [], cap = a.cap;
-    if (cap != null && caps[cap]) {
-      const c = caps[cap];
-      return `<button class="volver" type="button" data-volver>&larr; Capítulos</button><h2>${esc(c.titulo)}</h2>
-        <p class="tenue">Capítulo ${cap + 1} · ${fechaCorta(c.fecha)}</p><div class="capitulo">${limpiarHTML(c.html)}</div>`;
+    if (!historias.length) return `<h2 class="rotulo">Escritos</h2><p>Todavía no hay escritos en el estante.</p>`;
+    const hi = a.hist ?? 0, h = historias[hi], caps = capsDe(h);
+    if (a.cap != null && caps[a.cap]) {
+      const c = caps[a.cap];
+      return `<button class="volver" type="button" data-volver>&larr; Escritos</button><h2>${esc(c.titulo)}</h2>
+        <p class="tenue">${esc(tx(h.titulo))} · Capítulo ${a.cap + 1} · ${fechaCorta(c.fecha)} · ${miles(contarPalabras(c.html))} palabras</p><div class="capitulo">${limpiarHTML(c.html)}</div>`;
     }
-    const meta = [TIPO_ESCRITO[escrito.tipo] || 'Escrito', ESTADO_ESCRITO[escrito.estado] || '', `${caps.length} ${caps.length === 1 ? 'capítulo' : 'capítulos'}`, `actualizado ${fechaCorta(escrito.actualizado)}`].filter(Boolean).join(' · ');
-    return `<h2>${esc(tx(escrito.titulo))}</h2><p class="tenue">${meta}</p>
-      ${tx(escrito.resumen) ? `<p>${esc(tx(escrito.resumen))}</p>` : ''}${tx(escrito.notas) ? `<p>${esc(tx(escrito.notas))}</p>` : ''}
-      <h3>Capítulos</h3><ol class="lista">${caps.map((c, i) => `<li><button type="button" data-cap="${i}"><span class="f">${i + 1}</span><span><b>${esc(c.titulo)}</b><small>${fechaCorta(c.fecha)}</small></span></button></li>`).join('')}</ol>`;
+    const enSala = hay3D && actual && actual.id === 'escritos' && estado !== 'menu';
+    return `<h2 class="rotulo">Escritos</h2>${enSala ? '<p class="tenue">La versión en texto de la pantalla. <button class="enlace" type="button" data-ocultar>Volver a la pantalla</button></p>' : ''}
+      ${historias.map((h, hi) => `<h3>${esc(tx(h.titulo))}</h3><p class="tenue">${metaHistoria(h)}</p>
+        ${tx(h.resumen) ? `<p>${esc(tx(h.resumen))}</p>` : ''}${tx(h.notas) ? `<p>${esc(tx(h.notas))}</p>` : ''}
+        <ol class="lista">${capsDe(h).map((c, i) => `<li><button type="button" data-hist="${hi}" data-cap="${i}"><span class="f">${i + 1}</span><span><b>${esc(c.titulo)}</b><small>${fechaCorta(c.fecha)} · ${miles(contarPalabras(c.html))} palabras</small></span></button></li>`).join('')}</ol>`).join('')}`;
   },
   obras() {
     const lista = obrasLista(), aviso = obrasDemo ? `<p class="ejemplo">Estás viendo ${lista.length} obras de ejemplo para probar cómo se llena el tablero. <button class="enlace" type="button" data-demo-obras>Volver a tus obras</button></p>` : '';
@@ -569,7 +637,15 @@ function mostrar(id, abrir) {
   document.title = `${s.seccion} · Casa de juego de Frix`;
   marcarTira(SALAS.some(x => x.id === id) ? id : (id === 'reloj' || id === 'calendario') ? 'inicio' : id); pintarVineta();
   if (!menos) { contenido.classList.remove('entra'); void contenido.offsetWidth; contenido.classList.add('entra'); }
+  if (id !== 'escritos') textoAbierto = false;
+  actualizarVineta();
 }
+function actualizarVineta() {
+  const o = hay3D && estado !== 'menu' && actual && actual.id === 'escritos' && seccionActual === 'escritos' && !textoAbierto;
+  vineta.hidden = o; $('#pestana').hidden = !o; document.body.classList.toggle('sin-vineta', o);
+  if (o !== vinetaOculta) { vinetaOculta = o; if (hay3D) encuadrar(); }
+}
+$('#pestana').addEventListener('click', () => { textoAbierto = true; actualizarVineta(); pintarVineta(); });
 // Recorte: cada letra en su papelito, con tipos y giros distintos (como los títulos de Persona 5)
 function rotular(h) {
   const texto = h.textContent, r = azarSemilla([...texto].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7));
@@ -596,7 +672,8 @@ contenido.addEventListener('click', e => {
   let b;
   if ((b = q('a.img'))) { e.preventDefault(); const g = b.classList.toggle('grande'); b.setAttribute('aria-expanded', g); return; }
   if ((b = q('[data-jugada]'))) { const x = jugadas()[+b.dataset.jugada]; ir(x.ir, x.abrir); return; }
-  if ((b = q('[data-cap]'))) { mostrar('escritos', { cap: +b.dataset.cap }); return; }
+  if ((b = q('[data-cap]'))) { mostrar('escritos', { hist: +(b.dataset.hist || 0), cap: +b.dataset.cap }); return; }
+  if (q('[data-ocultar]')) { textoAbierto = false; actualizarVineta(); return; }
   if (q('[data-volver]')) { mostrar('escritos'); return; }
   if (q('#girar')) { girar(); return; }
   if (q('[data-demo-gal]')) { galDemo = !galDemo; ronda = 0; galSel = null; if (hay3D) { paneles.forEach((p, i) => voltear(i, false)); pintarRonda(); repintarCara('galeria'); } pintarVineta(true); return; }
@@ -678,7 +755,9 @@ function pintarEstado() {
   const nota = $('#acciones-nota'), bot = $('#acciones-botones'), botones = [];
   let texto = '';
   if (estado === 'cerca') { texto = 'Arrastra para girarlo. Haz clic en una pieza para mover su fila.'; botones.push(['agarrar', 'Agarrar', ''], ['soltar', 'Dejarlo', 'claro']); }
-  else if (estado === 'objeto') { texto = objeto === 'calendario' ? 'Haz clic en un día para ver qué cambió. Las flechas de arriba cambian de mes.' : ''; botones.push(['volver', 'Volver', 'claro']); }
+  else if (estado === 'objeto') { texto = objeto === 'calendario' ? 'Haz clic en un día para ver qué cambió. Las flechas de arriba cambian de mes.' : objeto === 'pantalla' ? 'Elige una historia: su libro sale del estante.' : ''; botones.push(['volver', 'Volver', 'claro']); }
+  else if (estado === 'libro') botones.push(['abrir', 'Abrir el libro', ''], ['devolver', 'Devolver al estante', 'claro'], ['salirLibro', 'Volver', 'claro']);
+  else if (estado === 'leyendo') botones.push(['ant', '‹ Anterior', 'claro'], ['indice', 'Índice', 'claro'], ['sig', 'Siguiente ›', 'claro'], ['cerrarLibro', 'Cerrar el libro', '']);
   else if (estado === 'sentado') {
     if (estadoCubo === 'mano') botones.push(['dejar', 'Dejar el cubo', '']);
     if (estadoCubo === 'mesa' && asientoCubo === asiento) { texto = 'Doble clic en el cubo para abrirlo.'; botones.push(['recoger', 'Recoger el cubo', 'claro']); }
@@ -691,21 +770,27 @@ function pintarEstado() {
   if (estadoCubo !== 'mano' || estado === 'menu') invAbierto = false;
   $('#inventario').hidden = !invAbierto;
   $('#ranuras').innerHTML = Array.from({ length: 8 }, (_, i) => i === 0 && estadoCubo === 'mano' ? `<div class="ranura llena" title="Cubo de pantallas">${ICONO_CUBO}</div>` : '<div class="ranura"></div>').join('');
-  $('#inv-nota').innerHTML = estadoCubo === 'mano' ? `<b>Cubo de pantallas</b>${estado === 'sentado' && actual && actual.id === 'inicio' ? 'Usa Dejar el cubo para ponerlo sobre la ruleta.' : 'Llévalo a la Ruleta, siéntate en un taburete y déjalo en la mesa.'}` : '';
+  $('#inv-nota').innerHTML = estadoCubo === 'mano' ? `<b>Cubo de pantallas</b>${estado === 'sentado' && actual && actual.id === 'inicio' ? 'Usa Dejar el cubo para ponerlo sobre la ruleta.' : 'Llévalo a la Ruleta, siéntate en un taburete y déjalo en la mesa.'}${hay3D && estado === 'sala' && actual && actual.id === 'escritos' ? '<br>O devuélvelo a su hueco: haz clic en el estante o aquí.<br><button class="enlace" type="button" data-accion="estante">Dejarlo en el estante</button>' : ''}` : '';
   $('.tira').classList.toggle('menu', estado === 'menu');
-  $('.ayuda').innerHTML = estado === 'menu' ? 'Arrastra o usa las flechas<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
+  $('.ayuda').innerHTML = estado === 'leyendo' ? '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> pasan de página<br>Esc cierra el libro' : estado === 'libro' ? 'Clic en el libro para abrirlo<br>Esc vuelve a la sala' : estado === 'menu' ? 'Arrastra o usa las flechas<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
 }
 $('#acciones').addEventListener('click', e => {
   const b = e.target.closest('[data-accion]'); if (!b) return;
-  ({ agarrar: agarrarCubo, soltar: () => devolverCubo(false), dejar: dejarCubo, recoger: recogerCubo, levantarse, volver: () => alejarObjeto(false) })[b.dataset.accion]();
+  ({ agarrar: agarrarCubo, soltar: () => devolverCubo(false), dejar: dejarCubo, recoger: recogerCubo, levantarse, volver: () => alejarObjeto(false), abrir: () => abrirLibro(), devolver: devolverLibro, salirLibro: salirDeLibro, ant: () => pasar(-1), sig: () => pasar(1), indice: volverIndice, cerrarLibro })[b.dataset.accion]();
 });
 $('#bolsa').addEventListener('click', () => { invAbierto = !invAbierto; pintarEstado(); });
 $('#cerrar-inv').addEventListener('click', () => { invAbierto = false; pintarEstado(); });
+$('#inventario').addEventListener('click', e => { if (e.target.closest('[data-accion="estante"]')) dejarEnEstante(); });
 
 function ir(id, abrir) {
   if (!seccion(id)) return;
   if (!hay3D) { mostrar(id, abrir); return; }
   if (estado === 'menu') { if (SALAS.some(s => s.id === id) && caraFrente !== id) irCara(id, abrir); else mostrar(id, abrir); return; }
+  if (['libro', 'leyendo', 'animLibro'].includes(estado)) {
+    guardarLibroYa(); estado = 'sala'; pintarEstado();
+    if (sala(id) === actual && !(abrir && abrir.cap != null)) { volar(vista(actual), 800, LIM_SALA); mostrar(id, abrir); return; }
+  }
+  if (id === 'escritos' && abrir && abrir.cap != null && actual.id === 'escritos' && !viaje) { if (estado === 'objeto') alejarObjeto(true); elegirHistoria(abrir.hist ?? 0, abrir.cap); return; }
   if (estado === 'cerca') devolverCubo(true);
   if (estado === 'sentado') { const misma = sala(id) === actual; levantarse(); if (misma) { mostrar(id, abrir); return; } }
   if (estado === 'objeto') { const misma = sala(id) === actual; alejarObjeto(!misma); if (misma) { mostrar(id, abrir); return; } }
@@ -718,12 +803,16 @@ addEventListener('keydown', e => {
     if (galSel != null && seccionActual === 'galeria') { if (hay3D) voltear(galSel % 6, false); galSel = null; pintarVineta(true); }
     else if (amplia) ampliar(false);
     else if (invAbierto) { invAbierto = false; pintarEstado(); }
+    else if (hay3D && estado === 'leyendo') cerrarLibro();
+    else if (hay3D && estado === 'libro') salirDeLibro();
     else if (hay3D && estado === 'menu') cerrarMenu();
     else if (hay3D && estado === 'cerca') devolverCubo(false);
     else if (hay3D && estado === 'sentado') levantarse();
     else if (hay3D && estado === 'objeto') alejarObjeto(false);
     return;
   }
+  if (hay3D && estado === 'leyendo' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); pasar(e.key === 'ArrowRight' ? 1 : -1); return; }
+  if (hay3D && estado === 'animLibro' && /^Arrow/.test(e.key)) { e.preventDefault(); return; }
   if (hay3D && estado === 'menu' && /^Arrow/.test(e.key)) { e.preventDefault(); moverVentana(e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0, e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0); return; }
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
   const id = destino ? destino.id : seccionActual;
@@ -1013,21 +1102,330 @@ function clicCalendario(uv) {
   pintarCalendario3D(); if (seccionActual === 'calendario') pintarVineta(true); else mostrar('calendario');
 }
 const LIM_OBJETO = { th: 0.22, ph0: -0.1, ph1: 0.1, sway: 0, zoom: false };
-const vistaObjeto = id => id === 'reloj'
+const vistaObjeto = id => id === 'pantalla'
+  ? { pos: PANTALLA.centro.clone().addScaledVector(PANTALLA.normal, 2.55).add(new THREE.Vector3(0, 0.05, 0)), mira: PANTALLA.centro.clone() }
+  : id === 'reloj'
   ? { pos: new THREE.Vector3(RELOJ.x, 2.6, PARED_N + 3.3), mira: new THREE.Vector3(RELOJ.x, 2.42, PARED_N) }
   : { pos: new THREE.Vector3(CAL.x, 2.5, PARED_N + 3.2), mira: new THREE.Vector3(CAL.x, 2.3, PARED_N) };
 function acercarObjeto(id) {
   if (viaje || estado === 'menu' || estado === 'cerca') return;
-  if (actual.id !== 'inicio') { irA('inicio'); return; }
-  asiento = null; estado = 'objeto'; objeto = id;
+  const cuarto = id === 'pantalla' ? 'escritos' : 'inicio';
+  if (actual.id !== cuarto) { irA(cuarto); return; }
+  if (['libro', 'animLibro', 'leyendo'].includes(estado)) return;
+  asiento = null; estado = 'objeto'; objeto = id; filaHover = -1;
   volar(vistaObjeto(id), 1100, LIM_OBJETO);
-  mostrar(id); pintarEstado();
+  if (seccion(id)) mostrar(id); pintarEstado();
 }
 function alejarObjeto(sinVuelo) {
   if (estado !== 'objeto') return;
   estado = 'sala'; objeto = null;
-  if (!sinVuelo) { volar(vista(actual), 950, LIM_SALA); mostrar('inicio'); }
+  if (!sinVuelo) { volar(vista(actual), 950, LIM_SALA); mostrar(actual.id); }
+  filaHover = -1; pintarPantallaLib();
   pintarEstado();
+}
+
+// ---------- Librería: pantalla con las historias, sus libros en el estante y la mesa de lectura ----------
+const LIB_W = 0.6, LIB_H = 0.8, LIB_T = 0.065, COLORES_LIBRO = ['#d4921a', TINTA, '#c4236c', '#2747c8', '#108f84', '#e0362c'];
+const QUAT_DE_PIE = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 1, 0)));
+const QUAT_PORTADA = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, -1, 0)));
+let pantallaCv = null, pantallaTex = null, filaHover = -1, pantallaPag = 0, mesaLib = null, librosLib = [], PANTALLA = null, hojaAnim = null;
+const PANT_W = 960, PANT_H = 600, PANT_CAB = 96, PANT_Y0 = 112, PANT_FILA = 84, FILAS_PANT = 5;
+const nombreAutor = () => (D.perfil || {}).nombre || 'Frix';
+function recortar(c, t, max) { let base = String(t || ''), r = base; while (c.measureText(r).width > max && base.length > 3) { base = base.slice(0, -1); r = base.trimEnd() + '…'; } return r; }
+
+// Animaciones sueltas (el libro que vuela, la tapa que se abre)
+const tweens = [];
+function animar(dur, paso, fin, tag) { tweens.push({ t0: performance.now(), dur: menos ? 1 : dur, paso, fin, tag }); }
+function avanzarTweens(ahora) {
+  for (let i = tweens.length - 1; i >= 0; i--) { const t = tweens[i]; if (!t) continue; const k = Math.min(1, (ahora - t.t0) / t.dur); t.paso(k); if (k >= 1) { tweens.splice(i, 1); if (t.fin) t.fin(); } }
+}
+
+function texTapa(h, color) {
+  const claro = color === TINTA;
+  return textura(480, 640, (c, w, hh) => {
+    c.fillStyle = color; c.fillRect(0, 0, w, hh);
+    c.fillStyle = claro ? PAPEL : TINTA; c.font = `58px ${ROT}`; c.textAlign = 'left'; c.textBaseline = 'alphabetic'; envolver(c, tx(h.titulo), 40, 120, w - 80, 72, 5);
+    c.fillStyle = claro ? PAPEL : TINTA; c.fillRect(0, hh - 116, w, 4); c.fillStyle = claro ? PAPEL : TINTA; c.font = `44px ${ROT}`; c.fillText(nombreAutor(), 40, hh - 44);
+    c.font = `500 28px ${TXT}`; c.textAlign = 'right'; const n = capsDe(h).length; c.fillText(`${n} cap.`, w - 40, hh - 48);
+    c.lineWidth = 14; c.strokeStyle = TINTA; c.strokeRect(7, 7, w - 14, hh - 14);
+  });
+}
+function texLomo(h, color) {
+  const claro = color === TINTA;
+  return textura(800, 130, (c, w, hh) => {
+    c.fillStyle = color; c.fillRect(0, 0, w, hh);
+    c.fillStyle = claro ? PAPEL : TINTA; c.textBaseline = 'middle'; c.textAlign = 'left'; c.font = `44px ${ROT}`; c.fillText(recortar(c, tx(h.titulo), w - 210), 34, hh / 2 + 4);
+    c.fillStyle = claro ? PAPEL : TINTA; c.fillRect(w - 140, 0, 140, hh); c.fillStyle = color; c.font = `56px ${ROT}`; c.textAlign = 'center'; c.save(); c.translate(w - 70, hh / 2); c.rotate(Math.PI / 2); c.fillText('書', 0, 4); c.restore();
+    c.lineWidth = 10; c.strokeStyle = TINTA; c.strokeRect(5, 5, w - 10, hh - 10);
+  });
+}
+// Un libro: cerrado es una caja (lomo y portada); abierto son dos mitades unidas por la bisagra del lomo
+function hacerLibro(h, i, estante, px) {
+  const color = COLORES_LIBRO[i % COLORES_LIBRO.length], tapa = texTapa(h, color), mCol = mat(color), mPap = mat(PAPEL, { trama: 0.5 }), mHoja = mat(PAPEL, { trama: 0 });
+  const g = new THREE.Group(); mundo.add(g);
+  const geo = new THREE.BoxGeometry(LIB_W, 2 * LIB_T, LIB_H); geo.translate(LIB_W / 2, LIB_T, 0);
+  const cerrado = new THREE.Mesh(geo, [mPap, mat(color, { mapa: texLomo(h, color), trama: 0 }), mat(color, { mapa: tapa, trama: 0 }), mCol, mPap, mPap]);
+  cerrado.userData.accion = { libro: i }; clicables.push(cerrado); g.add(cerrado);
+  const abierto = new THREE.Group(); abierto.visible = false; g.add(abierto);
+  const hojas = new THREE.BoxGeometry(LIB_W - 0.03, LIB_T - 0.02, LIB_H - 0.04);
+  const atras = new THREE.Mesh(new THREE.BoxGeometry(LIB_W, 0.02, LIB_H), mCol); atras.position.set(LIB_W / 2, 0.01, 0); abierto.add(atras);
+  const der = new THREE.Mesh(hojas, mHoja); der.position.set((LIB_W - 0.03) / 2, (LIB_T + 0.02) / 2, 0); abierto.add(der);
+  const bisagra = new THREE.Group(); bisagra.position.set(0, LIB_T, 0); bisagra.rotation.z = -Math.PI; abierto.add(bisagra);
+  const delante = new THREE.Mesh(new THREE.BoxGeometry(LIB_W, 0.02, LIB_H), mCol); delante.position.set(-LIB_W / 2, -LIB_T + 0.01, 0); bisagra.add(delante);
+  const izq = new THREE.Mesh(hojas, mHoja); izq.position.set(-(LIB_W - 0.03) / 2, -(LIB_T - 0.02) / 2, 0); bisagra.add(izq);
+  const portada = new THREE.Mesh(new THREE.PlaneGeometry(LIB_W, LIB_H), mat(color, { mapa: tapa, trama: 0 })); portada.quaternion.copy(QUAT_PORTADA); portada.position.set(-LIB_W / 2, -LIB_T - 0.002, 0); bisagra.add(portada);
+  estante.updateMatrixWorld();
+  const pos = new THREE.Vector3(px, 2.05 + LIB_H / 2, 0.4).applyMatrix4(estante.matrixWorld), quat = estante.getWorldQuaternion(new THREE.Quaternion()).multiply(QUAT_DE_PIE);
+  g.position.copy(pos); g.quaternion.copy(quat);
+  return { h, i, g, cerrado, abierto, bisagra, posEstante: pos.clone(), quatEstante: quat.clone(), estado: 'estante' };
+}
+function construirPantallaLib(cx, cz) {
+  const g = new THREE.Group(); g.position.set(cx, 0, cz); mundo.add(g);
+  const add = (geo, m, x, y, z, padre = g) => { const me = new THREE.Mesh(geo, m); me.position.set(x, y, z); padre.add(me); return me; };
+  add(new THREE.BoxGeometry(1.4, 0.08, 0.9), M.tinta, 0, 0.04, 0); add(new THREE.BoxGeometry(0.42, 1.05, 0.42), M.papel, 0, 0.6, 0);
+  const marco = new THREE.Group(); marco.position.set(0, 1.85, 0); marco.rotation.x = -0.2; g.add(marco);
+  add(new THREE.BoxGeometry(2.5, 1.66, 0.3), M.papel, 0, 0, 0, marco); add(new THREE.BoxGeometry(2.36, 1.52, 0.02), M.tinta, 0, 0, 0.155, marco);
+  [pantallaCv, pantallaTex] = lienzoTex(PANT_W, PANT_H);
+  const pant = add(new THREE.PlaneGeometry(2.24, 1.4), mat(PAPEL, { mapa: pantallaTex, trama: 0 }), 0, 0, 0.168, marco);
+  pant.userData.accion = { objeto: 'pantalla' }; clicables.push(pant);
+  g.updateMatrixWorld(true);
+  PANTALLA = { centro: pant.getWorldPosition(new THREE.Vector3()), normal: new THREE.Vector3(0, 0, 1).applyQuaternion(pant.getWorldQuaternion(new THREE.Quaternion())) };
+  pintarPantallaLib();
+}
+function pintarPantallaLib() {
+  if (!pantallaCv) return;
+  const c = pantallaCv.getContext('2d'), w = PANT_W, h = PANT_H, oc = sala('escritos').color, pags = Math.max(1, Math.ceil(historias.length / FILAS_PANT));
+  c.fillStyle = TINTA; c.fillRect(0, 0, w, h);
+  c.fillStyle = oc; c.fillRect(0, 0, w, PANT_CAB);
+  c.fillStyle = TINTA; c.textBaseline = 'middle'; c.textAlign = 'left'; c.font = `54px ${ROT}`; c.fillText('書', 30, PANT_CAB / 2 + 3);
+  c.font = `40px ${ROT}`; c.fillText('Historias publicadas', 104, PANT_CAB / 2 + 3);
+  c.textAlign = 'right'; c.font = `700 30px ${TXT}`; c.fillText(String(historias.length), w - 34, PANT_CAB / 2 + 3);
+  historias.slice(pantallaPag * FILAS_PANT, (pantallaPag + 1) * FILAS_PANT).forEach((hh, k) => {
+    const i = pantallaPag * FILAS_PANT + k, y = PANT_Y0 + k * PANT_FILA, activa = i === filaHover || (libroFuera && libroFuera.i === i);
+    if (activa) { c.fillStyle = oc; c.fillRect(18, y, w - 36, PANT_FILA - 8); }
+    c.fillStyle = activa ? TINTA : oc; c.fillRect(30, y + 12, 54, 54);
+    c.fillStyle = activa ? oc : TINTA; c.font = `30px ${ROT}`; c.textAlign = 'center'; c.fillText(String(i + 1).padStart(2, '0'), 57, y + 41);
+    c.textAlign = 'left'; c.fillStyle = activa ? TINTA : PAPEL; c.font = `700 32px ${TXT}`; c.fillText(recortar(c, tx(hh.titulo), w - 160), 104, y + 24);
+    c.font = `500 22px ${TXT}`; c.fillStyle = activa ? TINTA : '#bdb7ab'; c.fillText(recortar(c, metaHistoria(hh), w - 160), 104, y + 58);
+  });
+  c.textAlign = 'center'; c.fillStyle = '#bdb7ab'; c.font = `500 24px ${TXT}`;
+  c.fillText(historias.length ? 'Elige una historia y su libro sale del estante' : 'Todavía no hay historias publicadas', w / 2, h - 40);
+  if (pags > 1) { c.fillStyle = oc; c.font = `48px ${ROT}`; c.fillText('‹', 56, h - 40); c.fillText('›', w - 56, h - 40); c.font = `700 22px ${TXT}`; c.fillText(`${pantallaPag + 1} / ${pags}`, w - 150, h - 40); }
+  c.fillStyle = 'rgba(251, 250, 246, 0.05)'; for (let y = 0; y < h; y += 4) c.fillRect(0, y, w, 1);
+  c.lineWidth = 10; c.strokeStyle = TINTA; c.strokeRect(5, 5, w - 10, h - 10);
+  pantallaTex.needsUpdate = true;
+}
+const filaDe = uv => { if (!uv) return -1; const y = (1 - uv.y) * PANT_H, k = Math.floor((y - PANT_Y0) / PANT_FILA), i = pantallaPag * FILAS_PANT + k; return y >= PANT_Y0 && k < FILAS_PANT && i < historias.length ? i : -1; };
+function clicPantalla(uv) {
+  if (!uv) return;
+  const x = uv.x * PANT_W, y = (1 - uv.y) * PANT_H, pags = Math.max(1, Math.ceil(historias.length / FILAS_PANT));
+  if (y > PANT_H - 80 && pags > 1 && (x < 130 || x > PANT_W - 130)) { pantallaPag = (pantallaPag + (x < 130 ? -1 : 1) + pags) % pags; filaHover = -1; pintarPantallaLib(); return; }
+  const i = filaDe(uv); if (i >= 0) elegirHistoria(i);
+}
+function construirMesaLib(cx, cz) {
+  const T = new THREE.Vector3(cx, 0, cz);
+  caja(2.5, 0.1, 1.6, M.papel, T.x, 0.94, T.z);
+  const paño = textura(512, 330, (c, w, h) => { c.fillStyle = PAPEL; c.fillRect(0, 0, w, h); c.strokeStyle = sala('escritos').color; c.lineWidth = 12; c.strokeRect(18, 18, w - 36, h - 36); c.lineWidth = 4; c.strokeRect(40, 40, w - 80, h - 80); });
+  plano(2.3, 1.45, mat(PAPEL, { mapa: paño, trama: 0 }), T.x, 0.992, T.z);
+  for (const [dx, dz] of [[-1.1, -0.65], [1.1, -0.65], [-1.1, 0.65], [1.1, 0.65]]) caja(0.12, 0.89, 0.12, M.tinta, T.x + dx, 0.445, T.z + dz);
+  mesaLib = { centro: T, y: 0.995 };
+}
+
+// Vistas de la cámara
+const vistaEstanteLib = lib => { const p = lib.posEstante; return { pos: new THREE.Vector3(p.x + 0.8, p.y + 0.6, p.z + 3.0), mira: p.clone().setY(p.y - 0.1) }; };
+const vistaMesaLib = () => { const T = mesaLib.centro; return { pos: new THREE.Vector3(T.x + 0.4, 3.1, T.z + 2.1), mira: new THREE.Vector3(T.x, 1.0, T.z - 0.05) }; };
+function vistaLectura() {
+  const h = innerHeight, w = innerWidth, tg = Math.tan(THREE.MathUtils.degToRad(camara.fov / 2)), tiraH = $('.tira').offsetHeight;
+  const altoDisp = Math.max(240, h - tiraH - 100 - 28), anchoDisp = w - 48;
+  const d = Math.max((LIB_H - 0.04) * h / (altoDisp * 2 * tg), 2 * (LIB_W - 0.03) * h / (anchoDisp * 2 * tg));
+  const porPx = 2 * d * tg / h, dz = ((h / 2 - offY) - (16 + altoDisp / 2)) * porPx, T = mesaLib.centro, inc = 0.1;
+  const mira = new THREE.Vector3(T.x, mesaLib.y + LIB_T, T.z + dz);
+  return { pos: mira.clone().add(new THREE.Vector3(0, Math.cos(inc) * d, Math.sin(inc) * d)), mira };
+}
+const poseMesa = () => ({ pos: new THREE.Vector3(mesaLib.centro.x - LIB_W / 2, mesaLib.y, mesaLib.centro.z), quat: new THREE.Quaternion() });
+const poseEstante = lib => ({ pos: lib.posEstante.clone(), quat: lib.quatEstante.clone() });
+const poseFuera = lib => ({ pos: lib.posEstante.clone().add(new THREE.Vector3(0, 0, 0.55)), quat: lib.quatEstante.clone() });
+// Por encima de la pantalla, para no atravesarla
+const sobrePantalla = (a, b) => new THREE.Vector3((a.x + b.x) / 2, 3.8, PANTALLA.centro.z);
+function moverLibro(lib, a, b, dur, ctrl, fin) {
+  animar(dur, k => {
+    const e = suave(k);
+    if (ctrl) { const u = 1 - e; lib.g.position.set(0, 0, 0).addScaledVector(a.pos, u * u).addScaledVector(ctrl, 2 * u * e).addScaledVector(b.pos, e * e); }
+    else lib.g.position.lerpVectors(a.pos, b.pos, e);
+    lib.g.quaternion.slerpQuaternions(a.quat, b.quat, e);
+  }, fin, 'libro');
+}
+
+// Elegir en la pantalla: la cámara mira al estante, el libro sale flotando y se posa en la mesa
+function elegirHistoria(i, cap) {
+  if (viaje || vuelo || estado === 'animLibro' || estado === 'menu' || estado === 'cerca' || estado === 'leyendo') return;
+  if (actual.id !== 'escritos') { irA('escritos', { hist: i, cap }); return; }
+  const lib = librosLib[i]; if (!lib) return;
+  objeto = null; invAbierto = false;
+  if (libroFuera === lib && lib.estado === 'mesa') {
+    if (cap != null) { abrirLibro(cap); return; }
+    estado = 'libro'; volar(vistaMesaLib(), 800, LIM_OBJETO); pintarEstado(); return;
+  }
+  if (libroFuera) guardarLibroYa();
+  libroFuera = lib; lib.estado = 'saliendo'; estado = 'animLibro'; filaHover = -1; pintarPantallaLib(); pintarEstado();
+  volar(vistaEstanteLib(lib), 850, LIM_FIJO, () => {
+    moverLibro(lib, poseEstante(lib), poseFuera(lib), 420, null, () => {
+      const a = poseFuera(lib), b = poseMesa();
+      moverLibro(lib, a, b, 1400, sobrePantalla(a.pos, b.pos), () => { lib.estado = 'mesa'; estado = 'libro'; pintarEstado(); if (cap != null) abrirLibro(cap); });
+      volar(vistaMesaLib(), 1400, LIM_OBJETO);
+    });
+  });
+}
+function devolverLibro() {
+  if (estado !== 'libro' || !libroFuera) return;
+  const lib = libroFuera; estado = 'animLibro'; lib.estado = 'volviendo'; pintarEstado();
+  const a = { pos: lib.g.position.clone(), quat: lib.g.quaternion.clone() }, b = poseFuera(lib);
+  moverLibro(lib, a, b, 1200, sobrePantalla(a.pos, b.pos), () => moverLibro(lib, b, poseEstante(lib), 380, null, () => { lib.estado = 'estante'; if (libroFuera === lib) libroFuera = null; pintarPantallaLib(); }));
+  volar(vista(actual), 1300, LIM_SALA, () => { estado = 'sala'; pintarEstado(); });
+}
+function salirDeLibro() {
+  if (estado !== 'libro') return;
+  estado = 'sala'; volar(vista(actual), 900, LIM_SALA); pintarEstado();
+}
+function guardarLibroYa() {
+  for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].tag === 'libro') tweens.splice(i, 1);
+  if (hojaAnim) hojaAnim.terminar();
+  $('#libro').hidden = true; lectura = null;
+  const lib = libroFuera; libroFuera = null; if (!lib) return;
+  lib.g.position.copy(lib.posEstante); lib.g.quaternion.copy(lib.quatEstante); lib.abierto.visible = false; lib.cerrado.visible = true; lib.bisagra.rotation.z = -Math.PI; lib.estado = 'estante';
+  pintarPantallaLib();
+}
+
+// Abrir el libro: la tapa gira sobre el lomo, la cámara queda encima y las páginas se leen como texto de verdad
+function abrirLibro(cap) {
+  const lib = libroFuera;
+  if (!lib || lib.estado !== 'mesa' || viaje || vuelo || !['libro', 'sala'].includes(estado)) return;
+  estado = 'animLibro'; invAbierto = false; pintarEstado();
+  lib.cerrado.visible = false; lib.abierto.visible = true; lib.bisagra.rotation.z = -Math.PI;
+  const a = lib.g.position.clone(), b = new THREE.Vector3(mesaLib.centro.x, mesaLib.y, mesaLib.centro.z);
+  animar(800, k => { const e = suave(k); lib.bisagra.rotation.z = -Math.PI * (1 - e); lib.g.position.lerpVectors(a, b, e); }, null, 'libro');
+  volar(vistaLectura(), 1000, LIM_FIJO, () => { lib.estado = 'abierto'; estado = 'leyendo'; lectura = { hist: lib.i, doc: -1, pliego: 0 }; ponerDoc(cap ?? -1); pintarEstado(); });
+}
+function cerrarLibro() {
+  if (estado !== 'leyendo' || !libroFuera) return;
+  if (hojaAnim) hojaAnim.terminar();
+  const lib = libroFuera; $('#libro').hidden = true; lectura = null; estado = 'animLibro'; pintarEstado();
+  const a = lib.g.position.clone(), b = poseMesa().pos;
+  animar(650, k => { const e = suave(k); lib.bisagra.rotation.z = -Math.PI * e; lib.g.position.lerpVectors(a, b, e); }, () => { lib.abierto.visible = false; lib.cerrado.visible = true; lib.estado = 'mesa'; }, 'libro');
+  volar(vistaMesaLib(), 850, LIM_OBJETO, () => { estado = 'libro'; pintarEstado(); });
+}
+
+// Páginas: el texto corre en columnas del tamaño de una página; cada pliego muestra dos
+const G_COL = 48, libroEl = $('#libro'), pagIzq = $('#pag-izq'), pagDer = $('#pag-der');
+function rectLibro() {
+  camara.updateMatrixWorld();
+  const T = mesaLib.centro, y = mesaLib.y + LIB_T, ancho = LIB_W - 0.03, alto = (LIB_H - 0.04) / 2;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const x of [T.x - ancho, T.x + ancho]) for (const z of [T.z - alto, T.z + alto]) {
+    const p = new THREE.Vector3(x, y, z).project(camara), sx = (p.x + 1) / 2 * innerWidth, sy = (1 - p.y) / 2 * innerHeight;
+    x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+  }
+  return { x: Math.round(x0), y: Math.round(y0), w: Math.round(x1 - x0), h: Math.round(y1 - y0) };
+}
+const htmlIndice = hi => {
+  const h = historias[hi], caps = capsDe(h), pal = palabrasDe(h), meta = [TIPO_ESCRITO[h.tipo] || 'Escrito', ESTADO_ESCRITO[h.estado] || ''].filter(Boolean).join(' · ');
+  return `<div class="portadilla"><p class="kanji" aria-hidden="true">書</p><h2>${esc(tx(h.titulo))}</h2><p class="autor">${esc(nombreAutor())}</p>
+    <p class="meta">${meta}</p><p class="meta">${caps.length} ${caps.length === 1 ? 'capítulo' : 'capítulos'} · ${miles(pal)} palabras · ${minutos(pal)} min de lectura</p>
+    ${h.actualizado ? `<p class="meta">Actualizado el ${fechaLarga(h.actualizado).toLowerCase()}</p>` : ''}
+    ${tx(h.resumen) ? `<p class="resumen">${esc(tx(h.resumen))}</p>` : ''}${tx(h.notas) ? `<p class="resumen">${esc(tx(h.notas))}</p>` : ''}</div>
+    <div class="indice"><h3>Índice</h3><ol>${caps.map((c, i) => { const n = contarPalabras(c.html); return `<li><button type="button" data-cap="${i}"><span class="n">${i + 1}</span><span><b>${esc(c.titulo)}</b><small>${fechaCorta(c.fecha)} · ${miles(n)} palabras · ${minutos(n)} min</small></span></button></li>`; }).join('') || '<li><p>Todavía no tiene capítulos.</p></li>'}</ol></div>`;
+};
+const htmlCapitulo = (hi, ci) => {
+  const caps = capsDe(historias[hi]), c = caps[ci], n = contarPalabras(c.html), sig = caps[ci + 1];
+  return `<header class="cab-cap"><p class="num">Capítulo ${ci + 1}</p><h2>${esc(c.titulo)}</h2><p class="meta">${fechaCorta(c.fecha)} · ${miles(n)} palabras · ${minutos(n)} min</p></header>
+    <div class="texto-cap">${limpiarHTML(c.html)}</div><p class="fin" aria-hidden="true">◆</p>
+    <div class="nav-cap">${sig ? `<button type="button" data-cap="${ci + 1}">Siguiente: ${esc(sig.titulo)} &rsaquo;</button>` : ''}<button type="button" data-indice>Volver al índice</button></div>`;
+};
+function maquetar(html) {
+  const r = rectLibro();
+  Object.assign(libroEl.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
+  libroEl.style.setProperty('--fs', `${THREE.MathUtils.clamp(r.w / 2 / 31, 12.5, 17).toFixed(1)}px`);
+  libroEl.hidden = false;
+  const pad = Math.round(r.w / 2 * 0.085);
+  Object.assign(lectura, { html, pad, cw: pagIzq.clientWidth - 2 * pad, ch: pagIzq.clientHeight - 2 * pad - 20 });
+  // Medir cuántas columnas ocupa: una marca al final dice en qué columna terminó el texto
+  const v = document.createElement('div'); v.className = 'vista'; v.style.visibility = 'hidden';
+  const f = flujo(0); f.insertAdjacentHTML('beforeend', '<span data-fin></span>'); v.appendChild(f); pagIzq.appendChild(v);
+  const dx = f.querySelector('[data-fin]').getBoundingClientRect().left - f.getBoundingClientRect().left;
+  lectura.nCols = Math.max(1, Math.floor(dx / (lectura.cw + G_COL)) + 1); v.remove();
+}
+function flujo(col) {
+  const f = document.createElement('div'); f.className = 'flujo'; f.innerHTML = lectura.html;
+  Object.assign(f.style, { width: lectura.cw + 'px', height: lectura.ch + 'px', columnWidth: lectura.cw + 'px', columnGap: G_COL + 'px', transform: col ? `translateX(${-col * (lectura.cw + G_COL)}px)` : '' });
+  return f;
+}
+function vistaCol(col) {
+  const v = document.createElement('div'); v.className = 'vista';
+  Object.assign(v.style, { left: lectura.pad + 'px', top: lectura.pad + 'px', width: lectura.cw + 'px', height: lectura.ch + 'px' });
+  if (col >= 0 && col < lectura.nCols) v.appendChild(flujo(col)); else v.setAttribute('aria-hidden', 'true');
+  return v;
+}
+const pliegos = () => Math.ceil(lectura.nCols / 2);
+function pintarFolios() {
+  const p = lectura.pliego, fi = $('#folio-izq'), fd = $('#folio-der'), hay = 2 * p + 2 <= lectura.nCols;
+  fi.textContent = p > 0 ? `‹ ${2 * p + 1}` : String(2 * p + 1); fi.disabled = p === 0; fi.setAttribute('aria-label', 'Página anterior');
+  fd.textContent = p + 1 < pliegos() ? `${2 * p + 2} ›` : (hay ? String(2 * p + 2) : ''); fd.disabled = p + 1 >= pliegos(); fd.setAttribute('aria-label', 'Página siguiente');
+}
+function pintarPliego() { const p = lectura.pliego; pagIzq.replaceChildren(vistaCol(2 * p)); pagDer.replaceChildren(vistaCol(2 * p + 1)); pintarFolios(); }
+// La hoja que se da vuelta: por delante la página que se va, por detrás la que llega
+function voltearHoja(dir, frenteEl, dorsoEl, fin) {
+  if (hojaAnim) hojaAnim.terminar();
+  const hoja = document.createElement('div'), frente = document.createElement('div'), dorso = document.createElement('div');
+  hoja.className = 'hoja ' + (dir > 0 ? 'adelante' : 'atras'); hoja.setAttribute('aria-hidden', 'true');
+  frente.className = 'pag cara ' + (dir > 0 ? 'der' : 'izq'); dorso.className = 'pag cara dorso ' + (dir > 0 ? 'izq' : 'der');
+  frente.appendChild(frenteEl); dorso.appendChild(dorsoEl); hoja.append(frente, dorso); libroEl.appendChild(hoja);
+  let listo = false;
+  const terminar = () => { if (listo) return; listo = true; hoja.remove(); hojaAnim = null; if (lectura) fin(); };
+  hojaAnim = { terminar };
+  if (menos) { terminar(); return; }
+  requestAnimationFrame(() => requestAnimationFrame(() => hoja.classList.add('va')));
+  hoja.addEventListener('transitionend', terminar, { once: true }); setTimeout(terminar, 900);
+}
+function pasar(dir) {
+  if (!lectura) return;
+  if (hojaAnim) hojaAnim.terminar();
+  const p = lectura.pliego, n = p + dir; if (n < 0 || n >= pliegos()) return;
+  lectura.pliego = n; pintarFolios();
+  if (dir > 0) { const fr = vistaCol(2 * p + 1), dr = vistaCol(2 * n); pagDer.replaceChildren(vistaCol(2 * n + 1)); voltearHoja(1, fr, dr, pintarPliego); }
+  else { const fr = vistaCol(2 * p), dr = vistaCol(2 * n + 1); pagIzq.replaceChildren(vistaCol(2 * n)); voltearHoja(-1, fr, dr, pintarPliego); }
+}
+function ponerDoc(doc, voltear) {
+  if (hojaAnim) hojaAnim.terminar();
+  const viejoIzq = pagIzq.firstChild, viejoDer = pagDer.firstChild;
+  lectura.doc = doc; lectura.pliego = 0;
+  maquetar(doc < 0 ? htmlIndice(lectura.hist) : htmlCapitulo(lectura.hist, doc));
+  if (!voltear || !viejoDer) { pintarPliego(); return; }
+  if (voltear > 0) { pagDer.replaceChildren(vistaCol(1)); voltearHoja(1, viejoDer, vistaCol(0), pintarPliego); }
+  else { pagIzq.replaceChildren(vistaCol(0)); voltearHoja(-1, viejoIzq, vistaCol(1), pintarPliego); }
+  pintarFolios();
+}
+const volverIndice = () => { if (lectura && lectura.doc >= 0) ponerDoc(-1, -1); else if (lectura && lectura.pliego) { lectura.pliego = 1; pasar(-1); } };
+libroEl.addEventListener('click', e => {
+  if (!lectura) return;
+  const b = e.target.closest('[data-cap], [data-indice], [data-pasar]'); if (!b) return;
+  if (b.dataset.pasar) pasar(+b.dataset.pasar);
+  else if (b.hasAttribute('data-indice')) volverIndice();
+  else ponerDoc(+b.dataset.cap, 1);
+});
+function relayoutLibro() {
+  if (estado !== 'leyendo' || !lectura) return;
+  const v = vistaLectura(); vuelo = null; fijarVista(v, LIM_FIJO); camara.position.copy(v.pos); camara.lookAt(v.mira);
+  const frac = lectura.pliego / Math.max(1, pliegos());
+  maquetar(lectura.html); lectura.pliego = Math.min(pliegos() - 1, Math.round(frac * pliegos())); pintarPliego();
+}
+
+// El cubo vuelve a su hueco del estante
+function dejarEnEstante() {
+  if (estadoCubo !== 'mano' || estado !== 'sala' || actual.id !== 'escritos' || viaje || vuelo) return;
+  estadoCubo = 'estante'; guardar('cubo', 'estante'); invAbierto = false;
+  cubito.grupo.quaternion.identity(); cubito.grupo.position.y = 0; cuboGiro.dur = 0;
+  soporteCubo.position.copy(frenteCamara(0.9, 0, -0.25)); soporteCubo.scale.setScalar(0.3); soporteCubo.visible = true;
+  moverCubo(ESTANTE, 900, 0.2); pintarEstado();
 }
 
 // ---------- Blog: la mesa de siete cartas ----------
@@ -1086,8 +1484,11 @@ function construirLibreria() {
     return g;
   };
   const fondoZ = cz - L / 2 + 0.6;
-  let estanteCubo = null;
-  for (const x of [-6, -2, 2, 6]) { const g = estante(cx + x, fondoZ, 3.9, 0); if (x === -2) estanteCubo = g; }
+  let estanteCubo = null, estanteHist = null;
+  for (const x of [-6, -2, 2, 6]) { const g = estante(cx + x, fondoZ, 3.9, 0); if (x === -2) estanteCubo = g; if (x === 2) estanteHist = g; }
+  // Las historias publicadas: a la altura de los ojos, en el estante del fondo a la derecha
+  const finHist = -1.75 + 0.15 + historias.length * 0.17;
+  for (let i = lomos.length - 1; i >= 0; i--) { const b = lomos[i]; if (b.g === estanteHist && b.y > 2.0 && b.y < 2.95 && b.x < finHist + 0.1) lomos.splice(i, 1); }
   // El cubo escondido: en la tabla de abajo, entre los libros
   for (let i = lomos.length - 1; i >= 0; i--) { const b = lomos[i]; if (b.g === estanteCubo && Math.abs(b.x - 0.9) < 0.42 && b.y < 1.0) lomos.splice(i, 1); }
   ESTANTE = { pos: new THREE.Vector3(cx - 2 + 0.9, 0.15 + 0.24, fondoZ + 0.04), rotY: 0.5 };
@@ -1099,17 +1500,8 @@ function construirLibreria() {
     m4.compose(pos, q, sc); libros.setMatrixAt(i, m4); libros.setColorAt(i, col.set(colores[(i * 7 + Math.floor(i / 3)) % colores.length]));
   });
   mundo.add(libros);
-  // Atril con el libro de Frix
-  caja(1.3, 1.05, 0.95, M.papel, cx, 0.52, cz + 1.2);
-  const tapa = escrito ? textura(600, 800, (c, w, h) => {
-    c.fillStyle = s.color; c.fillRect(0, 0, w, h); c.fillStyle = TINTA; c.fillRect(0, h - 150, w, 150);
-    c.fillStyle = TINTA; c.font = `68px ${ROT}`; c.textAlign = 'left'; envolver(c, tx(escrito.titulo), 50, 150, w - 100, 86, 5);
-    c.fillStyle = PAPEL; c.font = `52px ${ROT}`; c.fillText('Frix', 50, h - 58);
-    c.font = `500 36px ${TXT}`; c.textAlign = 'right'; c.fillText(`${(escrito.capitulos || []).length} cap.`, w - 50, h - 62);
-    c.lineWidth = 16; c.strokeStyle = TINTA; c.strokeRect(8, 8, w - 16, h - 16);
-  }) : null;
-  const libro = poner(new THREE.BoxGeometry(0.9, 0.12, 1.2), [M.papel, M.papel, mat(PAPEL, { mapa: tapa, trama: 0 }), M.papel, M.papel, M.papel], cx, 1.12, cz + 1.2, { ir: 'escritos', abrir: {} });
-  libro.rotation.set(0.32, 0, 0);
+  librosLib = historias.map((h, i) => hacerLibro(h, i, estanteHist, -1.75 + 0.15 + 0.13 + i * 0.17));
+  construirPantallaLib(cx, cz - 1.5); construirMesaLib(cx, cz + 1.15);
   // Mostrador del librero
   caja(3.6, 1.05, 1.0, M.papel, cx - 5.2, 0.52, cz + 4.4); caja(3.7, 0.08, 1.1, M.tinta, cx - 5.2, 1.08, cz + 4.4);
   poner(new THREE.SphereGeometry(0.16, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.tinta, cx - 4.4, 1.12, cz + 4.4);
@@ -1461,6 +1853,7 @@ const cuboGiro = { desde: new THREE.Quaternion(), hacia: new THREE.Quaternion(),
 const ALZA = 0.24;
 let ventana = { cara: 'inicio', qx: 0, qy: 0 };
 function crearCubo() {
+  const hueco = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.62, 0.62), M.papel); hueco.visible = false; hueco.position.copy(ESTANTE.pos); hueco.userData.accion = { hueco: true }; mundo.add(hueco); clicables.push(hueco);
   cubito = hacerCubo(0.48); soporteCubo = new THREE.Group(); soporteCubo.add(cubito.grupo); mundo.add(soporteCubo);
   cubito.piezas.forEach(p => { p.userData.accion = { cubo: true }; clicables.push(p); });
   if (estadoCubo === 'mesa') { const d = puntoMesa(asientoCubo); soporteCubo.position.copy(d.pos); soporteCubo.rotation.y = d.rotY; return; }
@@ -1598,7 +1991,7 @@ const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 // atras: hacia la puerta; lado: a un costado; miraD: hacia el fondo de la sala
 const ENCUADRE = {
   blog: { atras: 4.8, lado: 3.6, alto: 8.0, miraD: 0.5, miraY: 0.9 },
-  escritos: { atras: 5.6, lado: 2.4, alto: 5.2, miraD: -0.2, miraY: 1.0 },
+  escritos: { atras: 6.3, lado: 2.2, alto: 5.0, miraD: 0.35, miraY: 1.35 },
   obras: { atras: 7.4, lado: 2.8, alto: 9.0, miraD: 0.4, miraY: 1.0 },
   galeria: { atras: 7.0, lado: 0.4, alto: 5.0, miraD: 5.0, miraY: 1.9 }
 };
@@ -1658,6 +2051,7 @@ function volar(v, dur, lim, fin) {
 
 function irA(id, abrir) {
   const b = sala(id === 'diario' ? 'escritos' : id); if (!b) return;
+  if (libroFuera && b !== actual) { guardarLibroYa(); if (['libro', 'leyendo', 'animLibro'].includes(estado)) { estado = 'sala'; pintarEstado(); } }
   vuelo = null; destino = b; marcarTira(id);
   if (b === actual && !viaje) { fijarBase(b); mostrar(id, abrir); return; }
   const curva = new THREE.CatmullRomCurve3(ruta(camara.position, b), false, 'centripetal', 0.5);
@@ -1672,6 +2066,7 @@ function irA(id, abrir) {
 window.irA = irA;
 function llegar(b, id, abrir) {
   viaje = null; actual = b; fijarBase(b); mostrar(id, abrir);
+  if (id === 'escritos' && abrir && abrir.cap != null) setTimeout(() => elegirHistoria(abrir.hist ?? 0, abrir.cap), menos ? 0 : 250);
   requestAnimationFrame(() => vineta.classList.remove('sale'));
   $('#velocidad').style.opacity = 0;
 }
@@ -1688,14 +2083,15 @@ function tocaCubo() {
 function tocado(e) {
   apuntar(e);
   if (estado === 'menu' || estado === 'cerca') return tocaCubo();
-  const h = ray.intersectObjects(clicables, false).find(x => !(x.object.userData.accion && x.object.userData.accion.cubo) || soporteCubo.visible);
+  if (estado === 'animLibro' || estado === 'leyendo') return null;
+  const h = ray.intersectObjects(clicables, false).find(x => { const a = x.object.userData.accion || {}; if (a.cubo && !soporteCubo.visible) return false; if (a.hueco && !(estadoCubo === 'mano' && estado === 'sala')) return false; return true; });
   return h ? { ...h.object.userData.accion, uv: h.uv } : null;
 }
 const enCubo = () => estado === 'menu' || estado === 'cerca';
 const girandoCubo = () => estado === 'cerca';
 lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
 lienzo.addEventListener('pointermove', e => {
-  if (!arrastre) { const t = tocado(e); lienzo.classList.toggle('sobre', !!t); lienzo.classList.toggle('salir', estado === 'menu' && !t); return; }
+  if (!arrastre) { const t = tocado(e); if (estado === 'objeto' && objeto === 'pantalla') { const f = t && t.objeto === 'pantalla' ? filaDe(t.uv) : -1; if (f !== filaHover) { filaHover = f; pintarPantallaLib(); } } lienzo.classList.toggle('sobre', !!t && !(t.objeto === 'pantalla' && estado === 'objeto' && objeto === 'pantalla' && filaHover < 0)); lienzo.classList.toggle('salir', estado === 'menu' && !t); return; }
   const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
   if (!arrastre.movio && Math.hypot(dx, dy) > 5) { arrastre.movio = true; lienzo.classList.add('arrastra'); }
   if (!arrastre.movio) return;
@@ -1727,12 +2123,14 @@ lienzo.addEventListener('pointerup', e => {
     if (!a.movio && !vuelo && !cubito.giro) { const t = tocado(e); if (t && t.pieza) girarCapa(cubito, 'y', Math.round(t.pieza.position.y / cubito.paso), Math.random() < 0.5 ? 1 : -1, 260); }
     return;
   }
-  if (a.movio) return;
+  if (a.movio || estado === 'animLibro' || estado === 'leyendo') return;
   const acc = tocado(e); if (!acc) return;
   if (acc.girar) girar();
   else if (acc.cubo) { if (estadoCubo === 'estante') acercarCubo(); }
   else if (acc.tema) $('#tema').click();
-  else if (acc.objeto) { if (estado === 'objeto' && objeto === 'calendario' && acc.objeto === 'calendario') clicCalendario(acc.uv); else acercarObjeto(acc.objeto); }
+  else if (acc.objeto) { if (estado === 'objeto' && objeto === acc.objeto && acc.objeto === 'calendario') clicCalendario(acc.uv); else if (estado === 'objeto' && objeto === 'pantalla' && acc.objeto === 'pantalla') clicPantalla(acc.uv); else acercarObjeto(acc.objeto); }
+  else if (acc.libro != null) { if (libroFuera && libroFuera.i === acc.libro && libroFuera.estado === 'mesa') abrirLibro(); else if (estado === 'sala' || estado === 'objeto') { if (estado === 'objeto') { estado = 'sala'; objeto = null; } elegirHistoria(acc.libro); } }
+  else if (acc.hueco) dejarEnEstante();
   else if (acc.sentarse != null) { objeto = null; sentarse(acc.sentarse); }
   else if (acc.panel != null) tocarPanel(acc.panel);
   else if (acc.rondaSig) { if (actual.id === 'galeria' && !viaje) cambiarRonda(ronda + 1); else ir('galeria'); }
@@ -1780,7 +2178,7 @@ let offX = 0, offXMeta = 0, offY = 0, anchoNormal = 0;
 function aplicarOffset() { camara.setViewOffset(innerWidth, innerHeight, Math.round(offX), offY, innerWidth, innerHeight); }
 function encuadrar(inmediato) {
   const w = innerWidth;
-  if (w > 760) { offXMeta = amplia ? 0 : Math.round(((anchoNormal || Math.min(410, w * 0.34) + 46) + 16) / 2); offY = Math.round($('.tira').offsetHeight / 2); }
+  if (w > 760) { offXMeta = amplia || vinetaOculta ? 0 : Math.round(((anchoNormal || Math.min(410, w * 0.34) + 46) + 16) / 2); offY = Math.round($('.tira').offsetHeight / 2); }
   else { offXMeta = 0; offY = amplia ? 0 : Math.round(vineta.getBoundingClientRect().height / 2); }
   if (inmediato || menos) { offX = offXMeta; aplicarOffset(); }
   else if (w <= 760) aplicarOffset();
@@ -1792,8 +2190,9 @@ function medir() {
   if (rtN) { rtN.dispose(); rtC.dispose(); }
   rtN = new THREE.WebGLRenderTarget(W, H, { depthTexture: new THREE.DepthTexture(W, H), depthBuffer: true });
   rtC = new THREE.WebGLRenderTarget(W, H, { samples: 4 });
-  if (!amplia) anchoNormal = vineta.getBoundingClientRect().width;
+  if (!amplia && !vineta.hidden) anchoNormal = vineta.getBoundingClientRect().width;
   encuadrar(true);
+  relayoutLibro();
   compuesto.uniforms.tC.value = rtC.texture; compuesto.uniforms.tN.value = rtN.texture; compuesto.uniforms.tD.value = rtN.depthTexture; compuesto.uniforms.uRes.value.set(W, H);
 }
 addEventListener('resize', medir);
@@ -1829,7 +2228,7 @@ function cuadro(ahora) {
     tmp.set(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(r).add(base.mira);
     camara.position.lerp(tmp, 1 - Math.exp(-dt * 7)); camara.lookAt(base.mira);
   }
-  actualizarReloj();
+  actualizarReloj(); avanzarTweens(ahora);
   // Ruleta: la rueda gira, la bola corre en contra, frena y cae en una casilla
   if (giro) {
     const g = (ahora - giro.t0) / 1000;
@@ -1874,7 +2273,7 @@ async function empezar() {
   if (s !== actual) { actual = destino = s; camara.position.copy(vista(s).pos); fijarBase(s); }
   mostrar(ini, ini === seccionActual ? ultima : {}); pintarEstado();
   setInterval(() => repintarPantalla('inicio', 1), 20000);
-  window.prueba = { ir, ampliar, girar, acercarObjeto, alejarObjeto, clicCalendario, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
+  window.prueba = { elegirHistoria, abrirLibro, cerrarLibro, pasar, ponerDoc: d => ponerDoc(d, 1), dejarEnEstante, get lectura() { return lectura && { pliego: lectura.pliego, nCols: lectura.nCols }; }, ir, ampliar, girar, acercarObjeto, alejarObjeto, clicCalendario, acercarCubo, agarrarCubo, sentarse, dejarCubo, abrirMenu, cerrarMenu, irCara, tocarPantalla, elegirImagen, get estado() { return estado; } };
   requestAnimationFrame(cuadro);
 }
 empezar();
