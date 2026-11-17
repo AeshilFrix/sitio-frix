@@ -38,6 +38,11 @@
 - Se recuerda dónde quedó el cubo (estante, mano o mesa) en localStorage.
 - Pendiente: sala propia de Usogui (otro easter egg); profundizar el juego de la ruleta; otras pantallas posibles para el cubo (visitas, música, Discord).
 
+### Versión 4 (17/11/2026)
+- El cubo se ve como un cubo de Rubik normal (solo colores) en el estante, en la mano y sobre la mesa. Las pantallas se encienden solo al abrir el menú y se apagan al salir.
+- En el menú el cubo flota sobre la mesa para no atravesarla al girar.
+- Zoom real: la cámara queda muy cerca y se ven 4 pantallas grandes (una ventana de 2x2 de la cara); las demás quedan cortadas y en la esquina asoma la mesa. Flechas o arrastrar para moverse; al pasar el borde se dobla a la cara vecina. Clic en la mesa o Esc para salir.
+
 ## Siguiente paso
 1. Que Frix lo recorra y diga qué cambiar.
 2. Si lo aprueba: integrarlo al sitio (decidir si reemplaza las páginas o las envuelve), que lea `datos.js` en vivo, versión en inglés, versión simple para teléfono, y escribir DESIGN.md con los tokens finales.

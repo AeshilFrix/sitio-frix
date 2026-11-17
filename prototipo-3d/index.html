@@ -616,7 +616,7 @@ function pintarEstado() {
   $('#ranuras').innerHTML = Array.from({ length: 8 }, (_, i) => i === 0 && estadoCubo === 'mano' ? `<div class="ranura llena" title="Cubo de pantallas">${ICONO_CUBO}</div>` : '<div class="ranura"></div>').join('');
   $('#inv-nota').innerHTML = estadoCubo === 'mano' ? `<b>Cubo de pantallas</b>${estado === 'sentado' && actual && actual.id === 'inicio' ? 'Usa Dejar el cubo para ponerlo sobre la ruleta.' : 'Llévalo a la Ruleta, siéntate en un taburete y déjalo en la mesa.'}` : '';
   $('.tira').classList.toggle('menu', estado === 'menu');
-  $('.ayuda').innerHTML = estado === 'menu' ? 'Arrastra para girar el cubo<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
+  $('.ayuda').innerHTML = estado === 'menu' ? 'Arrastra o usa las flechas<br>Clic en la mesa para salir' : estado === 'cerca' ? 'Arrastra para girar el cubo<br>Esc lo deja en su sitio' : 'Arrastra para mirar<br><kbd>&larr;</kbd> <kbd>&rarr;</kbd> cambia de sala';
 }
 $('#acciones').addEventListener('click', e => {
   const b = e.target.closest('[data-accion]'); if (!b) return;
@@ -645,8 +645,9 @@ addEventListener('keydown', e => {
     else if (hay3D && estado === 'sentado') levantarse();
     return;
   }
+  if (hay3D && estado === 'menu' && /^Arrow/.test(e.key)) { e.preventDefault(); moverVentana(e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0, e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0); return; }
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-  const id = estado === 'menu' ? caraFrente : (destino ? destino.id : seccionActual);
+  const id = destino ? destino.id : seccionActual;
   const i = Math.max(0, SALAS.findIndex(s => s.id === id)), n = SALAS[(i + (e.key === 'ArrowRight' ? 1 : -1) + SALAS.length) % SALAS.length];
   e.preventDefault(); ir(n.id);
 });
@@ -1089,6 +1090,8 @@ const ALREDEDOR = [0, 1, 2, 3, 5, 6, 7, 8];
 const colorCara = id => id === 'oculta' ? PAPEL : sala(id).color;
 const pegatinas = {};
 const fraseHoy = () => { const f = ((D.perfil || {}).frases || []).map(tx).filter(Boolean); return f.length ? f[new Date().getDate() % f.length] : ''; };
+// Texto plano corto para las pantallas: sin marcas de color, sin >, sin etiquetas
+const extracto = (t, n = 170) => { const x = String(t || '').replace(COLOR, '$1$2').replace(/<[^>]+>/g, ' ').replace(/^>/gm, '').replace(/\s+/g, ' ').trim(); return x.length > n ? x.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : x; };
 const horaAhora = () => { const d = new Date(); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 
 function pantallasDe(id) {
@@ -1096,7 +1099,7 @@ function pantallasDe(id) {
   if (id === 'oculta') {
     if (!diarioVisto) return t;
     t[4] = { tipo: 'titulo', kanji: '日', etiqueta: 'Diario', accion: { seccion: 'diario' } };
-    diarioOrdenado().slice(0, 8).forEach((e, k) => { t[ALREDEDOR[k]] = { tipo: 'texto', etiqueta: fechaCorta(e.fecha), lineas: [tx(e.titulo)], accion: { seccion: 'diario', abrir: { entrada: e.id } } }; });
+    diarioOrdenado().slice(0, 8).forEach((e, k) => { t[ALREDEDOR[k]] = { tipo: 'texto', etiqueta: fechaCorta(e.fecha), titulo: tx(e.titulo), lineas: [extracto(tx(e.texto))], accion: { seccion: 'diario', abrir: { entrada: e.id } } }; });
     return t;
   }
   t[4] = { tipo: 'titulo', kanji: s.kanji, etiqueta: s.seccion, accion: { seccion: id } };
@@ -1104,20 +1107,20 @@ function pantallasDe(id) {
     t[0] = { tipo: 'texto', etiqueta: 'Sobre mí', lineas: [tx((D.perfil || {}).presentacion)], accion: { seccion: 'inicio' } };
     t[1] = { tipo: 'digital', etiqueta: 'Hora', valor: horaAhora() };
     t[2] = { tipo: 'texto', etiqueta: 'Frase del día', lineas: [fraseHoy() || 'Sin frase hoy'], accion: { seccion: 'inicio' } };
-    t[3] = { tipo: 'texto', etiqueta: 'Últimas jugadas', lineas: jugadas().slice(0, 3).map(x => x.titulo), accion: { seccion: 'inicio', abrir: { ancla: 'jugadas' } } };
+    t[3] = { tipo: 'texto', etiqueta: 'Últimas jugadas', lineas: jugadas().slice(0, 5).map(x => `${fechaCorta(x.f)}  ${x.titulo}`), accion: { seccion: 'inicio', abrir: { ancla: 'jugadas' } } };
     t[5] = { tipo: 'digital', etiqueta: 'Ruleta', valor: tiradas[0] ? String(tiradas[0].n) : '--', accion: { girar: true } };
-    t[6] = { tipo: 'texto', etiqueta: 'Bitácora', lineas: [...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).slice(0, 1).map(c => tx(c.texto)), accion: { seccion: 'inicio', abrir: { ancla: 'bitacora' } } };
+    t[6] = { tipo: 'texto', etiqueta: 'Bitácora', lineas: [...(D.cambios || [])].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).slice(0, 3).map(c => `${fechaCorta(c.fecha)}  ${tx(c.texto)}`), accion: { seccion: 'inicio', abrir: { ancla: 'bitacora' } } };
     t[7] = { tipo: 'texto', etiqueta: 'Enlaces', lineas: (D.enlaces || []).slice(0, 4).map(e => e.nombre), accion: { seccion: 'inicio', abrir: { ancla: 'enlaces' } } };
     t[8] = { tipo: 'interruptor', etiqueta: 'Modo oscuro', valor: esOscuro(), accion: { tema: true } };
   } else if (id === 'blog') {
-    blog.slice(0, 6).forEach((p, k) => { t[[0, 1, 2, 3, 5, 6][k]] = { tipo: 'texto', etiqueta: numPost(p.id), lineas: [tx(p.titulo)], pie: fechaCorta(p.fecha), accion: { seccion: 'blog', abrir: { post: p.id } } }; });
-    if (blog.length) t[7] = { tipo: 'texto', etiqueta: 'Al azar', lineas: ['Una entrada cualquiera'], accion: { azar: true } };
+    blog.slice(0, 6).forEach((p, k) => { t[[0, 1, 2, 3, 5, 6][k]] = { tipo: 'texto', etiqueta: numPost(p.id), titulo: tx(p.titulo), lineas: [extracto(tx(p.texto))], pie: `${fechaCorta(p.fecha)}${p.imagen ? '  ·  con imagen' : ''}`, accion: { seccion: 'blog', abrir: { post: p.id } } }; });
+    if (blog.length) t[7] = { tipo: 'texto', etiqueta: 'Al azar', titulo: 'Una entrada cualquiera', lineas: ['Haz clic y te muestro una.'], accion: { azar: true } };
     t[8] = { tipo: 'digital', etiqueta: 'Entradas', valor: dos(blog.length), accion: { seccion: 'blog' } };
   } else if (id === 'escritos') {
     let k = 0;
-    (D.escritos || []).slice(0, 3).forEach(e => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: TIPO_ESCRITO[e.tipo] || 'Escrito', lineas: [tx(e.titulo)], pie: ESTADO_ESCRITO[e.estado] || '', accion: { seccion: 'escritos' } }; });
+    (D.escritos || []).slice(0, 3).forEach(e => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: TIPO_ESCRITO[e.tipo] || 'Escrito', titulo: tx(e.titulo), lineas: [tx(e.resumen) || tx(e.notas) || `${(e.capitulos || []).length} ${(e.capitulos || []).length === 1 ? 'capítulo' : 'capítulos'}`], pie: ESTADO_ESCRITO[e.estado] || '', accion: { seccion: 'escritos' } }; });
     const caps = escrito ? escrito.capitulos || [] : [];
-    caps.map((c, i) => ({ c, i })).reverse().slice(0, 7 - k).forEach(({ c, i }) => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: `Capítulo ${i + 1}`, lineas: [c.titulo], pie: fechaCorta(c.fecha), accion: { seccion: 'escritos', abrir: { cap: i } } }; });
+    caps.map((c, i) => ({ c, i })).reverse().slice(0, 7 - k).forEach(({ c, i }) => { t[ALREDEDOR[k++]] = { tipo: 'texto', etiqueta: `Capítulo ${i + 1}`, titulo: c.titulo, lineas: [extracto(c.html, 150)], pie: fechaCorta(c.fecha), accion: { seccion: 'escritos', abrir: { cap: i } } }; });
     t[8] = { tipo: 'digital', etiqueta: 'Capítulos', valor: dos(caps.length), accion: { seccion: 'escritos' } };
   } else if (id === 'obras') {
     const L = obrasLista(), c = j => L.filter(x => x.jugada === j).length;
@@ -1128,13 +1131,13 @@ function pantallasDe(id) {
     t[5] = { tipo: 'digital', etiqueta: 'Al agua', valor: dos(c('agua')), accion: { seccion: 'obras' } };
     const ult = L[L.length - 1], mejor = [...L].sort((a, b) => (b.o.nota ?? 0) - (a.o.nota ?? 0))[0], tipos = new Map();
     L.forEach(({ o }) => { const n = TIPO_OBRA[o.tipo] || 'Otro'; tipos.set(n, (tipos.get(n) || 0) + 1); });
-    if (ult) t[6] = { tipo: 'texto', etiqueta: 'La última', lineas: [ult.o.titulo], pie: ult.o.nota != null ? `Nota ${ult.o.nota}` : '', accion: { obra: ult.i } };
+    if (ult) t[6] = { tipo: 'texto', etiqueta: 'La última', titulo: ult.o.titulo, lineas: [TIPO_OBRA[ult.o.tipo] || '', ESTADO_OBRA[ult.o.estado] || ''], pie: ult.o.nota != null ? `Nota ${ult.o.nota}` : '', accion: { obra: ult.i } };
     if (L.length) t[7] = { tipo: 'texto', etiqueta: 'Por tipo', lineas: [...tipos].slice(0, 4).map(([n, v]) => `${n}: ${v}`), accion: { seccion: 'obras' } };
-    if (mejor) t[8] = { tipo: 'texto', etiqueta: 'Mejor nota', lineas: [mejor.o.titulo], pie: mejor.o.nota != null ? `${mejor.o.nota} de 10` : '', accion: { obra: mejor.i } };
+    if (mejor) t[8] = { tipo: 'texto', etiqueta: 'Mejor nota', titulo: mejor.o.titulo, lineas: [TIPO_OBRA[mejor.o.tipo] || ''], pie: mejor.o.nota != null ? `${mejor.o.nota} de 10` : '', accion: { obra: mejor.i } };
   } else if (id === 'galeria') {
     const G = galLista();
     G.slice(0, 8).forEach((g, k) => { t[ALREDEDOR[k]] = { tipo: 'imagen', g, etiqueta: LETRAS[k % 6], accion: { imagen: k } }; });
-    if (!G.length) t[1] = { tipo: 'texto', etiqueta: 'Galería', lineas: ['Todavía no hay imágenes'], accion: { seccion: 'galeria' } };
+    if (!G.length) t[1] = { tipo: 'texto', etiqueta: 'Galería', titulo: 'Todavía no hay imágenes', lineas: ['Cuando subas alguna desde el panel, aparece aquí.'], accion: { seccion: 'galeria' } };
   }
   return t;
 }
@@ -1151,7 +1154,7 @@ function sieteSeg(c, texto, cx, y, alto, color, maxAncho) {
     if (ch === ':') { c.fillStyle = color; c.fillRect(x + g * 0.4, y + alto * 0.28, g, g); c.fillRect(x + g * 0.4, y + alto * 0.64, g, g); x += dosP; continue; }
     const on = SEG[ch] || '', m = alto / 2;
     const seg = { a: [x + g, y, an - 2 * g, g], b: [x + an - g, y + g, g, m - 1.5 * g], c: [x + an - g, y + m + 0.5 * g, g, m - 1.5 * g], d: [x + g, y + alto - g, an - 2 * g, g], e: [x, y + m + 0.5 * g, g, m - 1.5 * g], f: [x, y + g, g, m - 1.5 * g], g: [x + g, y + m - g / 2, an - 2 * g, g] };
-    for (const k in seg) { c.fillStyle = on.includes(k) ? color : 'rgba(251, 250, 246, 0.035)'; c.fillRect(...seg[k]); }
+    for (const k in seg) { c.fillStyle = on.includes(k) ? color : 'rgba(251, 250, 246, 0.012)'; c.fillRect(...seg[k]); }
     x += paso;
   }
 }
@@ -1166,39 +1169,44 @@ function renglones(c, textos, ancho, max) {
   return out;
 }
 function dibujarPantalla(p, t, color) {
-  const c = p.cv.getContext('2d'), w = p.cv.width, m = 18, iw = w - 2 * m, tinta = color === PAPEL ? TINTA : color, turno = (p.turno = (p.turno || 0) + 1);
-  const marco = () => { c.beginPath(); c.roundRect(m, m, iw, iw, 22); };
-  const cabeza = (txt, fondo = tinta) => { c.fillStyle = fondo; c.fillRect(m, m, iw, 54); c.fillStyle = PAPEL; c.font = `700 25px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(txt, m + 16, m + 28); };
-  const cerrar = () => { c.restore(); marco(); c.lineWidth = 10; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
+  if (!p.cv) return;
+  const c = p.cv.getContext('2d'), w = 256, m = 14, iw = w - 2 * m, tinta = color === PAPEL ? TINTA : color, turno = (p.turno = (p.turno || 0) + 1);
+  c.setTransform(p.cv.width / w, 0, 0, p.cv.width / w, 0, 0);
+  const marco = () => { c.beginPath(); c.roundRect(m, m, iw, iw, 18); };
+  const cabeza = txt => { c.fillStyle = tinta; c.fillRect(m, m, iw, 42); c.fillStyle = PAPEL; c.font = `700 19px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(txt, m + 13, m + 22); };
+  const cerrar = () => { c.restore(); marco(); c.lineWidth = 8; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
   c.save(); c.fillStyle = color; c.fillRect(0, 0, w, w); marco(); c.clip();
   if (t.tipo === 'titulo') {
     c.fillStyle = color; c.fillRect(0, 0, w, w);
     c.fillStyle = color === PAPEL ? TINTA : PAPEL; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = `140px ${ROT}`; c.fillText(t.kanji, w / 2, w / 2 - 16); c.font = `700 25px ${TXT}`; c.fillText(t.etiqueta, w / 2, w - m - 30);
+    c.font = `126px ${ROT}`; c.fillText(t.kanji, w / 2, w / 2 - 14); c.font = `700 21px ${TXT}`; c.fillText(t.etiqueta, w / 2, w - m - 26);
   } else if (t.tipo === 'digital') {
     c.fillStyle = TINTA; c.fillRect(0, 0, w, w);
-    c.fillStyle = color === PAPEL ? PAPEL : color; c.font = `700 23px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 16, m + 30);
-    sieteSeg(c, t.valor, w / 2, 98, 92, color === PAPEL ? PAPEL : color, iw - 40);
+    c.fillStyle = color === PAPEL ? PAPEL : color; c.font = `700 19px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 13, m + 24);
+    sieteSeg(c, t.valor, w / 2, 96, 84, color === PAPEL ? PAPEL : color, iw - 40);
   } else if (t.tipo === 'interruptor') {
     c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
-    const x = w / 2 - 62, y = 112; c.lineWidth = 8; c.strokeStyle = TINTA; c.beginPath(); c.roundRect(x, y, 124, 60, 30); c.fillStyle = t.valor ? TINTA : PAPEL; c.fill(); c.stroke();
-    c.fillStyle = t.valor ? PAPEL : TINTA; c.beginPath(); c.arc(t.valor ? x + 94 : x + 30, y + 30, 20, 0, Math.PI * 2); c.fill();
-    c.fillStyle = TINTA; c.font = `700 26px ${TXT}`; c.textAlign = 'center'; c.fillText(t.valor ? 'Activado' : 'Apagado', w / 2, 210);
+    const x = w / 2 - 56, y = 104; c.lineWidth = 7; c.strokeStyle = TINTA; c.beginPath(); c.roundRect(x, y, 112, 54, 27); c.fillStyle = t.valor ? TINTA : PAPEL; c.fill(); c.stroke();
+    c.fillStyle = t.valor ? PAPEL : TINTA; c.beginPath(); c.arc(t.valor ? x + 85 : x + 27, y + 27, 18, 0, Math.PI * 2); c.fill();
+    c.fillStyle = TINTA; c.font = `700 20px ${TXT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t.valor ? 'Activado' : 'Apagado', w / 2, 196);
   } else if (t.tipo === 'tablero') {
     c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
-    const x0 = m + 34, y0 = m + 64, k = (iw - 68) / 10;
+    const x0 = m + 30, y0 = m + 54, k = (iw - 60) / 10;
     (t.lista || []).forEach(({ celda, jugada }) => { const x = x0 + (celda % 10) * k, y = y0 + Math.floor(celda / 10) * k; c.fillStyle = tinta; if (jugada === 'hundida') c.fillRect(x, y, k, k); else if (jugada === 'tocada') { c.lineWidth = 3; c.strokeStyle = tinta; c.strokeRect(x + 3, y + 3, k - 6, k - 6); } else if (jugada === 'agua') { c.fillStyle = TINTA; c.fillRect(x + k / 2 - 2, y + k / 2 - 2, 4, 4); } });
-    c.strokeStyle = TINTA; c.lineWidth = 1.5; for (let i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(x0 + i * k, y0); c.lineTo(x0 + i * k, y0 + 10 * k); c.stroke(); c.beginPath(); c.moveTo(x0, y0 + i * k); c.lineTo(x0 + 10 * k, y0 + i * k); c.stroke(); }
+    c.strokeStyle = TINTA; c.lineWidth = 1.2; for (let i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(x0 + i * k, y0); c.lineTo(x0 + i * k, y0 + 10 * k); c.stroke(); c.beginPath(); c.moveTo(x0, y0 + i * k); c.lineTo(x0 + 10 * k, y0 + i * k); c.stroke(); }
   } else if (t.tipo === 'imagen') {
     c.fillStyle = PAPEL; c.fillRect(0, 0, w, w);
-    const poner = im => { if (turno !== p.turno) return; const iw2 = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, e = Math.max(iw / iw2, iw / ih); c.save(); marco(); c.clip(); c.drawImage(im, w / 2 - iw2 * e / 2, w / 2 - ih * e / 2, iw2 * e, ih * e); c.fillStyle = TINTA; c.fillRect(m, m, 46, 46); c.fillStyle = PAPEL; c.font = `30px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 23, m + 25); c.restore(); marco(); c.lineWidth = 10; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
+    const poner = im => { if (turno !== p.turno) return; const iw2 = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, e = Math.max(iw / iw2, iw / ih); c.save(); marco(); c.clip(); c.drawImage(im, w / 2 - iw2 * e / 2, w / 2 - ih * e / 2, iw2 * e, ih * e); c.fillStyle = TINTA; c.fillRect(m, m, 40, 40); c.fillStyle = PAPEL; c.font = `26px ${ROT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t.etiqueta, m + 20, m + 22); c.restore(); marco(); c.lineWidth = 8; c.strokeStyle = TINTA; c.stroke(); p.tex.needsUpdate = true; };
     if (t.g.ejemplo != null) { cerrar(); poner(dibujoEjemplo(t.g.ejemplo)); return; }
     const im = new Image(); im.onload = () => poner(im); im.src = t.g.archivo;
   } else if (t.tipo === 'texto') {
     c.fillStyle = PAPEL; c.fillRect(0, 0, w, w); cabeza(t.etiqueta);
-    c.fillStyle = TINTA; c.font = `500 25px ${TXT}`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    renglones(c, t.lineas || [], iw - 30, t.pie ? 4 : 5).forEach((l, i) => c.fillText(l, m + 15, m + 92 + i * 31));
-    if (t.pie) { c.fillStyle = '#5b5751'; c.font = `500 20px ${TXT}`; c.fillText(t.pie, m + 15, w - m - 16); }
+    const tope = w - m - (t.pie ? 30 : 10); let y = m + 70;
+    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    if (t.titulo) { c.fillStyle = TINTA; c.font = `700 19px ${TXT}`; for (const l of renglones(c, [t.titulo], iw - 26, 2)) { c.fillText(l, m + 13, y); y += 23; } y += 5; }
+    c.fillStyle = '#34312d'; c.font = `500 16px ${TXT}`;
+    for (const l of renglones(c, (t.lineas || []).filter(Boolean), iw - 26, Math.max(0, Math.floor((tope - y + 16) / 21)))) { c.fillText(l, m + 13, y); y += 21; }
+    if (t.pie) { c.fillStyle = '#5b5751'; c.font = `500 14px ${TXT}`; c.fillText(t.pie, m + 13, w - m - 12); }
   } else {
     // Sin señal: ruido gris con bandas, distinto cada vez que se pinta
     const r = azarSemilla((p.semilla = (p.semilla || 7) + 13)); c.fillStyle = '#cfcac0'; c.fillRect(0, 0, w, w);
@@ -1207,26 +1215,40 @@ function dibujarPantalla(p, t, color) {
   }
   cerrar();
 }
-function repintarPantalla(cara, i) { const p = (pegatinas[cara] || [])[i]; if (!p) return; p.spec = pantallasDe(cara)[i]; dibujarPantalla(p, p.spec, colorCara(cara)); }
-function repintarCara(cara) { if (!pegatinas[cara]) return; const specs = pantallasDe(cara); pegatinas[cara].forEach((p, i) => { if (p) { p.spec = specs[i]; dibujarPantalla(p, specs[i], colorCara(cara)); } }); }
+function repintarPantalla(cara, i) { const p = (pegatinas[cara] || [])[i]; if (!p || !p.cv) return; p.spec = pantallasDe(cara)[i]; dibujarPantalla(p, p.spec, colorCara(cara)); }
+function repintarCara(cara) { if (!pegatinas[cara]) return; const specs = pantallasDe(cara); pegatinas[cara].forEach((p, i) => { if (p && p.cv) { p.spec = specs[i]; dibujarPantalla(p, specs[i], colorCara(cara)); } }); }
 
 function hacerCubo(lado) {
-  const grupo = new THREE.Group(), piezas = [], paso = lado / 3, cuerpo = paso * 0.95, pegote = paso * 0.86;
+  const grupo = new THREE.Group(), piezas = [], paso = lado / 3, cuerpo = paso * 0.95, pegote = paso * 0.86, planos = {};
   const geoC = new THREE.BoxGeometry(cuerpo, cuerpo, cuerpo), geoP = new THREE.PlaneGeometry(pegote, pegote);
-  CARAS.forEach(c => { pegatinas[c.id] = []; const e = new THREE.Euler(c.r[0], c.r[1], 0); c.der = new THREE.Vector3(1, 0, 0).applyEuler(e); c.arr = new THREE.Vector3(0, 1, 0).applyEuler(e); });
+  CARAS.forEach(c => { pegatinas[c.id] = []; planos[c.id] = mat(colorCara(c.id)); const e = new THREE.Euler(c.r[0], c.r[1], 0); c.der = new THREE.Vector3(1, 0, 0).applyEuler(e); c.arr = new THREE.Vector3(0, 1, 0).applyEuler(e); });
   for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
     const pieza = new THREE.Mesh(geoC, M.tinta), pos = new THREE.Vector3(x, y, z); pieza.position.copy(pos).multiplyScalar(paso);
     CARAS.forEach(c => {
       if (x * c.n[0] + y * c.n[1] + z * c.n[2] !== 1) return;
-      const indice = (1 - Math.round(pos.dot(c.arr))) * 3 + (Math.round(pos.dot(c.der)) + 1), [cv, tex] = lienzoTex(256, 256);
-      const st = new THREE.Mesh(geoP, mat(PAPEL, { mapa: tex, trama: 0 }));
+      const indice = (1 - Math.round(pos.dot(c.arr))) * 3 + (Math.round(pos.dot(c.der)) + 1);
+      const st = new THREE.Mesh(geoP, planos[c.id]);
       st.position.set(c.n[0], c.n[1], c.n[2]).multiplyScalar(cuerpo / 2 + paso * 0.004); st.rotation.set(c.r[0], c.r[1], 0); st.userData = { cara: c.id, indice };
-      pieza.add(st); pegatinas[c.id][indice] = { cv, tex };
+      pieza.add(st); pegatinas[c.id][indice] = { mesh: st, plano: planos[c.id], pantalla: null, cv: null, tex: null };
     });
     grupo.add(pieza); piezas.push(pieza);
   }
-  CARAS.forEach(c => repintarCara(c.id));
   return { grupo, piezas, paso, giro: null, cola: [], historia: [], alResolver: null };
+}
+function prepararPantallas() {
+  CARAS.forEach(c => pegatinas[c.id].forEach(p => { if (p && !p.cv) { [p.cv, p.tex] = lienzoTex(384, 384); p.pantalla = mat(PAPEL, { mapa: p.tex, trama: 0 }); } }));
+  CARAS.forEach(c => repintarCara(c.id));
+}
+// Encender: las pantallas se prenden de a poco, primero las de la cara que miras
+let turnoLuz = 0;
+function encender(on) {
+  const turno = ++turnoLuz;
+  if (on) prepararPantallas();
+  CARAS.forEach(c => pegatinas[c.id].forEach(p => {
+    if (!p) return;
+    const retraso = menos ? 0 : on ? (c.id === ventana.cara ? 250 : 650) + Math.random() * 420 : Math.random() * 220;
+    setTimeout(() => { if (turno === turnoLuz) p.mesh.material = on ? p.pantalla : p.plano; }, retraso);
+  }));
 }
 // Girar una capa: sus piezas pasan a un pivote, giran 90 grados y vuelven al cubo. Se anota para poder deshacerlo.
 function girarCapa(cubo, eje, capa, sentido, dur, deshacer) {
@@ -1264,6 +1286,9 @@ const capaAlAzar = (cubo, dur) => girarCapa(cubo, 'xyz'[Math.floor(Math.random()
 let cubito = null, soporteCubo = null, movCubo = null, ESTANTE = null, caraFrente = 'inicio', clicsOcultos = [];
 const TABURETES = [[-3, 2.6], [-1, 2.8], [1.2, 2.8], [3.2, 2.6], [-1, -2.8], [1.4, -2.8]];
 const cuboGiro = { desde: new THREE.Quaternion(), hacia: new THREE.Quaternion(), t0: 0, dur: 0 };
+// En el menú el cubo flota un poco sobre la mesa para que al girar no la atraviese
+const ALZA = 0.24;
+let ventana = { cara: 'inicio', qx: 0, qy: 0 };
 function crearCubo() {
   cubito = hacerCubo(0.48); soporteCubo = new THREE.Group(); soporteCubo.add(cubito.grupo); mundo.add(soporteCubo);
   cubito.piezas.forEach(p => { p.userData.accion = { cubo: true }; clicables.push(p); });
@@ -1283,7 +1308,6 @@ function moverCubo(dest, dur, alza, fin) {
 function girarCuboA(q, dur) { cuboGiro.desde.copy(cubito.grupo.quaternion); cuboGiro.hacia.copy(q); cuboGiro.t0 = performance.now(); cuboGiro.dur = menos ? 1 : dur; }
 const vistaCerca = () => ({ pos: new THREE.Vector3(ESTANTE.pos.x, 1.55, ESTANTE.pos.z + 2.95), mira: new THREE.Vector3(ESTANTE.pos.x, 1.2, ESTANTE.pos.z + 0.6) });
 function vistaAsiento(i) { const [sx, sz] = TABURETES[i]; return { pos: new THREE.Vector3(sx, 2.45, sz * 1.08), mira: new THREE.Vector3(THREE.MathUtils.clamp(sx, -1.5, 2.2) * 0.75, 1.25, -Math.sign(sz) * 0.2) }; }
-function vistaMenu() { const loc = (x, y, z) => soporteCubo.localToWorld(new THREE.Vector3(x, y, z)); return { pos: loc(-0.2, 0.16, 1.2), mira: loc(-0.2, 0.06, 0) }; }
 
 // En la librería: clic al cubo, la cámara se acerca y el cubo se levanta del estante
 function acercarCubo() {
@@ -1328,38 +1352,57 @@ function recogerCubo() {
   moverCubo({ pos: frenteCamara(0.7, -0.45, 0.3), rotY: soporteCubo.rotation.y, escala: 0.15 }, 420, 0.1, () => { soporteCubo.visible = false; soporteCubo.scale.setScalar(1); });
   pintarEstado();
 }
-// Menú cubo: doble clic al cubo sobre la mesa. Se arma solo y la cámara entra hasta una cara; en la esquina queda la mesa.
-const INCLINA = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.12, -0.2, 0));
+// Menú cubo: doble clic al cubo sobre la mesa. Se arma solo, flota, se encienden las pantallas y la cámara entra muy cerca:
+// se ven 4 pantallas grandes (una ventana de 2x2 de la cara) y en la esquina asoma la mesa. Salir: clic en la mesa.
 const Q_CARA = { inicio: [0, 0, 0], blog: [0, -Math.PI / 2, 0], escritos: [0, Math.PI, 0], obras: [0, Math.PI / 2, 0], galeria: [Math.PI / 2, 0, 0], oculta: [-Math.PI / 2, 0, 0] };
-const qCara = id => INCLINA.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...Q_CARA[id])));
+const qCara = id => new THREE.Quaternion().setFromEuler(new THREE.Euler(...Q_CARA[id]));
+function vistaVentana(v) {
+  const p = cubito.paso, wx = (v.qx - 0.5) * p, wy = (0.5 - v.qy) * p + ALZA, z = 1.5 * p;
+  const loc = (x, y, zz) => soporteCubo.localToWorld(new THREE.Vector3(x, y, zz));
+  const ox = v.qx ? 1 : -1, oy = v.qy ? -1 : 1;
+  return { pos: loc(wx + ox * 0.08, wy + 0.08, z + 0.36), mira: loc(wx + ox * 0.035, wy + oy * 0.025, z) };
+}
+const seccionDeCara = id => SALAS.some(s => s.id === id) ? id : (diarioVisto ? 'diario' : 'oculta');
+function irVentana(v, dur, abrir) {
+  const cambia = v.cara !== ventana.cara; ventana = v; caraFrente = v.cara;
+  if (cambia) girarCuboA(qCara(v.cara), 780);
+  volar(vistaVentana(v), dur, LIM_MENU);
+  if (cambia || abrir) { vineta.classList.add('sale'); setTimeout(() => { mostrar(seccionDeCara(v.cara), abrir); vineta.classList.remove('sale'); }, menos ? 0 : 160); }
+}
+// Moverse una ventana; al pasar el borde, se dobla a la cara vecina del cubo
+function moverVentana(dx, dy) {
+  if (estado !== 'menu' || (vuelo && performance.now() - vuelo.t0 < vuelo.dur * 0.6)) return;
+  const qx = ventana.qx + dx, qy = ventana.qy + dy;
+  if (qx >= 0 && qx <= 1 && qy >= 0 && qy <= 1) { irVentana({ cara: ventana.cara, qx, qy }, 520); return; }
+  const C = CARAS.find(c => c.id === ventana.cara), n = new THREE.Vector3(...C.n), p = cubito.paso;
+  const dir = dx ? C.der.clone().multiplyScalar(dx) : C.arr.clone().multiplyScalar(-dy), e = dx ? C.arr : C.der;
+  const centro = n.clone().multiplyScalar(1.5 * p).addScaledVector(C.der, (ventana.qx - 0.5) * p).addScaledVector(C.arr, (0.5 - ventana.qy) * p);
+  const G = CARAS.find(c => new THREE.Vector3(...c.n).distanceTo(dir) < 0.01);
+  const c2 = dir.clone().multiplyScalar(1.5 * p).addScaledVector(n, 0.5 * p).addScaledVector(e, centro.dot(e));
+  irVentana({ cara: G.id, qx: c2.dot(G.der) > 0 ? 1 : 0, qy: c2.dot(G.arr) > 0 ? 0 : 1 }, 950);
+}
 function abrirMenu() {
   if (estadoCubo !== 'mesa' || estado === 'menu' || estado === 'cerca' || viaje || vuelo || movCubo) return;
   const id = SALAS.some(s => s.id === seccionActual) ? seccionActual : 'inicio';
-  estado = 'menu'; invAbierto = false; caraFrente = id;
-  CARAS.forEach(c => repintarCara(c.id));
-  resolverCubo(cubito); girarCuboA(qCara(id), 1000);
-  volar(vistaMenu(), 1300, LIM_FIJO);
+  estado = 'menu'; invAbierto = false; ventana = { cara: id, qx: 0, qy: 0 }; caraFrente = id;
+  resolverCubo(cubito); girarCuboA(qCara(id), 1000); encender(true);
+  volar(vistaVentana(ventana), 1600, LIM_MENU);
   mostrar(id); pintarEstado();
 }
 function cerrarMenu() {
   if (estado !== 'menu') return;
-  estado = asiento != null ? 'sentado' : 'sala'; girarCuboA(new THREE.Quaternion(), 700);
-  volar(asiento != null ? vistaAsiento(asiento) : vista(actual), 1100, asiento != null ? LIM_SENTADO : LIM_SALA);
+  estado = asiento != null ? 'sentado' : 'sala'; girarCuboA(new THREE.Quaternion(), 800);
+  volar(asiento != null ? vistaAsiento(asiento) : vista(actual), 1200, asiento != null ? LIM_SENTADO : LIM_SALA);
+  setTimeout(() => { if (estado !== 'menu') encender(false); }, menos ? 0 : 650);
   if (seccionActual === 'diario' || seccionActual === 'oculta') mostrar('inicio');
   pintarEstado();
 }
-function irCara(id, abrir) {
-  caraFrente = id; girarCuboA(qCara(id), 650);
-  vineta.classList.add('sale');
-  setTimeout(() => { mostrar(id, abrir); vineta.classList.remove('sale'); }, menos ? 0 : 160);
-}
-function caraAlFrente() {
-  const meta = new THREE.Vector3(0, 0, 1).applyQuaternion(INCLINA); let mejor = caraFrente, max = -2;
-  CARAS.forEach(c => { const d = new THREE.Vector3(...c.n).applyQuaternion(cubito.grupo.quaternion).dot(meta); if (d > max) { max = d; mejor = c.id; } });
-  return mejor;
-}
+const irCara = (id, abrir) => irVentana({ cara: id, qx: 0, qy: 0 }, 950, abrir || {});
 function tocarPantalla(cara, i) {
-  if (cara !== caraFrente) { irCara(cara); return; }
+  const col = i % 3, fila = Math.floor(i / 3);
+  if (cara !== ventana.cara) { irVentana({ cara, qx: col === 2 ? 1 : 0, qy: fila === 2 ? 1 : 0 }, 950); return; }
+  // Una pantalla que asoma en el borde: primero se mueve la ventana hacia ella
+  if (!((col === ventana.qx || col === ventana.qx + 1) && (fila === ventana.qy || fila === ventana.qy + 1))) { irVentana({ cara, qx: col === 0 ? 0 : col === 2 ? 1 : ventana.qx, qy: fila === 0 ? 0 : fila === 2 ? 1 : ventana.qy }, 520); return; }
   if (cara === 'oculta' && !diarioVisto) {
     // La cara sin señal: cinco clics seguidos a la pantalla del centro
     repintarPantalla('oculta', i);
@@ -1423,7 +1466,7 @@ function ruta(desde, b) {
 }
 
 // ---------- Camara: mirar arrastrando, viajar entre salas, volar a un punto ----------
-const LIM_SALA = { th: 0.95, ph0: -0.45, ph1: 0.25, sway: 0.03, zoom: true }, LIM_SENTADO = { th: 0.45, ph0: -0.2, ph1: 0.18, sway: 0, zoom: false }, LIM_FIJO = { th: 0, ph0: 0, ph1: 0, sway: 0, zoom: false };
+const LIM_SALA = { th: 0.95, ph0: -0.45, ph1: 0.25, sway: 0.03, zoom: true }, LIM_SENTADO = { th: 0.45, ph0: -0.2, ph1: 0.18, sway: 0, zoom: false }, LIM_FIJO = { th: 0, ph0: 0, ph1: 0, sway: 0, zoom: false }, LIM_MENU = { th: 0.1, ph0: -0.08, ph1: 0.08, sway: 0, zoom: false };
 const mirar = { th: 0, ph: 0, dTh: 0, dPh: 0, r: 1, dR: 0 };
 let objetivo = vista(actual).mira.clone(), base = null, viaje = null, vuelo = null;
 function fijarVista(v, lim) {
@@ -1477,13 +1520,14 @@ function tocado(e) {
   return h ? h.object.userData.accion : null;
 }
 const enCubo = () => estado === 'menu' || estado === 'cerca';
-lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
+const girandoCubo = () => estado === 'cerca';
+lienzo.addEventListener('pointerdown', e => { arrastre = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, movio: false }; lienzo.setPointerCapture(e.pointerId); });
 lienzo.addEventListener('pointermove', e => {
   if (!arrastre) { const t = tocado(e); lienzo.classList.toggle('sobre', !!t); lienzo.classList.toggle('salir', estado === 'menu' && !t); return; }
   const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
   if (!arrastre.movio && Math.hypot(dx, dy) > 5) { arrastre.movio = true; lienzo.classList.add('arrastra'); }
   if (!arrastre.movio) return;
-  if (enCubo()) {
+  if (girandoCubo()) {
     if (!vuelo) {
       const eje = new THREE.Vector3(dy, dx, 0).normalize().applyQuaternion(camara.quaternion), qm = new THREE.Quaternion().setFromAxisAngle(eje, Math.hypot(dx, dy) * 0.009);
       const qs = soporteCubo.getWorldQuaternion(new THREE.Quaternion()); cubito.grupo.quaternion.premultiply(qs.clone().invert().multiply(qm).multiply(qs)); cuboGiro.dur = 0;
@@ -1498,7 +1542,11 @@ lienzo.addEventListener('pointerup', e => {
   if (!a) return;
   if (estado === 'menu') {
     if (vuelo) return;
-    if (a.movio) { const id = caraAlFrente(); if (id !== caraFrente) irCara(id); else girarCuboA(qCara(id), 380); return; }
+    if (a.movio) {
+      const dx = e.clientX - a.x0, dy = e.clientY - a.y0; mirar.dTh = mirar.dPh = 0;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 50) { if (Math.abs(dx) > Math.abs(dy)) moverVentana(dx < 0 ? 1 : -1, 0); else moverVentana(0, dy < 0 ? 1 : -1); }
+      return;
+    }
     const t = tocado(e); if (!t) { cerrarMenu(); return; }
     if (t.cara) tocarPantalla(t.cara, t.indice);
     return;
@@ -1634,7 +1682,11 @@ function cuadro(ahora) {
     soporteCubo.rotation.y = movCubo.r0 + (movCubo.r1 - movCubo.r0) * e; soporteCubo.scale.setScalar(movCubo.s0 + (movCubo.s1 - movCubo.s0) * e);
     if (k >= 1) { const f = movCubo.fin; movCubo = null; if (f) f(); }
   }
-  if (cuboGiro.dur && !(arrastre && arrastre.movio && enCubo())) { const k = THREE.MathUtils.clamp((ahora - cuboGiro.t0) / cuboGiro.dur, 0, 1); cubito.grupo.quaternion.slerpQuaternions(cuboGiro.desde, cuboGiro.hacia, suave(k)); if (k >= 1) cuboGiro.dur = 0; }
+  if (cuboGiro.dur && !(arrastre && arrastre.movio && girandoCubo())) { const k = THREE.MathUtils.clamp((ahora - cuboGiro.t0) / cuboGiro.dur, 0, 1); cubito.grupo.quaternion.slerpQuaternions(cuboGiro.desde, cuboGiro.hacia, suave(k)); if (k >= 1) cuboGiro.dur = 0; }
+  if (cubito) {
+    const alto = estadoCubo === 'mesa' && (estado === 'menu' || cuboGiro.dur || cubito.giro || cubito.cola.length) ? ALZA : 0;
+    cubito.grupo.position.y += (alto - cubito.grupo.position.y) * (1 - Math.exp(-dt * 7));
+  }
   if (Math.abs(offX - offXMeta) > 0.5) { offX += (offXMeta - offX) * (1 - Math.exp(-dt * 10)); if (Math.abs(offX - offXMeta) <= 0.5) offX = offXMeta; aplicarOffset(); }
   dibujar();
 }
