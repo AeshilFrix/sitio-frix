@@ -78,7 +78,7 @@
       campos: [['nombre', 'Nombre', 'text', 1], ['url', 'Enlace', 'url', 1], ['detalle', 'Detalle (opcional), por ejemplo tu usuario', 'text']],
       resumen: i => [i.nombre, i.url] }
   };
-  const PESTANAS = [['perfil', 'Perfil'], ['blog', 'Blog'], ['diario', 'Diario'], ['escritos', 'Escritos'], ['obras', 'Obras'], ['galeria', 'Galería'], ['musica', 'Música'], ['enlaces', 'Enlaces'], ['cambios', 'Bitácora'], ['publicar', 'Publicar']];
+  const PESTANAS = [['perfil', 'Perfil'], ['blog', 'Blog'], ['diario', 'Diario'], ['escritos', 'Escritos'], ['obras', 'Obras'], ['galeria', 'Galería'], ['musica', 'Música'], ['enlaces', 'Enlaces'], ['cambios', 'Bitácora'], ['pruebas', 'Pruebas'], ['publicar', 'Publicar']];
 
   // ---------- Utilidades de formulario ----------
   const leerRuta = (o, ruta) => ruta.split('.').reduce((a, k) => a == null ? undefined : a[k], o);
@@ -109,13 +109,14 @@
 
   // ---------- Pintar ----------
   function pintarPestanas() {
-    $('#pestanas').innerHTML = PESTANAS.map(([k, n]) => `<button type="button" role="tab" data-p="${k}" aria-selected="${k === pestana}">${n}${k !== 'perfil' && k !== 'publicar' ? ` (${datos[k].length})` : ''}</button>`).join('');
+    $('#pestanas').innerHTML = PESTANAS.map(([k, n]) => `<button type="button" role="tab" data-p="${k}" aria-selected="${k === pestana}">${n}${Array.isArray(datos[k]) ? ` (${datos[k].length})` : ''}</button>`).join('');
   }
   function pintar() {
     pintarPestanas();
     const h = $('#hoja');
     if (pestana === 'perfil') return pintarPerfil(h);
     if (pestana === 'publicar') return pintarPublicar(h);
+    if (pestana === 'pruebas') return pintarPruebas(h);
     const S = SECCIONES[pestana], lista = datos[S.lista];
     const item = editando == null ? S.nuevo() : lista[editando];
     const conCaps = pestana === 'escritos';
@@ -637,6 +638,54 @@
       guardarBorrador();
     }
     return n;
+  }
+
+  // ---------- Pestana Pruebas: cambiar tu dinero en el sitio 3D ----------
+  // El dinero vive en el navegador de cada visitante. Para cambiar el tuyo, el panel crea un enlace firmado con una llave
+  // privada que solo se guarda en esta PC; el sitio lo comprueba con la llave pública que va en datos.js.
+  const CLAVE_LLAVE = 'panel-llave-pruebas', SITIO_3D = 'https://aeshilfrix.neocities.org/casa.html';
+  const b64 = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  async function llavePruebas() {
+    let g = null; try { g = JSON.parse(localStorage.getItem(CLAVE_LLAVE) || 'null'); } catch (e) {}
+    if (!g) {
+      const par = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+      const pub = await crypto.subtle.exportKey('jwk', par.publicKey), priv = await crypto.subtle.exportKey('jwk', par.privateKey);
+      g = { pub: { x: pub.x, y: pub.y }, priv };
+      try { localStorage.setItem(CLAVE_LLAVE, JSON.stringify(g)); } catch (e) { throw new Error('No se pudo guardar la llave en este navegador.'); }
+    }
+    return g;
+  }
+  const llavePublicada = () => { try { return JSON.parse(original).ajustes?.llavePruebas || null; } catch (e) { return null; } };
+  async function pintarPruebas(h) {
+    let g = null, error = '';
+    if (!window.crypto || !crypto.subtle) error = 'Este navegador no puede crear la llave. Abre el panel en Chrome o Edge actualizados.';
+    else { try { g = await llavePruebas(); } catch (e) { error = e.message || 'No se pudo crear la llave.'; } }
+    if (pestana !== 'pruebas') return;
+    if (g && JSON.stringify((datos.ajustes || {}).llavePruebas) !== JSON.stringify(g.pub)) { datos.ajustes = Object.assign({}, datos.ajustes, { llavePruebas: g.pub }); guardarBorrador(); marcarEstado(); }
+    const lista = g && JSON.stringify(llavePublicada()) === JSON.stringify(g.pub);
+    h.innerHTML = `<section class="caja"><h3>Tu dinero en el sitio 3D</h3><div class="dentro pub">
+      <p>Tu dinero, tus logros y tus datos de juego se guardan en el navegador donde abres el sitio, no en datos.js. Desde aquí puedes cambiarlos para probar cosas sin tener que jugar horas.</p>
+      ${error ? `<p class="aviso error">${esc(error)}</p>` : lista ? '' : `<p class="aviso">Antes de usar esto, ve a <b>Publicar</b> y publica una vez: así tu sitio conoce la llave de este panel. Después ya no hace falta.</p>`}
+      <form class="formulario" id="form-pruebas">
+        <div class="dos"><div class="campo"><label for="prueba-dinero">Dinero (¥)</label><input id="prueba-dinero" type="number" min="0" max="999999999999" step="100" value="1000000" required></div>
+          <div class="campo"><label for="prueba-sitio">Dirección del sitio</label><input id="prueba-sitio" type="url" value="${SITIO_3D}"></div></div>
+        <label><input type="checkbox" id="prueba-logros"> Borrar también mis logros y datos de juego (empezar de cero)</label>
+        <div class="acciones"><button class="btn" type="submit"${lista ? '' : ' disabled'}>Abrir el sitio con este dinero</button><button class="btn sec" type="button" id="prueba-copiar"${lista ? '' : ' disabled'}>Copiar el enlace</button>
+          <button class="btn sec" type="button" data-rapido="10000">¥10.000 (inicial)</button><button class="btn sec" type="button" data-rapido="1000000">¥1.000.000</button></div>
+        <p class="ayuda" id="prueba-estado" role="status"></p>
+      </form>
+      <p class="ayuda">El enlace dura 30 minutos y solo funciona con la llave de esta PC. Si el sitio te pide entrar por la pantalla falsa, entra por la esquina y el cambio se aplica solo. También puedes pegar el enlace en la pestaña donde ya tienes el sitio abierto.</p>
+    </div></section>`;
+    if (!g) return;
+    const crear = async () => {
+      const d = Math.max(0, Math.floor(+$('#prueba-dinero').value || 0)), carga = new TextEncoder().encode(JSON.stringify({ d, l: $('#prueba-logros').checked ? 1 : 0, t: Date.now() }));
+      const k = await crypto.subtle.importKey('jwk', g.priv, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+      const firma = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, k, carga);
+      return `${($('#prueba-sitio').value || SITIO_3D).split('#')[0]}#prueba.${b64(carga)}.${b64(firma)}`;
+    };
+    h.querySelectorAll('[data-rapido]').forEach(b => { b.onclick = () => { $('#prueba-dinero').value = b.dataset.rapido; }; });
+    $('#form-pruebas').onsubmit = async e => { e.preventDefault(); const url = await crear(); window.open(url, '_blank', 'noopener'); $('#prueba-estado').textContent = 'Se abrió el sitio en otra pestaña con el enlace.'; };
+    $('#prueba-copiar').onclick = async () => { const url = await crear(); try { await navigator.clipboard.writeText(url); $('#prueba-estado').textContent = 'Enlace copiado. Pégalo en la barra de direcciones de la pestaña del sitio.'; } catch (e) { $('#prueba-estado').textContent = url; } };
   }
 
   // ---------- Pestana Publicar ----------
