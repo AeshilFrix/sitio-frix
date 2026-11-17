@@ -69,6 +69,19 @@ window.DATOS = {
         "en": "# I don't know who would care, but I managed to get everything back. It wasn't that difficult, but I made everything really complicated for myself. #FF0000"
       },
       "id": 3
+    },
+    {
+      "fecha": "2026-11-17T13:12",
+      "titulo": {
+        "es": "Algo nuevo se me viene encima ",
+        "en": "Something new is coming my way "
+      },
+      "imagen": "https://media.tenor.com/Hhfm3Xma4xkAAAAM/clara-kaminari.gif",
+      "texto": {
+        "es": "Es hora de hacer este casino como un casino de verdad, como manda la ludopatía ",
+        "en": "It's time to make this casino a real casino, as gambling addiction dictates. "
+      },
+      "id": 4
     }
   ],
   "diario": [
