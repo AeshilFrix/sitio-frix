@@ -95,6 +95,19 @@ window.DATOS = {
         "en": "I don't know why this thing always fails. I have to update the thing to update. "
       },
       "id": 5
+    },
+    {
+      "fecha": "2026-11-21T16:50",
+      "titulo": {
+        "es": "Es increíble como no avance nada en 5 días",
+        "en": "It's incredible how nothing has progressed in 5 days."
+      },
+      "imagen": "https://media1.tenor.com/m/p2Th5FxQbi8AAAAC/anime-anime-girl.gif",
+      "texto": {
+        "es": "En todo este tiempo no he logrado avanzar nada en el mapa.\nAunque bueno, aprobé mi examen final de Calculo, y he estado buscando el token pirata aunque sin éxito.\nQuizás para martes ya este todo. ",
+        "en": "In all this time, I haven't managed to make any progress on the map.\nAlthough, well, I passed my final Calculus exam, and I've been looking for the pirate token, but without success.\nMaybe everything will be done by Tuesday. "
+      },
+      "id": 6
     }
   ],
   "diario": [
