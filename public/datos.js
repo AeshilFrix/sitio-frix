@@ -108,6 +108,19 @@ window.DATOS = {
         "en": "In all this time, I haven't managed to make any progress on the map.\nAlthough, well, I passed my final Calculus exam, and I've been looking for the pirate token, but without success.\nMaybe everything will be done by Tuesday. "
       },
       "id": 6
+    },
+    {
+      "fecha": "2026-11-21T17:53",
+      "titulo": {
+        "es": "Bendito token",
+        "en": "Blessed token"
+      },
+      "imagen": "https://media.tenor.com/bBKxeKaflyoAAAA1/akira-pirate-token.webp",
+      "texto": {
+        "es": "1 hora más y me rindo en buscarlo, ya más de 20 mil partidas y ya no tengo el tiempo para seguir abriendo cofres ",
+        "en": "One more hour and I'll give up looking for it. I've played over 20,000 matches and I don't have time to keep opening chests anymore. "
+      },
+      "id": 7
     }
   ],
   "diario": [
