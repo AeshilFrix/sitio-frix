@@ -121,6 +121,19 @@ window.DATOS = {
         "en": "One more hour and I'll give up looking for it. I've played over 20,000 matches and I don't have time to keep opening chests anymore. "
       },
       "id": 7
+    },
+    {
+      "fecha": "2026-11-21T20:56",
+      "titulo": {
+        "es": "Un ultimo intento",
+        "en": "One last try"
+      },
+      "imagen": "https://media1.tenor.com/m/8RoTQVq2HfgAAAAC/oh-yeah-bring-it-on.gif",
+      "texto": {
+        "es": "A nada de que empiece la nueva hora del tesoro, quizás y solo quizás esta sea la ultima oportunidad del token ",
+        "en": "The new treasure hour is about to begin. Maybe, just maybe, this is the token's last chance. "
+      },
+      "id": 8
     }
   ],
   "diario": [
