@@ -147,6 +147,19 @@ window.DATOS = {
         "en": "Nothing for now, but faith is the last thing to lose."
       },
       "id": 9
+    },
+    {
+      "fecha": "2026-11-21T23:07",
+      "titulo": {
+        "es": "ah....",
+        "en": "oh..."
+      },
+      "imagen": "https://media.tenor.com/q7QaC2dlOQ0AAAAM/agnes-tachyon-tachyon.gif",
+      "texto": {
+        "es": "Bueno, al menos lo intente",
+        "en": "Well, at least I tried."
+      },
+      "id": 10
     }
   ],
   "diario": [
