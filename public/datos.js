@@ -117,8 +117,8 @@ window.DATOS = {
       },
       "imagen": "https://media.tenor.com/bBKxeKaflyoAAAA1/akira-pirate-token.webp",
       "texto": {
-        "es": "1 hora más y me rindo en buscarlo, ya más de 20 mil partidas y ya no tengo el tiempo para seguir abriendo cofres ",
-        "en": "One more hour and I'll give up looking for it. I've played over 20,000 matches and I don't have time to keep opening chests anymore. "
+        "es": "1 hora más y me rindo en buscarlo, ya más de 20 mil cofres y ya no tengo el tiempo para seguir abriendo cofres ",
+        "en": "One more hour and I'll give up looking for it. I've already opened more than 20,000 chests, and I don't have time to keep opening them. "
       },
       "id": 7
     },
