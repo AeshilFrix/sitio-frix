@@ -143,7 +143,7 @@ window.DATOS = {
       },
       "imagen": "https://media.tenor.com/r7Y_If5VuqkAAAAM/daitaku-helios-helios.gif",
       "texto": {
-        "es": "Por ahora nada, pero al fe es lo ultimo que se pierde",
+        "es": "Por ahora nada, pero la fe es lo ultimo que se pierde",
         "en": "Nothing for now, but faith is the last thing to lose."
       },
       "id": 9
