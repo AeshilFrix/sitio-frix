@@ -134,6 +134,19 @@ window.DATOS = {
         "en": "The new treasure hour is about to begin. Maybe, just maybe, this is the token's last chance. "
       },
       "id": 8
+    },
+    {
+      "fecha": "2026-11-21T22:14",
+      "titulo": {
+        "es": "...",
+        "en": "We..."
+      },
+      "imagen": "https://media.tenor.com/r7Y_If5VuqkAAAAM/daitaku-helios-helios.gif",
+      "texto": {
+        "es": "Por ahora nada, pero al fe es lo ultimo que se pierde",
+        "en": "Nothing for now, but faith is the last thing to lose."
+      },
+      "id": 9
     }
   ],
   "diario": [
