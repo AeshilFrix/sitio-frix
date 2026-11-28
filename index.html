@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acceso</title>
+<style>
+  :root { --fondo: #eef0f3; --caja: #fff; --borde: #c9ced6; --texto: #1d2329; --tenue: #69737f; --boton: #33404d; --error: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --fondo: #111417; --caja: #1a1f24; --borde: #2f3740; --texto: #dfe4ea; --tenue: #8c96a1; --boton: #3b4652; --error: #f2867c; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--fondo); color: var(--texto); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { width: 100%; max-width: 340px; background: var(--caja); border: 1px solid var(--borde); border-radius: 6px; padding: 26px 24px 20px; }
+  h1 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
+  p { margin: 0 0 16px; color: var(--tenue); }
+  .x { position: fixed; z-index: 5; width: 160px; height: 160px; right: calc(10px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  @media (max-width: 760px) { .x { width: 96px; height: 96px; } }
+  form { display: flex; gap: 8px; }
+  input { flex: 1; min-width: 0; font: inherit; color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); border-radius: 4px; padding: 7px 10px; }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--tenue); outline-offset: 1px; }
+  button { font: inherit; color: #fff; background: var(--boton); border: 0; border-radius: 4px; padding: 7px 14px; cursor: pointer; }
+  button:disabled, input:disabled { opacity: .5; cursor: default; }
+  [hidden] { display: none !important; }
+  #m { min-height: 21px; margin: 10px 0 0; color: var(--error); font-size: 13px; }
+  .temblor { animation: temblor .3s; }
+  @keyframes temblor { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  @media (prefers-reduced-motion: reduce) { .temblor { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1 data-t="Acceso restringido|Restricted access">Acceso restringido</h1>
+  <p><span data-t="Este sitio es privado. Escribe el código de acceso|This site is private. Enter the access code">Este sitio es privado. Escribe el código de acceso</span>.</p>
+  <form id="f" autocomplete="off">
+    <input id="c" type="password" data-p="Código|Code" placeholder="Código" aria-label="Código">
+    <button id="b" type="submit" data-t="Entrar|Enter">Entrar</button>
+  </form>
+  <p id="m" role="status"></p>
+</main>
+<div class="x" aria-hidden="true"></div>
+<script>
+(function () {
+  var en = false;
+  try { en = (localStorage.getItem('idioma') || navigator.language || 'es').toLowerCase().indexOf('en') === 0; } catch (e) {}
+  var L = function (s) { var p = s.split('|'); return en ? p[1] : p[0]; };
+  if (en) {
+    document.documentElement.lang = 'en';
+    [].forEach.call(document.querySelectorAll('[data-t]'), function (e) { e.textContent = L(e.dataset.t); });
+    var c0 = document.getElementById('c'); c0.placeholder = L(c0.dataset.p); c0.setAttribute('aria-label', c0.placeholder);
+  }
+  var pasar = function () {
+    var d = 'bellagio.html';
+    try {
+      sessionStorage.setItem('puerta', '1');
+      var guardado = sessionStorage.getItem('destino') || '';
+      sessionStorage.removeItem('destino');
+      if (/^[a-z]+(\.html)?([?#].*)?$/.test(guardado) && !/^index(\.html)?([?#]|$)/.test(guardado)) d = guardado; // Neocities quita el .html de las direcciones
+    } catch (e) {}
+    location.replace(d);
+  };
+  try { if (sessionStorage.getItem('puerta')) return pasar(); } catch (e) {}
+
+  document.querySelector('.x').addEventListener('click', pasar);
+
+  // De 4:00 a 4:59 (hora de quien visita) la mesa esta cerrada: no hay formulario. La esquina sigue funcionando.
+  if (new Date().getHours() === 4) {
+    document.querySelector('h1').textContent = L('Sitio en mantenimiento|Site under maintenance');
+    document.querySelector('main p').textContent = L('Vuelve a partir de las 5:00.|Come back after 5:00.');
+    document.getElementById('f').hidden = true; document.getElementById('m').hidden = true;
+    return;
+  }
+
+  var f = document.getElementById('f'), c = document.getElementById('c'), b = document.getElementById('b'), m = document.getElementById('m');
+  var intentos = 0, MAX = 5;
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!c.value.trim()) { c.focus(); return; }
+    intentos++;
+    f.classList.remove('temblor'); void f.offsetWidth; f.classList.add('temblor');
+    c.value = '';
+    if (intentos < MAX) { m.textContent = L('Código incorrecto. Intento ' + intentos + ' de ' + MAX + '.|Wrong code. Attempt ' + intentos + ' of ' + MAX + '.'); c.focus(); return; }
+    var s = 30; c.disabled = b.disabled = true;
+    var tic = function () {
+      m.textContent = L('Demasiados intentos. Espera ' + s + ' segundos.|Too many attempts. Wait ' + s + ' seconds.');
+      if (s-- > 0) return setTimeout(tic, 1000);
+      intentos = 0; c.disabled = b.disabled = false; m.textContent = ''; c.focus();
+    };
+    tic();
+  });
+})();
+</script>
+</body>
+</html>
